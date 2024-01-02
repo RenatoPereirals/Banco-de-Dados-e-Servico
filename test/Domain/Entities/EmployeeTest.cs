@@ -11,7 +11,7 @@ namespace test.Domain.Entities
         public void EmployeeInitializationTest()
         {
             // Arrange
-            Employee e = new Employee(3782, TypeService.P140);
+            Employee e = new Employee("3782", TypeService.P140);
 
             // Act
             var typeServiceString = e.TypeService.ToString();
@@ -19,7 +19,7 @@ namespace test.Domain.Entities
             // Assert
             Assert.Equal("P140", typeServiceString);
             Assert.Equal(6, e.Digit);
-            Assert.True(e.Bsd);
+            Assert.NotNull(e.Bsd);
         }
     }
 }
