@@ -4,18 +4,11 @@ namespace Bsd.Domain.Entities
 {
     public class Employee
     {
-        // Campos privados
-        private string _registration; 
-
         // Propriedades
-        public string Registration
-        {
-            get => _registration;
-            private set => SetRegistration(value);
-        }
+        public string Registration { get; private set; } = string.Empty;
         public int Digit => CalculateDigit();
-        public TypeService TypeService { get; set; }
-        public Bsd Bsd { get; set; }
+        public TypeService TypeService { get; set; } = new TypeService();
+        public Bsd Bsd { get; set; } = new Bsd();
 
         // Construtor
         public Employee(string registration, TypeService typeService)
@@ -24,7 +17,14 @@ namespace Bsd.Domain.Entities
             TypeService = typeService;
             Bsd = new Bsd();
         }
-        
+
+        // Método para definir a matrícula
+        public void SetRegistration(string value)
+        {
+            ValidateRegistration(value);
+            Registration = value;
+        }
+
         // Métodos
         private int CalculateDigit()
         {
@@ -40,14 +40,12 @@ namespace Bsd.Domain.Entities
             return 11 - mod;
         }
 
-        private void SetRegistration(string value)
+        private static void ValidateRegistration(string value)
         {
             if (value.Length != 4)
             {
                 throw new ArgumentException("A matrícula deve conter 4 dígitos");
             }
-
-            _registration = value;
         }
     }
 }
