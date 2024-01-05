@@ -11,10 +11,10 @@ namespace test.Domain.Entities
         public void EmployeeInitializationTest()
         {
             // Arrange
-            Employee e = new Employee("3782", TypeService.P140);
+            Employee e = new Employee("3782", ServiceType.P140);
 
             // Act
-            var typeServiceString = e.TypeService.ToString();
+            var typeServiceString = e.ServiceType.ToString();
 
             // Assert
             Assert.Equal("P140", typeServiceString);
