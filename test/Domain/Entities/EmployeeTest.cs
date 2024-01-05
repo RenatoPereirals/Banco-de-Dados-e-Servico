@@ -5,13 +5,11 @@ namespace test.Domain.Entities
 {
     public class EmployeeTest
     {
-        
-
         [Fact]
-        public void EmployeeInitializationTest()
+        public void EmployeeConstructor_ShouldCreateInstance()
         {
             // Arrange
-            Employee e = new Employee("3782", ServiceType.P140);
+            Employee e = new("3782", ServiceType.P140);
 
             // Act
             var typeServiceString = e.ServiceType.ToString();
