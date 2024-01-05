@@ -7,14 +7,15 @@ namespace Bsd.Domain.Entities
         // Propriedades
         public string Registration { get; private set; } = string.Empty;
         public int Digit => CalculateDigit();
-        public TypeService TypeService { get; set; } = new TypeService();
+        public ServiceType ServiceType { get; } = new ServiceType();
+        public int BsdId { get; }
         public IEnumerable<Bsd> Bsd { get; set; } = new List<Bsd>();
 
         // Construtor
-        public Employee(string registration, TypeService typeService)
+        public Employee(string registration, ServiceType serviceType)
         {
             SetRegistration(registration);
-            TypeService = typeService;
+            ServiceType = serviceType;
         }
 
         // Método para definir a matrícula
