@@ -13,13 +13,12 @@ namespace Bsd.Domain.Entities
 
         public Bsd(string bsdNumber,
                    IEnumerable<Employee> employees,
-                   DateTime dateService,
-                   IEnumerable<Rubric> rubric)
+                   DateTime dateService)
         {
             BsdNumber = bsdNumber;
             Employee = employees;
             DateService = dateService;
-            Rubrics = rubric;
+            Rubrics = employees.SelectMany(e => e.Rubrics).ToList();
         }
     }
 }
