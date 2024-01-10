@@ -1,71 +1,72 @@
 using Bsd.Domain.Entities;
 using Bsd.Domain.Enums;
 using Bsd.Domain.Repository.Interfaces;
+using Bsd.Domain.Service.Interfaces;
 using Bsd.Domain.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Bsd.Domain.Services
 {
     public class OvertimeCalculationService : IHoursCalculationService
     {
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly IBsdRepository _bsdRepository;
-        private readonly IRubricRepository _rubricRepository;
+        private readonly IHoliDayChecker _holiDayChecker;
 
         public OvertimeCalculationService(IEmployeeRepository employeeRepository,
-                                          IBsdRepository bsdRepository,
-                                          IRubricRepository rubricRepository)
+                                          IHoliDayChecker holiDayChecker)
         {
             _employeeRepository = employeeRepository;
-            _bsdRepository = bsdRepository;
-            _rubricRepository = rubricRepository;
+            _holiDayChecker = holiDayChecker;
         }
 
-        public async Task<decimal> CalculateOvertimeHours(string registration, DateTime dateService, DayType dayType)
+        public async Task<List<Rubric>> CalculateOvertimeHoursList(string employeeId, Entities.Bsd bsd)
         {
-            var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(registration) ?? throw new Exception("Funcionário não encontrado");
+            var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeId);
+            ValidateEmployee(employee);
 
-            var rubrics = CalculateOvertimeBasedOnDayType(dayType, employee.ServiceType);
+            var date = bsd.DateService;
+            var listRubrics = await CalculateOvertimeRubricsBasedOnDayType(date, employeeId);
 
-            // Faça algo com as rubricas, como somar as horas extras de cada rubrica
-            decimal totalOvertimeHours = rubrics.Sum(r => r.HoursPerDay);
-
-            return totalOvertimeHours;
+            return listRubrics;
         }
 
-        public Task<decimal> CalculateOvertimeHours(string registration, DateTime dateService, DateTime startTime, DateTime endTime)
+        private void ValidateEmployee(Employee employee)
         {
-            throw new NotImplementedException();
+            if (employee == null)
+            {
+                throw new ArgumentNullException(nameof(employee), "Funcionário não pode ser nulo");
+            }
         }
 
-        private List<Rubric> CalculateOvertimeBasedOnDayType(DayType dayType, ServiceType serviceType)
+        private async Task<List<Rubric>> CalculateOvertimeRubricsBasedOnDayType(DateTime date, string employeeId)
         {
-            // Recupera todas as rubricas aplicáveis para o tipo de dia e tipo de serviço
-            var rubrics = _rubricRepository.GetAll()
-                .Where(r => r.DayType == dayType && (r.ServiceType == serviceType))
-                .ToList();
+            var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeId);
+            var dayType = CalculateDayType(date);
+            var rubrics = new List<Rubric>(employee.Rubrics);
+
+            if (dayType == DayType.Sunday)
+            {
+                var sundayRubrics = new List<Rubric>
+                {
+                    new("1937", "se domingos então 7h/dia de 100%", 7.00m, DayType.Sunday, ServiceType.P140),
+                    new("1921", "se domingos ou feriados então 3h/dia de 150%", 3.00m, DayType.Sunday, ServiceType.P140)
+                    // Adicione outras rubricas de domingo conforme necessário
+                };
+
+                rubrics.AddRange(sundayRubrics);
+            }
 
             return rubrics;
         }
 
-        private void CalculateOvertimeBaseWorkday(ServiceType serviceType)
+        private DayType CalculateDayType(DateTime date)
         {
-            var rubricList = new List<Rubric>();
-            if (serviceType == ServiceType.P140)
-            {
-                rubricList.Add(new Rubric("asdf", "Descrição da Rubrica", 3.0M, DayType.Workday, ServiceType.P140));
-            }
-            else if (serviceType == ServiceType.P110)
-            {
-                rubricList.Add(new Rubric("asdf", "Descrição da Rubrica", 3.0M, DayType.Workday, ServiceType.P110));
-            }
-            else
-            {
-                throw new Exception("Tipo de serviço não encontrado!");
-            }
+            if (date.DayOfWeek == DayOfWeek.Sunday)
+                return DayType.Sunday;
+
+            if (_holiDayChecker.IsHoliday(date))
+                return DayType.HoliDay;
+
+            return DayType.Workday;
         }
     }
 }
