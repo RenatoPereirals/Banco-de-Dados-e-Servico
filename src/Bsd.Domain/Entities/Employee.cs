@@ -10,10 +10,10 @@ namespace Bsd.Domain.Entities
         public ServiceType ServiceType { get; } = new ServiceType();
         public int BsdId { get; }
         public IEnumerable<Bsd> Bsd { get; set; } = new List<Bsd>();
-        public IEnumerable<Rubric> Rubrics { get; set; }
+        public List<Rubric> Rubrics { get; set; }
 
         // Construtor
-        public Employee(string registration, ServiceType serviceType, IEnumerable<Rubric> rubrics)
+        public Employee(string registration, ServiceType serviceType, List<Rubric> rubrics)
         {
             SetRegistration(registration);
             ServiceType = serviceType;
@@ -21,13 +21,13 @@ namespace Bsd.Domain.Entities
         }
 
         // Método para definir a matrícula
-        public void SetRegistration(string value)
+        private void SetRegistration(string value)
         {
             ValidateRegistration(value);
             Registration = value;
         }
 
-        // Métodos
+        // Calcula o digito da matrícula com base no módulo 11
         private int CalculateDigit()
         {
             int sum = 0;
