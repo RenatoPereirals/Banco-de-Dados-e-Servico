@@ -11,11 +11,15 @@ namespace Bsd.Domain.Entities
         public DateTime EndTime { get; set; }
         public DayType DayType { get; }
 
-        public Bsd(string bsdNumber, IEnumerable<Employee> employees, DateTime dateService)
+        public Bsd(string bsdNumber,
+                   IEnumerable<Employee> employees,
+                   DateTime dateService,
+                   IEnumerable<Rubric> rubric)
         {
             BsdNumber = bsdNumber;
             Employee = employees;
             DateService = dateService;
+            Rubrics = rubric;
         }
     }
 }
