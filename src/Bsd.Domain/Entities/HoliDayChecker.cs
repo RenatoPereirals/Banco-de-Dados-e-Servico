@@ -2,7 +2,7 @@ using Bsd.Domain.Service.Interfaces;
 
 namespace Bsd.Domain.Entities
 {
-    public class HoliDayChecker
+    public class HoliDayChecker : IHoliDayChecker
     {
         // Lista de feriados fixos (mês, dia)
         private static readonly List<(int, int)> FixedHolidays = new()
