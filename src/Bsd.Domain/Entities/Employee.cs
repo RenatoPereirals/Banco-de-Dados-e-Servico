@@ -10,12 +10,14 @@ namespace Bsd.Domain.Entities
         public ServiceType ServiceType { get; } = new ServiceType();
         public int BsdId { get; }
         public IEnumerable<Bsd> Bsd { get; set; } = new List<Bsd>();
+        public IEnumerable<Rubric> Rubrics { get; set; }
 
         // Construtor
-        public Employee(string registration, ServiceType serviceType)
+        public Employee(string registration, ServiceType serviceType, IEnumerable<Rubric> rubrics)
         {
             SetRegistration(registration);
             ServiceType = serviceType;
+            Rubrics = rubrics;
         }
 
         // Método para definir a matrícula
