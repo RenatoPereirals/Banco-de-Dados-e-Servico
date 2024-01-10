@@ -3,9 +3,9 @@ namespace Bsd.Domain.Entities
 {
     public class Bsd
     {
-        public string BsdNumber { get; }
+        public string BsdNumber { get; set; }
         public IEnumerable<Employee> Employee { get; }
-        public IEnumerable<Rubric> Rubrics { get; set; }
+        public IEnumerable<Rubric> Rubrics { get; }
         public DateTime DateService { get; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
