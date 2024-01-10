@@ -9,7 +9,11 @@ namespace Bsd.Domain.Entities
         public DayType DayType { get; set; }
         public ServiceType ServiceType { get; set; }
 
-        public Rubric(string code, string description, decimal hoursPerDay, DayType dayType, ServiceType serviceType)
+        public Rubric(string code,
+                      string description,
+                      decimal hoursPerDay,
+                      DayType dayType,
+                      ServiceType serviceType)
         {
             Code = code;
             Description = description;
