@@ -9,6 +9,7 @@ namespace Bsd.Domain.Entities
         public int Digit => CalculateDigit();
         public ServiceType ServiceType { get; } = new ServiceType();
         public int BsdId { get; }
+        public DateTime DateService { get; set; }
         public IEnumerable<Bsd> Bsd { get; set; } = new List<Bsd>();
         public List<Rubric> Rubrics { get; set; } = new List<Rubric>();
 
