@@ -20,3 +20,4 @@ Banco de Horas e Serviços (BSD) é um sistema de gerenciamento de horas extras 
 | Segurança              | 🔒 |
 | Depreciação            | 💤 |
 | Versão                 | 📦 |
+| Exclusão de Arquivos   | 🗑️ |
