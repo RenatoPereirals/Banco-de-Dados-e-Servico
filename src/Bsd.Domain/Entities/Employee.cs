@@ -10,7 +10,7 @@ namespace Bsd.Domain.Entities
         public ServiceType ServiceType { get; } = new ServiceType();
         public int BsdId { get; }
         public IEnumerable<Bsd> Bsd { get; set; } = new List<Bsd>();
-        public List<Rubric> Rubrics { get; set; }
+        public List<Rubric> Rubrics { get; set; } = new List<Rubric>();
 
         // Construtor
         public Employee(string registration, ServiceType serviceType, List<Rubric> rubrics)
