@@ -8,15 +8,15 @@ namespace Bsd.Domain.Services
     public class HoursCalculationService : IHoursCalculationService
     {
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly IDayTypeRubricCalculator _dayTypeRubricCalculator;
+        private readonly IDayTypeAndServiceTypeRubricCalculator _rubricCalculator;
         private readonly IEmployeeException _employeeException;
 
         public HoursCalculationService(IEmployeeRepository employeeRepository,
-                                          IDayTypeRubricCalculator dayTypeRubricCalculator,
+                                          IDayTypeAndServiceTypeRubricCalculator dayTypeRubricCalculator,
                                           IEmployeeException employeeException)
         {
             _employeeRepository = employeeRepository;
-            _dayTypeRubricCalculator = dayTypeRubricCalculator;
+            _rubricCalculator = dayTypeRubricCalculator;
             _employeeException = employeeException;
         }
 
@@ -25,7 +25,7 @@ namespace Bsd.Domain.Services
             var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeId);
             _employeeException.ValidateEmployeeIdNotNull(employee);
             
-            var listRubrics = await _dayTypeRubricCalculator.CalculateOvertimeRubricsBasedOnDayType(employeeId);
+            var listRubrics = await _rubricCalculator.CalculateOvertimeRubricsBasedOnDayType(employeeId);
 
             return listRubrics;
         }        
