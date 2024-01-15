@@ -1,27 +1,30 @@
 using Bsd.Domain.Entities;
 using Bsd.Domain.Enums;
 
-public class RubricManager
-{
-    private readonly List<Rubric> rubrics = new();
-
-    // Construtor que recebe as rubricas iniciais
-    public RubricManager(IEnumerable<Rubric> initialRubrics)
+namespace Bsd.Domain.Service
+{    
+    public class RubricManager
     {
-        if (initialRubrics != null)
+        private readonly List<Rubric> rubrics = new();
+
+        // Construtor que recebe as rubricas iniciais
+        public RubricManager(IEnumerable<Rubric> initialRubrics)
         {
-            rubrics.AddRange(initialRubrics);
+            if (initialRubrics != null)
+            {
+                rubrics.AddRange(initialRubrics);
+            }
         }
-    }
 
-    public void AddRubric(string code, string description, decimal hoursPerDay, DayType dayType, ServiceType serviceType)
-    {
-        Rubric newRubric = new(code, description, hoursPerDay, dayType, serviceType);
-        rubrics.Add(newRubric);
-    }
+        public void AddRubric(string code, string description, decimal hoursPerDay, DayType dayType, ServiceType serviceType)
+        {
+            Rubric newRubric = new(code, description, hoursPerDay, dayType, serviceType);
+            rubrics.Add(newRubric);
+        }
 
-    public List<Rubric> GetRubrics()
-    {
-        return rubrics;
+        public List<Rubric> GetRubrics()
+        {
+            return rubrics;
+        }
     }
 }
