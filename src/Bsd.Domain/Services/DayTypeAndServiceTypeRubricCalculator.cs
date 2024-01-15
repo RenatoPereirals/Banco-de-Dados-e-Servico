@@ -1,7 +1,5 @@
 using Bsd.Domain.Entities;
-using Bsd.Domain.Enums;
 using Bsd.Domain.Repository.Interfaces;
-using Bsd.Domain.Service.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 
 namespace Bsd.Domain.Services
@@ -9,63 +7,43 @@ namespace Bsd.Domain.Services
     public class DayTypeAndServiceTypeRubricCalculator : IDayTypeAndServiceTypeRubricCalculator
     {
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly IHoliDayChecker _holiDayChecker;
+        private readonly IRubricRepository _rubricRepository;
+        private readonly IBsdRepository _bsdRepository;
 
-        public DayTypeAndServiceTypeRubricCalculator(IEmployeeRepository employeeRepository,
-                                       IHoliDayChecker holiDayChecker)
+        public DayTypeAndServiceTypeRubricCalculator(
+                                    IEmployeeRepository employeeRepository,
+                                    IRubricRepository rubricRepository,
+                                    IBsdRepository bsdRepository)
         {
             _employeeRepository = employeeRepository;
-            _holiDayChecker = holiDayChecker;
+            _rubricRepository = rubricRepository;
+            _bsdRepository = bsdRepository;
         }
 
-        public async Task<List<Rubric>> CalculateOvertimeRubricsBasedOnDayType(string employeeId)
+        public async Task<List<Rubric>> CalculateOvertimeRubricsBasedOnDayType(string bsdId)
         {
-            var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeId);
-            var date = employee.DateService;
-            var dayType = CalculateDayType(date);
-            var dayTypeRubrics = new List<Rubric>(employee.Rubrics);
+            var bsd = await _bsdRepository.GetBsdByIdAsync(bsdId);
+            var dayTypeRubricsRubrics = new List<Rubric>();
 
-            if (dayType == DayType.Sunday)
-            {
-                var sundayRubrics = new List<Rubric>
-                {
-                    new("1937", "se domingos então 7h/dia de 100%", 7.00m, DayType.Sunday, ServiceType.P140),
-                    new("1921", "se domingos ou feriados então 3h/dia de 150%", 3.00m, DayType.Sunday, ServiceType.P140)
-                };
+            var rubricsArray = await _rubricRepository.GetRubricsByDayTypeAsync(bsd.DayType);
 
-                dayTypeRubrics.AddRange(sundayRubrics);
-            }
+            if (rubricsArray != null)
+                dayTypeRubricsRubrics.AddRange(rubricsArray);
 
-            return dayTypeRubrics;
+            return dayTypeRubricsRubrics;
         }
 
         public async Task<List<Rubric>> CalculateOvertimeRubricsBasedOnServiceType(string employeeId)
         {
             var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeId);
             var serviceTypeRubrics = new List<Rubric>();
-            
-            if(employee.ServiceType == ServiceType.P140)
-            {
-                var P140Rubrics = new List<Rubric>
-                {
-                    new("1937", "se domingos então 7h/dia de 100%", 7.00m, DayType.Sunday, ServiceType.P140),
-                    new("1921", "se domingos ou feriados então 3h/dia de 150%", 3.00m, DayType.Sunday, ServiceType.P140)
-                };
 
-                serviceTypeRubrics.AddRange(P140Rubrics);
-            } 
+            var rubricsArray = await _rubricRepository.GetRubricsByServiceTypeAsync(employee.ServiceType);
+
+            if (rubricsArray != null)
+                serviceTypeRubrics.AddRange(rubricsArray);
+
             return serviceTypeRubrics;
-        }
-
-        private DayType CalculateDayType(DateTime date)
-        {
-            if (date.DayOfWeek == DayOfWeek.Sunday)
-                return DayType.Sunday;
-
-            if (_holiDayChecker.IsHoliday(date))
-                return DayType.HoliDay;
-
-            return DayType.Workday;
         }
     }
 }
