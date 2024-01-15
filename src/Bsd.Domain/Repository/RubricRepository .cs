@@ -4,7 +4,7 @@ using Bsd.Domain.Repository.Interfaces;
 
 namespace Bsd.Domain.Repository
 {
-    public class RubricRepository : IRubricRepository
+    public class RubricRepository
     {
         private readonly List<Rubric> _rubrics;
 
