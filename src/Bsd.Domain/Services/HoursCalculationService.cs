@@ -1,33 +1,34 @@
 using Bsd.Domain.Entities;
-using Bsd.Domain.Exceptions.Interfaces;
-using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 
 namespace Bsd.Domain.Services
 {
     public class HoursCalculationService : IHoursCalculationService
     {
-        private readonly IEmployeeRepository _employeeRepository;
         private readonly IDayTypeAndServiceTypeRubricCalculator _rubricCalculator;
-        private readonly IEmployeeException _employeeException;
 
-        public HoursCalculationService(IEmployeeRepository employeeRepository,
-                                          IDayTypeAndServiceTypeRubricCalculator dayTypeRubricCalculator,
-                                          IEmployeeException employeeException)
+        public HoursCalculationService(IDayTypeAndServiceTypeRubricCalculator dayTypeRubricCalculator)
         {
-            _employeeRepository = employeeRepository;
             _rubricCalculator = dayTypeRubricCalculator;
-            _employeeException = employeeException;
         }
 
-        public async Task<List<Rubric>> CalculateOvertimeHoursList(string employeeId)
+        public async Task<List<Rubric>> CalculateOvertimeHoursList(string employeeId, string bsdId)
         {
-            var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeId);
-            _employeeException.ValidateEmployeeIdNotNull(employee);
-            
-            var listRubrics = await _rubricCalculator.CalculateOvertimeRubricsBasedOnDayType(employeeId);
+            var dayTypeRubrics = await _rubricCalculator.CalculateOvertimeRubricsBasedOnDayType(employeeId);
+            var serviceTypeRubrics = await _rubricCalculator.CalculateOvertimeRubricsBasedOnServiceType(bsdId);
 
-            return listRubrics;
-        }        
+            var combinedRubrics = CombineRubrics(serviceTypeRubrics, dayTypeRubrics);
+
+            return combinedRubrics;
+        }
+
+        private List<Rubric> CombineRubrics(List<Rubric> rubrics1, List<Rubric> rubrics2)
+        {
+            var rubricsSet = new HashSet<Rubric>(rubrics1); // HashSet garante unicidade
+
+            rubricsSet.UnionWith(rubrics2); // Adiciona rubricas do segundo conjunto
+
+            return rubricsSet.ToList();
+        }
     }
 }
