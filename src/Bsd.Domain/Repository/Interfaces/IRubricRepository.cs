@@ -1,10 +1,11 @@
 using Bsd.Domain.Entities;
+using Bsd.Domain.Enums;
 
 namespace Bsd.Domain.Repository.Interfaces
 {
     public interface IRubricRepository
     {
-        IEnumerable<Rubric> GetAll();
-        void Add(Rubric rubric);
+        Task<Rubric[]> GetRubricsByServiceTypeAsync(ServiceType serviceType);
+        Task<Rubric[]> GetRubricsByDayTypeAsync(DayType dayType);
     }
 }
