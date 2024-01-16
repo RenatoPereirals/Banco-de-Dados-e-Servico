@@ -7,7 +7,6 @@ namespace Bsd.Domain.Service
     {
         private readonly List<Rubric> rubrics = new();
 
-        // Construtor que recebe as rubricas iniciais
         public RubricManager(IEnumerable<Rubric> initialRubrics)
         {
             if (initialRubrics != null)

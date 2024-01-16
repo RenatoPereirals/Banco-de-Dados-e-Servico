@@ -4,7 +4,6 @@ namespace Bsd.Domain.Services.Interfaces
 {
     public interface IDayTypeAndServiceTypeRubricCalculator
     {
-        Task<List<Rubric>> CalculateOvertimeRubricsBasedOnDayType(string employeeId);
-        Task<List<Rubric>> CalculateOvertimeRubricsBasedOnServiceType(string employeeId);
+        Task<List<Rubric>> CombineRubricsList(string employeeId, string bsdId);
     }
 }

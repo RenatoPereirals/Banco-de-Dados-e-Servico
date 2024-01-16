@@ -15,7 +15,7 @@ namespace test.Domain.Entities
             var employeeList = new List<Employee>();
 
             // Act
-            var bsd = new Bsd.Domain.Entities.Bsd(bsdNumber, employeeList, dateService);
+            var bsd = new BsdEntity(bsdNumber, employeeList, dateService);
 
             // Assert
             Assert.Equal(bsdNumber, bsd.BsdNumber);

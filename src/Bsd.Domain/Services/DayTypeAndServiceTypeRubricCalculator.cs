@@ -20,7 +20,19 @@ namespace Bsd.Domain.Services
             _bsdRepository = bsdRepository;
         }
 
-        public async Task<List<Rubric>> CalculateOvertimeRubricsBasedOnDayType(string bsdId)
+        public async Task<List<Rubric>> CombineRubricsList(string employeeId, string bsdId)
+        {
+            var rubricsDayType = await GetRubricsForDayType(bsdId);
+            var rubricsServiceType = await GetRubricsForServiceType(employeeId);
+
+            var rubricsSet = new HashSet<Rubric>(rubricsDayType);
+
+            rubricsSet.UnionWith(rubricsServiceType);
+
+            return rubricsSet.ToList();
+        }
+
+        private async Task<List<Rubric>> GetRubricsForDayType(string bsdId)
         {
             var bsd = await _bsdRepository.GetBsdByIdAsync(bsdId);
             var dayTypeRubricsRubrics = new List<Rubric>();
@@ -33,7 +45,7 @@ namespace Bsd.Domain.Services
             return dayTypeRubricsRubrics;
         }
 
-        public async Task<List<Rubric>> CalculateOvertimeRubricsBasedOnServiceType(string employeeId)
+        private async Task<List<Rubric>> GetRubricsForServiceType(string employeeId)
         {
             var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeId);
             var serviceTypeRubrics = new List<Rubric>();
