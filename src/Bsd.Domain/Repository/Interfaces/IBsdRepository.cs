@@ -1,7 +1,9 @@
+using Bsd.Domain.Entities;
+
 namespace Bsd.Domain.Repository.Interfaces
 {
-    public interface IBsdRepository : ICreatableUpdatable<Bsd.Domain.Entities.Bsd> 
+    public interface IBsdRepository : ICreatableUpdatable<BsdEntity> 
     {
-        Task<Entities.Bsd> GetBsdByIdAsync(string bsdId);
+        Task<BsdEntity> GetBsdByIdAsync(string bsdId);
     }
 }
