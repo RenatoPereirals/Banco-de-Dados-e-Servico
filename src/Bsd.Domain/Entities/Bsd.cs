@@ -1,15 +1,16 @@
 ﻿using Bsd.Domain.Enums;
+using Bsd.Domain.Service;
 namespace Bsd.Domain.Entities
 {
     public class BsdEntity
     {
         public string BsdNumber { get; set; }
         public IEnumerable<Employee> Employee { get; }
-        public List<Rubric> Rubrics { get; }
         public DateTime DateService { get; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public DayType DayType { get; }
+        public List<RubricConfiguration> RubricConfigurations { get; set; } = new();
 
         public BsdEntity(string bsdNumber,
                    IEnumerable<Employee> employees,
@@ -18,7 +19,6 @@ namespace Bsd.Domain.Entities
             BsdNumber = bsdNumber;
             Employee = employees;
             DateService = dateService;
-            Rubrics = employees.SelectMany(e => e.Rubrics).ToList();
         }
     }
 }
