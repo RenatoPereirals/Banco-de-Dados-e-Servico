@@ -26,3 +26,4 @@ Por favor, note que o sistema ainda está em desenvolvimento e pode sofrer alter
 | Depreciação            | 💤 |
 | Versão                 | 📦 |
 | Exclusão de Arquivos   | 🗑️ |
+| Mover arquivos         | 🚚 |
