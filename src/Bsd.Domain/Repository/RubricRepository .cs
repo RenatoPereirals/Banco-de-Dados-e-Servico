@@ -1,6 +1,5 @@
 using Bsd.Domain.Entities;
 using Bsd.Domain.Enums;
-using Bsd.Domain.Repository.Interfaces;
 
 namespace Bsd.Domain.Repository
 {
