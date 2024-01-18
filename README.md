@@ -7,23 +7,25 @@ Atualmente, o sistema está em desenvolvimento como parte das minhas atividades 
 Por favor, note que o sistema ainda está em desenvolvimento e pode sofrer alterações à medida que o projeto avança.
 
 # Padrão de commits 
-| Tipo de Mudança        | Símbolo  |
-|------------------------|--------|
-| Correção de Bugs       | 🐛 | 
-| Nova Funcionalidade    | ✨ |
-| Documentação           | 📚 |
-| Estilo                 | 🎨 |
-| Refatoração            | 🔨 |
-| Configuração           | ⚙️ |
-| Testes                 | ✅ |
-| Pequena Alteração      | 🔄 |
-| Adição de Atributo     | ➕ |
-| Melhoria de Estrutura  | 🏗️ |
-| Simplificação          | 🎯 |
-| Pequeno Ajuste         | 🛠️ |
-| Performance            | 🚀 |
-| Segurança              | 🔒 |
-| Depreciação            | 💤 |
-| Versão                 | 📦 |
-| Exclusão de Arquivos   | 🗑️ |
-| Mover arquivos         | 🚚 |
+| Tipo de Mudança                 | Símbolo  |
+|--------------------------------|--------|
+| Correção de Bugs               | 🐛 | 
+| Nova Funcionalidade            | ✨ |
+| Documentação                   | 📚 |
+| Estilo                         | 🎨 |
+| Refatoração                    | 🔨 |
+| Configuração                   | ⚙️ |
+| Testes                         | ✅ |
+| Pequena Alteração              | 🔄 |
+| Adição de Atributo             | ➕ |
+| Melhoria de Estrutura          | 🏗️ |
+| Simplificação                  | 🎯 |
+| Performance                    | 🚀 |
+| Segurança                      | 🔒 |
+| Depreciação                    | 💤 |
+| Versão                         | 📦 |
+| Exclusão de Arquivos           | 🗑️ |
+| Mover arquivos                 | 🚚 |
+| Renomear   | 📝 |
+| Exclusão  | ❌ |
+
