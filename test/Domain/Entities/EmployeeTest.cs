@@ -9,16 +9,14 @@ namespace test.Domain.Entities
         public void EmployeeConstructor_ShouldCreateInstance()
         {
             // Arrange
-            Employee employee = new("3782", ServiceType.P140, new List<Rubric>());
+            Employee employee = new(1525, ServiceType.P140);
 
             // Act
             var typeServiceString = employee.ServiceType.ToString();
-            var rubricsList = new List<Rubric>();
 
             // Assert
             Assert.Equal("P140", typeServiceString);
-            Assert.Equal(6, employee.Digit);
-            Assert.Equal(rubricsList, employee.Rubrics);
+            Assert.Equal(3, employee.Digit);
         }
     }
 }
