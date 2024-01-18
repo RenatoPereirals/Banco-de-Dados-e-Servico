@@ -4,48 +4,50 @@ namespace Bsd.Domain.Entities
 {
     public class Employee
     {
-        // Propriedades
-        public string Registration { get; private set; } = string.Empty;
-        public int Digit => CalculateDigit();
+        public int Registration { get; private set; }
+        public int Digit => CalculateModulo11CheckDigit();
         public ServiceType ServiceType { get; } = new ServiceType();
-        public int BsdId { get; }
         public DateTime DateService { get; set; }
+        public int BsdId { get; }
         public IEnumerable<BsdEntity> BsdEntity { get; set; } = new List<BsdEntity>();
-        public List<Rubric> Rubrics { get; set; } = new List<Rubric>();
 
-        // Construtor
-        public Employee(string registration, ServiceType serviceType, List<Rubric> rubrics)
+        public Employee(int registration, ServiceType serviceType)
         {
             SetRegistration(registration);
             ServiceType = serviceType;
-            Rubrics = rubrics;
         }
 
-        // Método para definir a matrícula
-        private void SetRegistration(string value)
+        private void SetRegistration(int value)
         {
             ValidateRegistration(value);
             Registration = value;
         }
 
-        // Calcula o digito da matrícula com base no módulo 11
-        private int CalculateDigit()
+        private int CalculateModulo11CheckDigit()
         {
             int sum = 0;
-            int indice = 0;
-            for (int i = Registration.Length; i > 0; i--)
+            string registration = Registration.ToString();
+            int weight = registration.Length + 1;
+
+            foreach (char digitChar in registration)
             {
-                sum += int.Parse(Registration[indice].ToString()) * (i + 1);
-                indice++;
+                if (!int.TryParse(digitChar.ToString(), out int digit))
+                {
+                    throw new FormatException($"Caractere inválido {digitChar} na mátricula");
+                }
+
+                sum += digit * weight;
+                weight--;
             }
 
             int mod = sum % 11;
             return 11 - mod;
         }
 
-        private static void ValidateRegistration(string value)
+        private static void ValidateRegistration(int value)
         {
-            if (value.Length != 4)
+            string registration = value.ToString();
+            if (registration.Length != 4)
             {
                 throw new ArgumentException("A matrícula deve conter 4 dígitos");
             }
