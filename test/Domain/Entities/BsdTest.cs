@@ -10,9 +10,9 @@ namespace test.Domain.Entities
         public void BsdConstructor_ShouldCreateInstance()
         {
             // Arrange
-            var bsdNumber = "BSD123";
+            var bsdNumber = 25123;
             var dateService = DateTime.Now;
-            var employeeList = new List<Employee>();
+            var employeeList = new List<int>();
 
             // Act
             var bsd = new BsdEntity(bsdNumber, employeeList, dateService);
@@ -20,7 +20,7 @@ namespace test.Domain.Entities
             // Assert
             Assert.Equal(bsdNumber, bsd.BsdNumber);
             Assert.Equal(dateService, bsd.DateService);
-            Assert.Equal(employeeList, bsd.Employee);
+            Assert.Equal(employeeList, bsd.EmployeeIds);
         }
     }
 }
