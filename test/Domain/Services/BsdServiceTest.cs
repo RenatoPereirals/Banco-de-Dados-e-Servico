@@ -8,7 +8,6 @@ namespace test.Domain.Services
 {
     public class BsdServiceTest
     {
-        private readonly Employee employee;
         private readonly BsdEntity bsd;
         private readonly Mock<IEmployeeRepository> _employeeRepository;
         private readonly Mock<IRubricRepository> _rubricRepository;
@@ -16,13 +15,12 @@ namespace test.Domain.Services
         public BsdServiceTest()
         {
             // Arrange
-            employee = new Employee(1234, ServiceType.P140);
-            bsd = new BsdEntity(54321, new List<int>(), DateTime.Now);
+            bsd = new BsdEntity(54321, DateTime.Now, new List<EmployeeBsdEntity>());
             _employeeRepository = new Mock<IEmployeeRepository>();
             _rubricRepository = new Mock<IRubricRepository>();
         }
 
-        public async Task<Dictionary<int, List<Rubric>>>  SetupAndAct(List<Rubric> listRubrics)
+        public async Task<Dictionary<int, List<Rubric>>> SetupAndAct(List<Rubric> listRubrics)
         {
             // Arrange
             _rubricRepository.Setup(r => r.GetAllRubricsAsync()).ReturnsAsync(listRubrics);
@@ -35,7 +33,7 @@ namespace test.Domain.Services
         }
 
         [Fact]
-        public async void Should_Return_Correct_Number_Of_Rubrics_For_Each_Day_Type()
+        public async void Should_Return_Correct_Number_Of_Rubrics_For_Each_Service_Type()
         {
             var listRubrics = new List<Rubric>
             {
@@ -48,15 +46,16 @@ namespace test.Domain.Services
 
             // Assert
             Assert.NotNull(result);
-            foreach (var employeeId in bsd.EmployeeIds)
+            foreach (var employeeBsdEntity in bsd.EmployeeBsdEntities)
             {
+                var employeeId = employeeBsdEntity.EmployeeRegistration;
                 Assert.Equal(2, result[employeeId].Count(r => r.ServiceType == ServiceType.P140));
                 Assert.Equal(1, result[employeeId].Count(r => r.ServiceType == ServiceType.P110));
             }
         }
 
         [Fact]
-        public async void CalculateOvertimeHoursList_Filter_Rubrics_Based_On_The_Bsd_Day_Type()
+        public async void Should_Return_Correct_Number_Of_Rubrics_For_Each_Day_Type()
         {
             var listRubrics = new List<Rubric>
             {
@@ -69,9 +68,9 @@ namespace test.Domain.Services
             var result = await SetupAndAct(listRubrics);
 
             // Assert
-            Assert.NotNull(result);
-            foreach (var employeeId in bsd.EmployeeIds)
+            foreach (var employeeBsdEntity in bsd.EmployeeBsdEntities)
             {
+                var employeeId = employeeBsdEntity.EmployeeRegistration;
                 Assert.Equal(2, result[employeeId].Count(r => r.DayType == DayType.Sunday));
                 Assert.Equal(1, result[employeeId].Count(r => r.DayType == DayType.HoliDay));
                 Assert.Equal(1, result[employeeId].Count(r => r.DayType == DayType.Workday));
