@@ -15,7 +15,7 @@ namespace test.Domain.Services
         public BsdServiceTest()
         {
             // Arrange
-            bsd = new BsdEntity(54321, DateTime.Now, new List<EmployeeBsdEntity>());
+            bsd = new BsdEntity(54321, DateTime.Now);
             _employeeRepository = new Mock<IEmployeeRepository>();
             _rubricRepository = new Mock<IRubricRepository>();
         }
@@ -26,8 +26,8 @@ namespace test.Domain.Services
             _rubricRepository.Setup(r => r.GetAllRubricsAsync()).ReturnsAsync(listRubrics);
 
             // Act
-            var bsdService = new BsdService(_employeeRepository.Object, _rubricRepository.Object);
-            var result = await bsdService.FilterRubricsBasedOnTheEmployeeTypeServiceAndTypeDay(bsd);
+            var bsdService = new BsdService( _rubricRepository.Object, _employeeRepository.Object);
+            var result = await bsdService.FilterRubricsByServiceTypeAndDayAsync(bsd);
 
             return result;
         }

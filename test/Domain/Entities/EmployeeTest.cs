@@ -10,7 +10,7 @@ namespace test.Domain.Entities
         {
             // Arrange
             var bsdList = new List<EmployeeBsdEntity>();
-            Employee employee = new(1525, ServiceType.P140, bsdList);
+            Employee employee = new(1525, ServiceType.P140);
 
             // Act
             var typeServiceString = employee.ServiceType.ToString();
