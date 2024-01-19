@@ -29,13 +29,13 @@ namespace Bsd.Domain.Services
             {
                 var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(registration) 
                     ?? throw new Exception("Usuário não pode ser nulo.");
-                    
+
                 var employeeBsdEntity = new EmployeeBsdEntity(registration, employee, bsdEntity.BsdNumber, bsdEntity);
                 bsdEntity.EmployeeBsdEntities.Add(employeeBsdEntity);
             }
         }
 
-        public async Task<Dictionary<int, List<Rubric>>> FilterRubricsBasedOnTheEmployeeTypeServiceAndTypeDay(BsdEntity bsd)
+        public async Task<Dictionary<int, List<Rubric>>> FilterRubricsByServiceTypeAndDayAsync(BsdEntity bsd)
         {
             var employeeRubrics = new Dictionary<int, List<Rubric>>();
             var allRubrics = await _rubricRepository.GetAllRubricsAsync();
