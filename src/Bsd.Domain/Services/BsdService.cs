@@ -4,15 +4,35 @@ using Bsd.Domain.Repository.Interfaces;
 
 namespace Bsd.Domain.Services
 {
-   public class BsdService
+    public class BsdService
     {
-        private readonly IEmployeeRepository _employeeRepository;
         private readonly IRubricRepository _rubricRepository;
+        private readonly IEmployeeRepository _employeeRepository;
 
-        public BsdService(IEmployeeRepository employeeRepository, IRubricRepository rubricRepository)
+        public BsdService(IRubricRepository rubricRepository,
+                          IEmployeeRepository employeeRepository)
         {
-            _employeeRepository = employeeRepository;
             _rubricRepository = rubricRepository;
+            _employeeRepository = employeeRepository;
+        }
+
+        public async Task<BsdEntity> CreateBsdAsync(int bsdNumber, DateTime dateService, IEnumerable<int> employeeRegistrations)
+        {
+            var bsdEntity = new BsdEntity(bsdNumber, dateService);
+            await AddEmployeesToBsdAsync(bsdEntity, employeeRegistrations);
+            return bsdEntity;
+        }
+
+        private async Task AddEmployeesToBsdAsync(BsdEntity bsdEntity, IEnumerable<int> employeeRegistrations)
+        {
+            foreach (var registration in employeeRegistrations)
+            {
+                var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(registration) 
+                    ?? throw new Exception("Usuário não pode ser nulo.");
+                    
+                var employeeBsdEntity = new EmployeeBsdEntity(registration, employee, bsdEntity.BsdNumber, bsdEntity);
+                bsdEntity.EmployeeBsdEntities.Add(employeeBsdEntity);
+            }
         }
 
         public async Task<Dictionary<int, List<Rubric>>> FilterRubricsBasedOnTheEmployeeTypeServiceAndTypeDay(BsdEntity bsd)
