@@ -1,56 +1,37 @@
-using Bsd.Domain.Entities;
-using Bsd.Domain.Enums;
-using test.Domain.Services.TestSetup;
+using Bsd.Domain.Services;
 
-namespace test.Domain.Services
+namespace test.Domain.Services.TestSetup
 {
-    public class BsdServiceTest
+    public class BsdServiceTests
     {
-        private readonly TestSetupBsdServiceTest _testSetup;
+        private readonly SetupBsdServiceTest _setup;
+        private readonly BsdService _bsdService;
 
-        public BsdServiceTest()
+        public BsdServiceTests()
         {
-            _testSetup = new TestSetupBsdServiceTest();
+            _setup = new SetupBsdServiceTest();
+            _bsdService = new BsdService(_setup.EmployeeRepository.Object, _setup.RubricService.Object);
         }
 
-
-        private void AssertRubrics(Dictionary<int, List<Rubric>> result, Func<Rubric, bool> predicate, int expectedCount)
+        [Fact]
+        public async void Should_Return_Correct_Rubrics_For_Each_Employee()
         {
+            // Act
+            var result = await _bsdService.FilterRubricsByServiceTypeAndDayAsync(_setup.Bsd);
+
             // Assert
-            Assert.NotNull(result);
-            foreach (var employeeBsdEntity in _testSetup.Bsd.EmployeeBsdEntities)
+            foreach (var employeeBsdEntity in _setup.Bsd.EmployeeBsdEntities)
             {
-                var employeeId = employeeBsdEntity.EmployeeRegistration;
-                Assert.Equal(expectedCount, result[employeeId].Count(predicate));
+                var employeeId = employeeBsdEntity.Employee.Registration;
+                var employeeServiceType = employeeBsdEntity.Employee.ServiceType;
+                Assert.True(result.ContainsKey(employeeId));
+                var rubrics = result[employeeId];
+                Assert.All(rubrics, r =>
+                {
+                    Assert.Equal(employeeServiceType, r.ServiceType);
+                    Assert.Equal(_setup.Bsd.DayType, r.DayType);
+                });
             }
-        }
-
-
-        private readonly List<Rubric> listRubrics = new()
-        {
-            new("1", "a", 3, DayType.Workday, ServiceType.P140),
-            new("2", "b", 2, DayType.Sunday, ServiceType.P140),
-            new("3", "b", 2, DayType.Sunday, ServiceType.P140),
-            new("4", "c", 1, DayType.HoliDay, ServiceType.P110),
-        };
-
-        [Fact]
-        public async void Should_Return_Correct_Number_Of_Rubrics_For_Each_Service_Type()
-        {
-            var result = await _testSetup.SetupAndAct(listRubrics);
-
-            AssertRubrics(result, r => r.ServiceType == ServiceType.P140, 3);
-            AssertRubrics(result, r => r.ServiceType == ServiceType.P110, 1);
-        }
-
-        [Fact]
-        public async void Should_Return_Correct_Number_Of_Rubrics_For_Each_Day_Type()
-        {
-            var result = await _testSetup.SetupAndAct(listRubrics);
-
-            AssertRubrics(result, r => r.DayType == DayType.Sunday, 2);
-            AssertRubrics(result, r => r.DayType == DayType.HoliDay, 1);
-            AssertRubrics(result, r => r.DayType == DayType.Workday, 1);
         }
     }
 }
