@@ -7,40 +7,23 @@ namespace Bsd.Domain.Entities
         // Lista de feriados fixos (mês, dia)
         private static readonly List<(int, int)> FixedHolidays = new()
         {
-            (1, 1), (1, 28), (3, 6), (4, 7), (4, 21), (5, 1), (6, 24), 
+            (1, 1),  (3, 6), (4, 7), (4, 21), (5, 1), (6, 24),
             (7, 16), (9, 7), (10, 12), (11, 2), (11, 15), (12, 8), (12, 25)
         };
 
-        private readonly List<IHolidayAdjuster> _holidayAdjusters;
+        private readonly IVariableDateHolidayAdjuster _variableDateHolidayAdjuster;
 
-        public HoliDayChecker(List<IHolidayAdjuster> holidayAdjusters)
+        public HoliDayChecker(IVariableDateHolidayAdjuster variableDateHolidayAdjuster)
         {
-            _holidayAdjusters = holidayAdjusters;
+            _variableDateHolidayAdjuster = variableDateHolidayAdjuster;
         }
 
-        public bool IsHoliday(DateTime dateTime)
+        public bool IsHoliday(DateTime date)
         {
-            // Verifica se a data está na lista de feriados fixos
-            bool isFixedHoliday = FixedHolidays.Any(h => h.Item1 == dateTime.Month && h.Item2 == dateTime.Day);
+            bool isFixedHoliday = FixedHolidays.Any(h => h.Item1 == date.Month && h.Item2 == date.Day);
+            bool isVariableHolidays = _variableDateHolidayAdjuster.IsVariableHoliday(date);
 
-            // Aplica ajustes adicionais para feriados específicos
-            DateTime adjustedDate = ApplyAdjustments(dateTime);
-
-            // Verifica novamente se a data ajustada é feriado
-            bool isAdjustedHoliday = FixedHolidays.Any(h => h.Item1 == adjustedDate.Month && h.Item2 == adjustedDate.Day);
-
-            return isFixedHoliday || isAdjustedHoliday;
-        }
-
-        private DateTime ApplyAdjustments(DateTime date)
-        {
-            // Aplica ajustes adicionais para feriados específicos
-            foreach (var adjuster in _holidayAdjusters)
-            {
-                date = adjuster.Adjust(date);
-            }
-
-            return date;
+            return isFixedHoliday || isVariableHolidays;
         }
     }
 }
