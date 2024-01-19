@@ -20,13 +20,13 @@ namespace Bsd.Domain.Services
             var employeeRubrics = new Dictionary<int, List<Rubric>>();
             var allRubrics = await _rubricRepository.GetAllRubricsAsync();
 
-            foreach (var employeeId in bsd.EmployeeIds)
+            foreach (var employeeBsdEntity in bsd.EmployeeBsdEntities)
             {
-                var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeId);
+                var employee = employeeBsdEntity.Employee;
                 var filteredRubrics = new HashSet<Rubric>(allRubrics
                     .Where(r => r.ServiceType == employee.ServiceType && r.DayType == bsd.DayType))
                     .ToList();
-                employeeRubrics.Add(employeeId, filteredRubrics);
+                employeeRubrics.Add(employee.Registration, filteredRubrics);
             }
 
             return employeeRubrics;
