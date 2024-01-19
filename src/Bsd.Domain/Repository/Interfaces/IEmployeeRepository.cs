@@ -2,7 +2,7 @@ using Bsd.Domain.Entities;
 
 namespace Bsd.Domain.Repository.Interfaces
 {
-    public interface IEmployeeRepository : ICreatableUpdatable<Employee>
+    public interface IEmployeeRepository : IGeralRepository<Employee>
     {
         Task<Employee> GetEmployeeByRegistrationAsync(int employeeId);
         IEnumerable<Employee> GetAllEmployees();
