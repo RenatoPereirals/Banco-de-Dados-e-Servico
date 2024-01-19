@@ -1,19 +1,19 @@
-using System.Data;
 using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
+using Bsd.Domain.Services.Interfaces;
 
 namespace Bsd.Domain.Services
 {
-    public class BsdService
+    public class BsdService : IBsdService
     {
-        private readonly IRubricRepository _rubricRepository;
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IRubricService _rubricService;
 
-        public BsdService(IRubricRepository rubricRepository,
-                          IEmployeeRepository employeeRepository)
+        public BsdService(IEmployeeRepository employeeRepository,
+                          IRubricService rubricService)
         {
-            _rubricRepository = rubricRepository;
             _employeeRepository = employeeRepository;
+            _rubricService = rubricService;
         }
 
         public async Task<BsdEntity> CreateBsdAsync(int bsdNumber, DateTime dateService, IEnumerable<int> employeeRegistrations)
@@ -27,7 +27,7 @@ namespace Bsd.Domain.Services
         {
             foreach (var registration in employeeRegistrations)
             {
-                var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(registration) 
+                var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(registration)
                     ?? throw new Exception("Usuário não pode ser nulo.");
 
                 var employeeBsdEntity = new EmployeeBsdEntity(registration, employee, bsdEntity.BsdNumber, bsdEntity);
@@ -38,19 +38,15 @@ namespace Bsd.Domain.Services
         public async Task<Dictionary<int, List<Rubric>>> FilterRubricsByServiceTypeAndDayAsync(BsdEntity bsd)
         {
             var employeeRubrics = new Dictionary<int, List<Rubric>>();
-            var allRubrics = await _rubricRepository.GetAllRubricsAsync();
 
             foreach (var employeeBsdEntity in bsd.EmployeeBsdEntities)
             {
                 var employee = employeeBsdEntity.Employee;
-                var filteredRubrics = new HashSet<Rubric>(allRubrics
-                    .Where(r => r.ServiceType == employee.ServiceType && r.DayType == bsd.DayType))
-                    .ToList();
+                var filteredRubrics = await _rubricService.GetRubricsByServiceTypeAndDayAsync(employee.ServiceType, bsd.DayType);
                 employeeRubrics.Add(employee.Registration, filteredRubrics);
             }
 
             return employeeRubrics;
         }
-
     }
 }
