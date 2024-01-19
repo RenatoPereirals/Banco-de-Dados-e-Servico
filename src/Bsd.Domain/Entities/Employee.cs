@@ -4,18 +4,20 @@ namespace Bsd.Domain.Entities
 {
     public class Employee
     {
+        public Employee(int registration, 
+                        ServiceType serviceType,
+                        IEnumerable<EmployeeBsdEntity> employeeBsdEntities)
+        {
+            SetRegistration(registration);
+            ServiceType = serviceType;
+            EmployeeBsdEntities = employeeBsdEntities.ToList();
+        }
+
         public int Registration { get; private set; }
         public int Digit => CalculateModulo11CheckDigit();
         public ServiceType ServiceType { get; } = new ServiceType();
         public DateTime DateService { get; set; }
-        public int BsdId { get; }
-        public IEnumerable<BsdEntity> BsdEntity { get; set; } = new List<BsdEntity>();
-
-        public Employee(int registration, ServiceType serviceType)
-        {
-            SetRegistration(registration);
-            ServiceType = serviceType;
-        }
+        public ICollection<EmployeeBsdEntity> EmployeeBsdEntities { get; set; }
 
         private void SetRegistration(int value)
         {
