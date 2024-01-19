@@ -9,7 +9,8 @@ namespace test.Domain.Entities
         public void EmployeeConstructor_ShouldCreateInstance()
         {
             // Arrange
-            Employee employee = new(1525, ServiceType.P140);
+            var bsdList = new List<EmployeeBsdEntity>();
+            Employee employee = new(1525, ServiceType.P140, bsdList);
 
             // Act
             var typeServiceString = employee.ServiceType.ToString();
@@ -17,6 +18,7 @@ namespace test.Domain.Entities
             // Assert
             Assert.Equal("P140", typeServiceString);
             Assert.Equal(3, employee.Digit);
+            Assert.Equal(bsdList, employee.EmployeeBsdEntities);
         }
     }
 }
