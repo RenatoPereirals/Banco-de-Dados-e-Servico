@@ -14,7 +14,7 @@ namespace Bsd.Domain.Services
             _rubricRepository = rubricRepository;
         }
 
-        public async Task<List<Rubric>> GetRubricsByServiceTypeAndDayAsync(ServiceType serviceType, DayType dayType)
+        public async Task<List<Rubric>> FilterRubricsByServiceTypeAndDayAsync(ServiceType serviceType, DayType dayType)
         {
             var allRubrics = await _rubricRepository.GetAllRubricsAsync();
             return allRubrics.Where(r => r.ServiceType == serviceType && r.DayType == dayType).ToList();
