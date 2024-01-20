@@ -24,12 +24,12 @@ namespace Bsd.Domain.Services
             return bsdEntity;
         }
 
-        private async Task AddEmployeesToBsdAsync(BsdEntity bsdEntity, IEnumerable<int> employeeRegistrations)
+        public async Task AddEmployeesToBsdAsync(BsdEntity bsdEntity, IEnumerable<int> employeeRegistrations)
         {
             foreach (var registration in employeeRegistrations)
             {
                 var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(registration)
-                    ?? throw new Exception("Usuário não pode ser nulo.");
+                    ?? throw new Exception("Mátricula do funcionário não encontrada.");
 
                 var employeeBsdEntity = new EmployeeBsdEntity(registration, employee, bsdEntity.BsdNumber, bsdEntity);
                 bsdEntity.EmployeeBsdEntities.Add(employeeBsdEntity);
@@ -38,7 +38,7 @@ namespace Bsd.Domain.Services
             }
         }
 
-        private async Task AssignRubricsToEmployeeByServiceTypeAndDayAsync(EmployeeBsdEntity employeeBsdEntity, DayType dayType)
+        public async Task AssignRubricsToEmployeeByServiceTypeAndDayAsync(EmployeeBsdEntity employeeBsdEntity, DayType dayType)
         {
             var employee = employeeBsdEntity.Employee;
             var filteredRubrics = await _rubricService.FilterRubricsByServiceTypeAndDayAsync(employee.ServiceType, dayType);
