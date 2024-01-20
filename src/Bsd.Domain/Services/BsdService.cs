@@ -35,14 +35,14 @@ namespace Bsd.Domain.Services
             }
         }
 
-        public async Task<Dictionary<int, List<Rubric>>> FilterRubricsByServiceTypeAndDayAsync(BsdEntity bsd)
+        public async Task<Dictionary<int, List<Rubric>>> AssignRubricsToEmployeesByServiceTypeAndDayAsync(BsdEntity bsd)
         {
             var employeeRubrics = new Dictionary<int, List<Rubric>>();
 
             foreach (var employeeBsdEntity in bsd.EmployeeBsdEntities)
             {
                 var employee = employeeBsdEntity.Employee;
-                var filteredRubrics = await _rubricService.GetRubricsByServiceTypeAndDayAsync(employee.ServiceType, bsd.DayType);
+                var filteredRubrics = await _rubricService.FilterRubricsByServiceTypeAndDayAsync(employee.ServiceType, bsd.DayType);
                 employeeRubrics.Add(employee.Registration, filteredRubrics);
             }
 
