@@ -15,12 +15,12 @@ namespace test.Domain.Services
             var mockRubricRepository = new Mock<IRubricRepository>();
             var rubricService = new RubricService(mockRubricRepository.Object);
 
-            var allRubrics = TestRubrics;
+            var allRubrics = TestRubricsList;
 
             mockRubricRepository.Setup(r => r.GetAllRubricsAsync()).ReturnsAsync(allRubrics);
 
             // Act
-            var result = await rubricService.GetRubricsByServiceTypeAndDayAsync(ServiceType.P110, DayType.HoliDay);
+            var result = await rubricService.FilterRubricsByServiceTypeAndDayAsync(ServiceType.P110, DayType.HoliDay);
 
             // Assert
             Assert.Equal(2, result.Count);
