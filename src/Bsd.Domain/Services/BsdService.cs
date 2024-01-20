@@ -1,4 +1,5 @@
 using Bsd.Domain.Entities;
+using Bsd.Domain.Enums;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 
@@ -32,21 +33,16 @@ namespace Bsd.Domain.Services
 
                 var employeeBsdEntity = new EmployeeBsdEntity(registration, employee, bsdEntity.BsdNumber, bsdEntity);
                 bsdEntity.EmployeeBsdEntities.Add(employeeBsdEntity);
+
+                await AssignRubricsToEmployeeByServiceTypeAndDayAsync(employeeBsdEntity, bsdEntity.DayType);
             }
         }
 
-        public async Task<Dictionary<int, List<Rubric>>> AssignRubricsToEmployeesByServiceTypeAndDayAsync(BsdEntity bsd)
+        private async Task AssignRubricsToEmployeeByServiceTypeAndDayAsync(EmployeeBsdEntity employeeBsdEntity, DayType dayType)
         {
-            var employeeRubrics = new Dictionary<int, List<Rubric>>();
-
-            foreach (var employeeBsdEntity in bsd.EmployeeBsdEntities)
-            {
-                var employee = employeeBsdEntity.Employee;
-                var filteredRubrics = await _rubricService.FilterRubricsByServiceTypeAndDayAsync(employee.ServiceType, bsd.DayType);
-                employeeRubrics.Add(employee.Registration, filteredRubrics);
-            }
-
-            return employeeRubrics;
+            var employee = employeeBsdEntity.Employee;
+            var filteredRubrics = await _rubricService.FilterRubricsByServiceTypeAndDayAsync(employee.ServiceType, dayType);
+            employeeBsdEntity.Rubrics = filteredRubrics;
         }
     }
 }

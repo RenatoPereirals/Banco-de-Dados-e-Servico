@@ -11,6 +11,7 @@ namespace Bsd.Domain.Entities
             Employee = employee;
             BsdEntityNumber = bsdEntityNumber;
             BsdEntity = bsdEntity;
+            Rubrics = new List<Rubric>();
         }
 
         public int EmployeeRegistration { get; set; }
@@ -18,5 +19,7 @@ namespace Bsd.Domain.Entities
 
         public int BsdEntityNumber { get; set; }
         public BsdEntity BsdEntity { get; set; }
+
+        public List<Rubric> Rubrics { get; set; }
     }
 }
