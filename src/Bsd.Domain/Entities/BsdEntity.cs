@@ -13,7 +13,6 @@ namespace Bsd.Domain.Entities
         public int BsdNumber { get; set; }
         public DateTime DateService { get; }
         public DayType DayType { get; }
-        public Dictionary<int, List<Rubric>> EmployeeRubrics { get; set; } = new();
         public ICollection<EmployeeBsdEntity> EmployeeBsdEntities { get; set; } = new List<EmployeeBsdEntity>();
 
     }
