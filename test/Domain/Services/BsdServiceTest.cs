@@ -16,6 +16,7 @@ namespace test.Domain.Services.TestSetup
     {
         private readonly Mock<IEmployeeRepository> _mockEmployeeRepository;
         private readonly Mock<IRubricService> _mockRubricService;
+        private readonly Mock<IDayTypeChecker> _mockDayTypeChecer;
         private readonly BsdService _bsdService;
         private readonly List<Employee> _employees;
         private readonly List<int> _employeeRegistrations;
@@ -24,7 +25,10 @@ namespace test.Domain.Services.TestSetup
         {
             _mockEmployeeRepository = new Mock<IEmployeeRepository>();
             _mockRubricService = new Mock<IRubricService>();
-            _bsdService = new BsdService(_mockEmployeeRepository.Object, _mockRubricService.Object);
+            _mockDayTypeChecer = new Mock<IDayTypeChecker>();
+            _bsdService = new BsdService(_mockEmployeeRepository.Object,
+                                         _mockRubricService.Object,
+                                         _mockDayTypeChecer.Object);
 
             _employeeRegistrations = new List<int> { 1234, 2345, 3456 };
             _employees = TestEmployeeList;
@@ -37,7 +41,7 @@ namespace test.Domain.Services.TestSetup
         }
 
         [Fact]
-        public async Task Should_Create_Bsd_Correctly()
+        public async Task Should_Set_BsdNumber_Correctly()
         {
             // Arrange
             var dateService = DateTime.Parse("1/1/2024");
@@ -48,7 +52,33 @@ namespace test.Domain.Services.TestSetup
 
             // Assert
             Assert.Equal(bsdNumber, result.BsdNumber);
+        }
+
+        [Fact]
+        public async Task Should_Set_DateService_Correctly()
+        {
+            // Arrange
+            var dateService = DateTime.Parse("1/1/2024");
+            var bsdNumber = 1234;
+
+            // Act
+            var result = await _bsdService.CreateBsdAsync(bsdNumber, dateService, _employeeRegistrations);
+
+            // Assert
             Assert.Equal(dateService, result.DateService);
+        }
+
+        [Fact]
+        public async Task Should_Add_Employees_To_Bsd_Correctly()
+        {
+            // Arrange
+            var dateService = DateTime.Parse("1/1/2024");
+            var bsdNumber = 1234;
+
+            // Act
+            var result = await _bsdService.CreateBsdAsync(bsdNumber, dateService, _employeeRegistrations);
+
+            // Assert
             Assert.Equal(_employeeRegistrations.Count, result.EmployeeBsdEntities.Count);
             foreach (var employeeBsdEntity in result.EmployeeBsdEntities)
             {
