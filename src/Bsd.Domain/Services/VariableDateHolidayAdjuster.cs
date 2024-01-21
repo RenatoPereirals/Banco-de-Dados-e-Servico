@@ -9,7 +9,7 @@ namespace Bsd.Domain.Service
             return IsPortuaryDay(date);
         }
 
-        private bool IsPortuaryDay(DateTime date)
+        private static bool IsPortuaryDay(DateTime date)
         {
             if (date.Month == 1 && (date.Day == 28 || date.Day == 29 || date.Day == 30))
             {

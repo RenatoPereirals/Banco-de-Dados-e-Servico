@@ -41,7 +41,7 @@ namespace Bsd.Domain.Services
             return false;
         }
 
-        private bool IsSunday(DateTime date)
+        private static bool IsSunday(DateTime date)
         {
             if (date.DayOfWeek == DayOfWeek.Sunday)
             {
