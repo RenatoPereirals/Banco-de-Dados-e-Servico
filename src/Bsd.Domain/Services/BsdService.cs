@@ -9,17 +9,24 @@ namespace Bsd.Domain.Services
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IRubricService _rubricService;
+        private readonly IDayTypeChecker _daytypeChecker;
 
         public BsdService(IEmployeeRepository employeeRepository,
-                          IRubricService rubricService)
+                          IRubricService rubricService,
+                          IDayTypeChecker dayTypeChecker)
         {
             _employeeRepository = employeeRepository;
             _rubricService = rubricService;
+            _daytypeChecker = dayTypeChecker;
         }
 
         public async Task<BsdEntity> CreateBsdAsync(int bsdNumber, DateTime dateService, IEnumerable<int> employeeRegistrations)
         {
-            var bsdEntity = new BsdEntity(bsdNumber, dateService);
+            var dayType = _daytypeChecker.GetDayType(dateService);
+            var bsdEntity = new BsdEntity(bsdNumber, dateService)
+            {
+                DayType = dayType
+            };
             await AddEmployeesToBsdAsync(bsdEntity, employeeRegistrations);
             return bsdEntity;
         }
