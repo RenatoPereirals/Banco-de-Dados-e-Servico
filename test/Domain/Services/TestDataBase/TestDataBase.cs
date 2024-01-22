@@ -19,5 +19,27 @@ namespace test.Domain.Services.TestDataBase
                 new(2345, ServiceType.P140),
                 new(3456, ServiceType.P140)
         };
+
+       protected static List<BsdEntity> TestBsdList => GenerateTestBsdList();
+
+        private static List<BsdEntity> GenerateTestBsdList()
+        {
+            var testBsdList = new List<BsdEntity>();
+            var startDate = DateTime.Parse("1/1/2024");
+            var employeeRegistration = 1234;
+
+            for (int i = 0; i < 7; i++)
+            {
+                var bsdEntity = new BsdEntity(employeeRegistration, startDate.AddDays(i * 2));
+                var employee = new Employee(employeeRegistration, ServiceType.P140);
+                var employeeBsdEntity = new EmployeeBsdEntity(employeeRegistration, employee, employeeRegistration, bsdEntity);
+                bsdEntity.EmployeeBsdEntities.Add(employeeBsdEntity);
+
+                testBsdList.Add(bsdEntity);
+                employeeRegistration += 1111;
+            }
+
+            return testBsdList;
+        }
     }
 }
