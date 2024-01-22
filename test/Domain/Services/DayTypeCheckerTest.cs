@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Bsd.Domain.Enums;
 using Bsd.Domain.Service.Interfaces;
 using Bsd.Domain.Services;
 using Moq;
-using Xunit;
 
 namespace test.Domain.Services.TestDataBase
 {
@@ -19,8 +14,6 @@ namespace test.Domain.Services.TestDataBase
         {
             _mockHolidayChecer = new Mock<IHoliDayChecker>();
             _dayTypeChecker = new DayTypeChecker(_mockHolidayChecer.Object);
-
-            
         }
 
         [Theory]
