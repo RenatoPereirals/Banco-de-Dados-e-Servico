@@ -1,4 +1,5 @@
 using Bsd.Domain.Enums;
+
 namespace Bsd.Domain.Entities
 {
     public class Rubric
