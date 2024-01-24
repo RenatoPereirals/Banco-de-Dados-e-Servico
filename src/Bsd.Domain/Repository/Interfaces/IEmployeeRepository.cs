@@ -2,10 +2,9 @@ using Bsd.Domain.Entities;
 
 namespace Bsd.Domain.Repository.Interfaces
 {
-    public interface IEmployeeRepository : IGeralRepository<Employee>
+    public interface IEmployeeRepository
     {
         Task<Employee> GetEmployeeByRegistrationAsync(int employeeId);
-        IEnumerable<Employee> GetAllEmployees();
-        void Delete(Employee employee);
+        Task<IEnumerable<Employee>> GetAllEmployees();
     }
 }
