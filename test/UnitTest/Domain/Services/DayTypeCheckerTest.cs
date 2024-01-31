@@ -50,5 +50,23 @@ namespace test.Domain.Services.TestDataBase
             //Assert
             Assert.Equal(dayTypeExpected, dayTypeResult);
         }
+
+        [Fact]
+        public void Should_Return_DayType_For_Holiday_And_Sunday_Correctly()
+        {
+            // Arrange
+            var HolidayDate = DateTime.Parse("21/4/2024");
+            var dayTypeExpected = DayType.SundayAndHoliday;
+
+            _mockHolidayChecer
+                .Setup(hc => hc.IsHoliday(It.IsAny<DateTime>()))
+                .Returns(true);
+
+            // Act
+            var dayTypeResult = _dayTypeChecker.GetDayType(HolidayDate);
+
+            //Assert
+            Assert.Equal(dayTypeExpected, dayTypeResult);
+        }
     }
 }
