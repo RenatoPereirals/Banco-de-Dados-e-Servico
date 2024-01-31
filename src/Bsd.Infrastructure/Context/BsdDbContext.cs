@@ -15,7 +15,6 @@ namespace Bsd.Infrastructure.Context
         public DbSet<Rubric> Rubrics { get; set; }
 
 #pragma warning restore CS8618
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -23,6 +22,15 @@ namespace Bsd.Infrastructure.Context
             modelBuilder.Entity<EmployeeBsdEntity>()
                         .HasKey(EB => new { EB.BsdEntityNumber, EB.EmployeeRegistration });
 
+            modelBuilder.Entity<EmployeeBsdEntity>()
+                        .HasOne(eb => eb.Employee)
+                        .WithMany(e => e.EmployeeBsdEntities)
+                        .HasForeignKey(eb => eb.EmployeeRegistration);
+
+            modelBuilder.Entity<EmployeeBsdEntity>()
+                        .HasOne(eb => eb.BsdEntity)
+                        .WithMany(b => b.EmployeeBsdEntities)
+                        .HasForeignKey(eb => eb.BsdEntityNumber);
         }
     }
 }
