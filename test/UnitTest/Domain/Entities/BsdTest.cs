@@ -1,6 +1,4 @@
 ﻿using Bsd.Domain.Entities;
-using Bsd.Domain.Enums;
-using Moq;
 namespace test.Domain.Entities
 {
     public class BsdTest

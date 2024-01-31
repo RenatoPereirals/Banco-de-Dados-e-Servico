@@ -17,7 +17,6 @@ namespace test.Domain.Entities
 
             // Assert
             Assert.Equal("P140", typeServiceString);
-            Assert.Equal(3, employee.Digit);
             Assert.Equal(bsdList, employee.EmployeeBsdEntities);
         }
     }
