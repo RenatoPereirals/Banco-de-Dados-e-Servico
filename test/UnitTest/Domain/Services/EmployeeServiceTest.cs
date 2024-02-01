@@ -1,17 +1,25 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
+using Bsd.Domain.Entities;
+using Bsd.Domain.Enums;
+using Bsd.Domain.Services;
 
 namespace test.UnitTest.Domain.Services
 {
     public class EmployeeServiceTest
     {
         [Fact]
-        public void Test1()
+        public void Should_Calculate_CheckDigit_Correctly()
         {
-            Assert.True(true);
+            // Arrange
+            var registration = 3782;
+            var serviceType = ServiceType.P140;
+            var employee = new Employee(registration, serviceType);
+
+            var employeeService = new EmployeeService(employee);
+
+            // Act
+            employeeService.SetRegistrationAndDigit(registration);
+
+            // Assert
         }
     }
 }
