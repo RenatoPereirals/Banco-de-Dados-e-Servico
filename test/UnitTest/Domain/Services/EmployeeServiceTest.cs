@@ -7,7 +7,7 @@ namespace test.UnitTest.Domain.Services
     public class EmployeeServiceTest
     {
         [Fact]
-        public void Should_Calculate_CheckDigit_Correctly()
+        public void Should_Validation_Registration_True()
         {
             // Arrange
             var registration = 3782;
@@ -17,9 +17,10 @@ namespace test.UnitTest.Domain.Services
             var employeeService = new EmployeeService(employee);
 
             // Act
-            employeeService.SetRegistrationAndDigit(registration);
+            employeeService.ValidateRegistration(registration);
 
             // Assert
+
         }
     }
 }
