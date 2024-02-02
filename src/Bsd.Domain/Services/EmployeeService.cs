@@ -1,8 +1,9 @@
 using Bsd.Domain.Entities;
+using Bsd.Domain.Services.Interfaces;
 
 namespace Bsd.Domain.Services
 {
-    public class EmployeeService
+    public class EmployeeService : IEmployeeService
     {
         private readonly Employee _employee;
         public EmployeeService(Employee employee)
@@ -10,28 +11,23 @@ namespace Bsd.Domain.Services
             _employee = employee;
         }
 
-        public void SetRegistrationAndDigit(int registration)
+        public void ValidateRegistration(int registrationValue)
         {
-            ValidateRegistration(registration);
-            _employee.SetRegistration(registration);
-        }
-
-        private static void ValidateRegistration(int value)
-        {
-            string registration = value.ToString();
+            string registration = registrationValue.ToString();
             if (registration.Length != 4)
             {
-                throw new ArgumentException($"A matrícula {value}, deve conter 4 dígitos");
+                throw new ArgumentException($"A matrícula {registrationValue}, deve conter 4 dígitos");
             }
         }
 
-        public int CalculateModulo11CheckDigit(int value)
+        public int CalculateModulo11CheckDigit(int registrationValue)
         {
-            string registration = value.ToString();
+            string registration = registrationValue.ToString();
             ValidateRegistrationLength(registration);
 
             int sum = CalculateWeightedSum(registration);
             int mod = sum % 11;
+
             return 11 - mod;
         }
 
