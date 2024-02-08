@@ -3,6 +3,7 @@ using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services;
 using test.Domain.Services.TestDataBase;
 using Moq;
+using Bsd.Domain.Services.Interfaces;
 
 namespace test.Domain.Services
 {
@@ -10,13 +11,15 @@ namespace test.Domain.Services
     {
         private readonly Mock<IBsdRepository> _mockBsdRepository;
         private readonly Mock<IRubricRepository> _mockRubricRepository;
+        private readonly Mock<IEmployeeService> _mockEmployeeService;
         private readonly RubricService _rubricService;
 
         public RubricServiceTest()
         {
             _mockBsdRepository = new Mock<IBsdRepository>();
             _mockRubricRepository = new Mock<IRubricRepository>();
-            _rubricService = new RubricService(_mockRubricRepository.Object, _mockBsdRepository.Object);
+            _mockEmployeeService = new Mock<IEmployeeService>();
+            _rubricService = new RubricService(_mockRubricRepository.Object, _mockBsdRepository.Object, _mockEmployeeService.Object);
 
 
         }
