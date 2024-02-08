@@ -10,17 +10,14 @@ namespace Bsd.Domain.Services
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IRubricService _rubricService;
         private readonly IDayTypeChecker _daytypeChecker;
-        private readonly IBsdRepository _bsdReposiory;
 
         public BsdService(IEmployeeRepository employeeRepository,
                           IRubricService rubricService,
-                          IDayTypeChecker dayTypeChecker,
-                          IBsdRepository bsdRepository)
+                          IDayTypeChecker dayTypeChecker)
         {
             _employeeRepository = employeeRepository;
             _rubricService = rubricService;
             _daytypeChecker = dayTypeChecker;
-            _bsdReposiory = bsdRepository;
         }
 
         public async Task<BsdEntity> CreateBsdAsync(int bsdNumber, DateTime dateService, List<int> employeeRegistrations)
@@ -54,28 +51,6 @@ namespace Bsd.Domain.Services
             var employee = employeeBsdEntity.Employee;
             var filteredRubrics = await _rubricService.FilterRubricsByServiceTypeAndDayAsync(employee.ServiceType, dayType);
             employeeBsdEntity.Rubrics = filteredRubrics;
-        }
-
-        public async Task<int> CalculateEmployeeWorkedDays(int employeeId, DateTime startDate, DateTime endDate)
-        {
-            var bsdEntities = await _bsdReposiory.GetAllBsdAsync();
-            var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeId);
-
-            var filterbsdEntities = bsdEntities.Where(bsdDate => bsdDate.DateService >= startDate && bsdDate.DateService <= endDate);
-
-            var workedDays = 0;
-
-            foreach (var bsdEntity in filterbsdEntities)
-            {
-                foreach (var employeeBsdEntity in bsdEntity.EmployeeBsdEntities)
-                {
-                    if (employee.Registration == employeeBsdEntity.Employee.Registration)
-                    {
-                        workedDays++;
-                    }
-                }
-            }
-            return workedDays;
         }
     }
 }
