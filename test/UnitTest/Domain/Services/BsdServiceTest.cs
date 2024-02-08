@@ -17,7 +17,6 @@ namespace test.Domain.Services.TestSetup
         private readonly Mock<IEmployeeRepository> _mockEmployeeRepository;
         private readonly Mock<IRubricService> _mockRubricService;
         private readonly Mock<IDayTypeChecker> _mockDayTypeChecer;
-        private readonly Mock<IBsdRepository> _bsdRepository;
         private readonly BsdService _bsdService;
         private readonly List<Employee> _employees;
 
@@ -26,15 +25,10 @@ namespace test.Domain.Services.TestSetup
             _mockEmployeeRepository = new Mock<IEmployeeRepository>();
             _mockRubricService = new Mock<IRubricService>();
             _mockDayTypeChecer = new Mock<IDayTypeChecker>();
-            _bsdRepository = new Mock<IBsdRepository>();
             _bsdService = new BsdService(_mockEmployeeRepository.Object,
                                          _mockRubricService.Object,
-                                         _mockDayTypeChecer.Object,
-                                         _bsdRepository.Object);
+                                         _mockDayTypeChecer.Object);
             _employees = TestEmployeeList;
-
-            _bsdRepository
-                .Setup(repo => repo.GetAllBsdAsync()).ReturnsAsync(TestBsdList);
 
             _mockEmployeeRepository
                 .Setup(repo => repo.GetEmployeeByRegistrationAsync(It.IsAny<int>()))
@@ -49,7 +43,7 @@ namespace test.Domain.Services.TestSetup
             // Arrange
             var dateService = DateTime.Parse("1/1/2024");
             var bsdNumber = 1234;
-            var employeesRegistrations = new List<int>{ 1234, 2345, 3456};
+            var employeesRegistrations = new List<int> { 1234, 2345, 3456 };
 
             // Act
             var result = await _bsdService.CreateBsdAsync(bsdNumber, dateService, employeesRegistrations);
@@ -64,7 +58,7 @@ namespace test.Domain.Services.TestSetup
             // Arrange
             var dateService = DateTime.Parse("1/1/2024");
             var bsdNumber = 1234;
-            var employeesRegistrations = new List<int>{ 1234, 2345, 3456};
+            var employeesRegistrations = new List<int> { 1234, 2345, 3456 };
 
             // Act
             var result = await _bsdService.CreateBsdAsync(bsdNumber, dateService, employeesRegistrations);
@@ -145,23 +139,5 @@ namespace test.Domain.Services.TestSetup
             // Assert
             Assert.Equal(expectedRubrics, employeeBsdEntity.Rubrics);
         }
-
-        [Fact]
-        public async Task Should_Return_Worked_Days_Correctly()
-        {
-            // Arrange
-            var employee = new Employee(1234, ServiceType.P140); 
-            var startDate = DateTime.Parse("1/1/2024");
-            var endDate = DateTime.Parse("31/1/2024");
-            var employeeId = employee.Registration;
-            
-            // Act
-            var result = await _bsdService.CalculateEmployeeWorkedDays(employeeId, startDate, endDate);
-
-            // Assert
-            var expectedWorkedDays = TestBsdList.Count(b => b.EmployeeBsdEntities.Any(e => e.EmployeeRegistration == employeeId));
-            Assert.Equal(expectedWorkedDays, result);
-        }
-
     }
 }

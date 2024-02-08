@@ -13,6 +13,15 @@ namespace Bsd.Infrastructure.RepositoryImpl
             _context = context;
         }
 
+        public async Task<IEnumerable<EmployeeBsdEntity>> GetEmployeeBsdEntitiesByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            return await GetBsdQuery()
+                .Where(b => b.DateService >= startDate && b.DateService <= endDate)
+                .SelectMany(b => b.EmployeeBsdEntities)
+                .OrderBy(eb => eb.BsdEntity)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<BsdEntity>> GetAllBsdAsync()
         {
             return await GetBsdQuery().OrderBy(b => b.DateService).ToListAsync();

@@ -1,4 +1,5 @@
 using Bsd.Domain.Entities;
+using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 
 namespace Bsd.Domain.Services
@@ -6,9 +7,12 @@ namespace Bsd.Domain.Services
     public class EmployeeService : IEmployeeService
     {
         private readonly Employee _employee;
-        public EmployeeService(Employee employee)
+        private readonly IBsdRepository _bsdRepository;
+        public EmployeeService(Employee employee,
+                               IBsdRepository bsdRepository)
         {
             _employee = employee;
+            _bsdRepository = bsdRepository;
         }
 
         public void ValidateRegistration(int registrationValue)
@@ -54,6 +58,15 @@ namespace Bsd.Domain.Services
             }
 
             return sum;
+        }
+
+        public async Task<int> CalculateEmployeeWorkedDays(int employeeRegistration, DateTime startDate, DateTime endDate)
+        {
+            var bsdEntities = await _bsdRepository.GetAllBsdAsync();
+            return bsdEntities
+                .Where(bsdDate => bsdDate.DateService >= startDate && bsdDate.DateService <= endDate)
+                .SelectMany(bsdEntity => bsdEntity.EmployeeBsdEntities)
+                .Count(employeeBsdEntity => employeeRegistration == employeeBsdEntity.Employee.Registration);
         }
     }
 }

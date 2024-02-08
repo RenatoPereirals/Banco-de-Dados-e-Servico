@@ -5,8 +5,12 @@ namespace test.Domain.Services.TestDataBase
 {
     public class TestBase
     {
+        protected static List<BsdEntity> TestBsdList => GenerateTestBsdList();
+        protected static List<EmployeeBsdEntity> TestEmployeeBsdEntitiesList => GenerateTestEmployeeBsdEntitiesList();
+
         protected static List<Rubric> TestRubricsList => new()
         {
+            // Codigo, Descrição, Horas/dia, Tipo de dia, Tipo de servico
             new("1", "a", 3.0M, DayType.HoliDay, ServiceType.P110),
             new("2", "b", 2.0M, DayType.HoliDay, ServiceType.P110),
             new("3", "c", 1.0M, DayType.Sunday, ServiceType.P140),
@@ -19,8 +23,6 @@ namespace test.Domain.Services.TestDataBase
                 new(2345, ServiceType.P140),
                 new(3456, ServiceType.P140)
         };
-
-       protected static List<BsdEntity> TestBsdList => GenerateTestBsdList();
 
         private static List<BsdEntity> GenerateTestBsdList()
         {
@@ -41,5 +43,27 @@ namespace test.Domain.Services.TestDataBase
 
             return testBsdList;
         }
+
+        private static List<EmployeeBsdEntity> GenerateTestEmployeeBsdEntitiesList()
+        {
+            var testEmployeeBsdEntitiesList = new List<EmployeeBsdEntity>();
+            var employeeRegistration = 1234;
+
+            foreach (var employee in TestEmployeeList)
+            {
+                foreach (var bsdEntity in TestBsdList)
+                {
+                    var employeeBsdEntity = new EmployeeBsdEntity(employeeRegistration, employee, bsdEntity.BsdNumber, bsdEntity)
+                    {
+                        Rubrics = TestRubricsList
+                    };
+                    testEmployeeBsdEntitiesList.Add(employeeBsdEntity);
+                }
+                employeeRegistration += 1111;
+            }
+
+            return testEmployeeBsdEntitiesList;
+        }
+
     }
 }
