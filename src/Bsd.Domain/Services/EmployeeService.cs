@@ -58,7 +58,6 @@ namespace Bsd.Domain.Services
 
             return sum;
         }
-
         public async Task<int> CalculateEmployeeWorkedDays(int employeeRegistration, DateTime startDate, DateTime endDate)
         {
             var bsdEntities = await _bsdRepository.GetAllBsdAsync();

@@ -14,6 +14,7 @@ namespace test.UnitTest.Domain.Services
         {
             _mockBsdRpository = new Mock<IBsdRepository>();
         }
+
         [Fact]
         public void Should_Validation_Registration_True()
         {
