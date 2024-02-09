@@ -1,9 +1,9 @@
 using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
-
+using Bsd.Domain.Services.Interfaces;
 namespace Bsd.Domain.Services
 {
-    public class EmployeeService
+    public class EmployeeService : IEmployeeService
     {
         private readonly Employee _employee;
         private readonly IBsdRepository _bsdRepository;
@@ -14,41 +14,49 @@ namespace Bsd.Domain.Services
             _bsdRepository = bsdRepository;
         }
 
-        public void SetRegistrationAndDigit(int value)
+        public void ValidateRegistration(int registrationValue)
         {
-            ValidateRegistration(value);
-            _employee.SetRegistration(value);
-            _employee.SetDigit(CalculateModulo11CheckDigit(value));
-        }
-
-        private static void ValidateRegistration(int value)
-        {
-            string registration = value.ToString();
+            string registration = registrationValue.ToString();
             if (registration.Length != 4)
             {
-                throw new ArgumentException($"A matrícula {value}, deve conter 4 dígitos");
+                throw new ArgumentException($"A matrícula {registrationValue}, deve conter 4 dígitos");
             }
         }
 
-        private static int CalculateModulo11CheckDigit(int value)
+        public int CalculateModulo11CheckDigit(int registrationValue)
+        {
+            string registration = registrationValue.ToString();
+            ValidateRegistrationLength(registration);
+
+            int sum = CalculateWeightedSum(registration);
+            int mod = sum % 11;
+
+            return 11 - mod;
+        }
+
+        private static void ValidateRegistrationLength(string registration)
+        {
+            if (registration.Length != 4)
+            {
+                throw new ArgumentException($"A matrícula {registration} deve conter exatamente 4 dígitos.");
+            }
+        }
+
+        private static int CalculateWeightedSum(string registration)
         {
             int sum = 0;
-            string registration = value.ToString();
             int weight = registration.Length + 1;
 
             foreach (char digitChar in registration)
             {
                 if (!int.TryParse(digitChar.ToString(), out int digit))
-                {
-                    throw new FormatException($"Caractere inválido {digitChar} na mátricula");
-                }
+                    throw new FormatException($"O caractere {digitChar} é inválido na matrícula");
 
                 sum += digit * weight;
                 weight--;
             }
 
-            int mod = sum % 11;
-            return 11 - mod;
+            return sum;
         }
 
         public async Task<int> CalculateEmployeeWorkedDays(int employeeRegistration, DateTime startDate, DateTime endDate)
@@ -59,6 +67,5 @@ namespace Bsd.Domain.Services
                 .SelectMany(bsdEntity => bsdEntity.EmployeeBsdEntities)
                 .Count(employeeBsdEntity => employeeRegistration == employeeBsdEntity.Employee.Registration);
         }
-
     }
 }

@@ -1,17 +1,34 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
+using Bsd.Domain.Entities;
+using Bsd.Domain.Enums;
+using Bsd.Domain.Repository.Interfaces;
+using Bsd.Domain.Services;
+using Moq;
 
 namespace test.UnitTest.Domain.Services
 {
     public class EmployeeServiceTest
     {
-        [Fact]
-        public void Test1()
+        private readonly Mock<IBsdRepository> _mockBsdRpository;
+
+        public EmployeeServiceTest()
         {
-            Assert.True(true);
+            _mockBsdRpository = new Mock<IBsdRepository>();
+        }
+        [Fact]
+        public void Should_Validation_Registration_True()
+        {
+            // Arrange
+            var registration = 3782;
+            var serviceType = ServiceType.P140;
+            var employee = new Employee(registration, serviceType);
+
+            var employeeService = new EmployeeService(employee, _mockBsdRpository.Object);
+
+            // Act
+            employeeService.ValidateRegistration(registration);
+
+            // Assert
+
         }
     }
 }
