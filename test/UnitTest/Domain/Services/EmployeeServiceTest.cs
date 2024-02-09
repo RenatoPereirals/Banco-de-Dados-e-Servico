@@ -1,5 +1,3 @@
-using Bsd.Domain.Entities;
-using Bsd.Domain.Enums;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services;
 using Moq;
@@ -20,16 +18,24 @@ namespace test.UnitTest.Domain.Services
         {
             // Arrange
             var registration = 3782;
-            var serviceType = ServiceType.P140;
-            var employee = new Employee(registration, serviceType);
+            var employeeService = new EmployeeService(_mockBsdRpository.Object);
 
-            var employeeService = new EmployeeService(employee, _mockBsdRpository.Object);
-
-            // Act
+           // Act
             employeeService.ValidateRegistration(registration);
 
             // Assert
+            // Nada a fazer, se o método não lançar uma exceção, o teste passa
+        }
 
+        [Fact]
+        public void Should_Validation_Registration_False()
+        {
+            // Arrange
+            var registration = 123;
+            var employeeService = new EmployeeService(_mockBsdRpository.Object);
+
+            // Act and Assert
+            Assert.Throws<ArgumentException>(() => employeeService.ValidateRegistration(registration));
         }
     }
 }
