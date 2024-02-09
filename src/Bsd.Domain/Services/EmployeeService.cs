@@ -1,16 +1,12 @@
-using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 namespace Bsd.Domain.Services
 {
     public class EmployeeService : IEmployeeService
     {
-        private readonly Employee _employee;
         private readonly IBsdRepository _bsdRepository;
-        public EmployeeService(Employee employee,
-                               IBsdRepository bsdRepository)
+        public EmployeeService(IBsdRepository bsdRepository)
         {
-            _employee = employee;
             _bsdRepository = bsdRepository;
         }
 
