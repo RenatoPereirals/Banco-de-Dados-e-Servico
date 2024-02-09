@@ -10,19 +10,11 @@ namespace Bsd.Domain.Services
             _bsdRepository = bsdRepository;
         }
 
-        public void ValidateRegistration(int registrationValue)
-        {
-            string registration = registrationValue.ToString();
-            if (registration.Length != 4)
-            {
-                throw new ArgumentException($"A matrícula {registrationValue}, deve conter 4 dígitos");
-            }
-        }
-
         public int CalculateModulo11CheckDigit(int registrationValue)
         {
             string registration = registrationValue.ToString();
             ValidateRegistrationLength(registration);
+            ValidateRegistrationCharacters(registration);
 
             int sum = CalculateWeightedSum(registration);
             int mod = sum % 11;
@@ -35,6 +27,14 @@ namespace Bsd.Domain.Services
             if (registration.Length != 4)
             {
                 throw new ArgumentException($"A matrícula {registration} deve conter exatamente 4 dígitos.");
+            }
+        }
+
+        private static void ValidateRegistrationCharacters(string registration)
+        {
+            if (!registration.All(char.IsDigit))
+            {
+                throw new ArgumentException($"A matrícula {registration}, deve conter apenas números.");
             }
         }
 
@@ -54,6 +54,7 @@ namespace Bsd.Domain.Services
 
             return sum;
         }
+        
         public async Task<int> CalculateEmployeeWorkedDays(int employeeRegistration, DateTime startDate, DateTime endDate)
         {
             var bsdEntities = await _bsdRepository.GetAllBsdAsync();
