@@ -1,7 +1,6 @@
 using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
-
 namespace Bsd.Domain.Services
 {
     public class EmployeeService : IEmployeeService
@@ -59,7 +58,7 @@ namespace Bsd.Domain.Services
 
             return sum;
         }
-
+        
         public async Task<int> CalculateEmployeeWorkedDays(int employeeRegistration, DateTime startDate, DateTime endDate)
         {
             var bsdEntities = await _bsdRepository.GetAllBsdAsync();
