@@ -5,16 +5,19 @@ namespace test.Domain.Services.TestDataBase
 {
     public class TestBase
     {
-        protected static List<BsdEntity> TestBsdList => GenerateTestBsdList();
-        protected static List<EmployeeBsdEntity> TestEmployeeBsdEntitiesList => GenerateTestEmployeeBsdEntitiesList();
+        protected static int indexCount = 1;
+        protected static int testEmployeeRegistration = 1234;
+        protected static int daysWorked = 7;
+        protected static IEnumerable<BsdEntity> TestBsdList => GenerateTestBsdList();
+        protected static IEnumerable<EmployeeRubricHours> TestEmployeeRubricHours => GenerateExpectedRubricHours();
 
         protected static List<Rubric> TestRubricsList => new()
         {
             // Codigo, Descrição, Horas/dia, Tipo de dia, Tipo de servico
-            new("1", "a", 3.0M, DayType.HoliDay, ServiceType.P110),
-            new("2", "b", 2.0M, DayType.HoliDay, ServiceType.P110),
-            new("3", "c", 1.0M, DayType.Sunday, ServiceType.P140),
-            new("4", "d", 1.0M, DayType.Workday, ServiceType.P140),
+            new("1", "a", 3M, DayType.HoliDay, ServiceType.P110),
+            new("2", "b", 2M, DayType.HoliDay, ServiceType.P110),
+            new("3", "c", 1M, DayType.Sunday, ServiceType.P140),
+            new("4", "d", 1M, DayType.Workday, ServiceType.P140),
         };
 
         protected static List<Employee> TestEmployeeList => new()
@@ -27,43 +30,47 @@ namespace test.Domain.Services.TestDataBase
         private static List<BsdEntity> GenerateTestBsdList()
         {
             var testBsdList = new List<BsdEntity>();
-            var startDate = DateTime.Parse("1/1/2024");
+            var dateService = DateTime.Parse("1/1/2024");
             var employeeRegistration = 1234;
 
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < daysWorked; i++)
             {
-                var bsdEntity = new BsdEntity(employeeRegistration, startDate.AddDays(i * 2));
+                var bsdEntity = new BsdEntity(employeeRegistration, dateService.AddDays(i * 2));
                 var employee = new Employee(employeeRegistration, ServiceType.P140);
-                var employeeBsdEntity = new EmployeeBsdEntity(employeeRegistration, employee, employeeRegistration, bsdEntity);
+                var employeeBsdEntity = GenerateTestEmployeeBsdEntitiesList(employee, bsdEntity);
+
                 bsdEntity.EmployeeBsdEntities.Add(employeeBsdEntity);
 
                 testBsdList.Add(bsdEntity);
-                employeeRegistration += 1111;
+                // employeeRegistration += 1111;
             }
 
             return testBsdList;
         }
 
-        private static List<EmployeeBsdEntity> GenerateTestEmployeeBsdEntitiesList()
+        private static EmployeeBsdEntity GenerateTestEmployeeBsdEntitiesList(Employee employee, BsdEntity bsdEntity)
         {
-            var testEmployeeBsdEntitiesList = new List<EmployeeBsdEntity>();
-            var employeeRegistration = 1234;
-
-            foreach (var employee in TestEmployeeList)
+            var employeeBsdEntity = new EmployeeBsdEntity(employee.Registration, employee, bsdEntity.BsdNumber, bsdEntity)
             {
-                foreach (var bsdEntity in TestBsdList)
-                {
-                    var employeeBsdEntity = new EmployeeBsdEntity(employeeRegistration, employee, bsdEntity.BsdNumber, bsdEntity)
-                    {
-                        Rubrics = TestRubricsList
-                    };
-                    testEmployeeBsdEntitiesList.Add(employeeBsdEntity);
-                }
-                employeeRegistration += 1111;
-            }
+                Rubrics = TestRubricsList
+            };
 
-            return testEmployeeBsdEntitiesList;
+            return employeeBsdEntity;
         }
 
+        private static List<EmployeeRubricHours> GenerateExpectedRubricHours()
+        {
+            var list = new List<EmployeeRubricHours>();
+
+            for (int i = 0; i < daysWorked; i++)
+            {
+                list.Add(new EmployeeRubricHours { EmployeeRegistration = testEmployeeRegistration, RubricCode = "1", TotalHours = 3M });
+                list.Add(new EmployeeRubricHours { EmployeeRegistration = testEmployeeRegistration, RubricCode = "2", TotalHours = 2M });
+                list.Add(new EmployeeRubricHours { EmployeeRegistration = testEmployeeRegistration, RubricCode = "3", TotalHours = 1M });
+                list.Add(new EmployeeRubricHours { EmployeeRegistration = testEmployeeRegistration, RubricCode = "4", TotalHours = 1M });
+            }
+
+            return list;
+        }
     }
 }

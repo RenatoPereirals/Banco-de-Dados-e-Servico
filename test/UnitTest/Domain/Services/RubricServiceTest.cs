@@ -2,8 +2,8 @@ using Bsd.Domain.Enums;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services;
 using test.Domain.Services.TestDataBase;
-using Moq;
 using Bsd.Domain.Services.Interfaces;
+using Moq;
 
 namespace test.Domain.Services
 {
@@ -20,8 +20,6 @@ namespace test.Domain.Services
             _mockRubricRepository = new Mock<IRubricRepository>();
             _mockEmployeeService = new Mock<IEmployeeService>();
             _rubricService = new RubricService(_mockRubricRepository.Object, _mockBsdRepository.Object, _mockEmployeeService.Object);
-
-
         }
 
         [Fact]
@@ -44,23 +42,26 @@ namespace test.Domain.Services
         }
 
         [Fact]
-        public async Task Should_Calculate_Total_Hours_Per_Month_By_Rubrics_Correct()
+        public async Task Should_Rutrun_Lista_Total_Hours_Per_Month_By_Rubrics_Correctly()
         {
             // Arrange
-            var startDate = new DateTime(2023, 1, 1);
-            var endDate = new DateTime(2023, 1, 31);
-            var employeeBsdEntities = TestEmployeeBsdEntitiesList;
+            var startDate = new DateTime(2024, 1, 1);
+            var endDate = new DateTime(2024, 12, 31);
+            var testBsdEntitiesList = TestBsdList;
 
-            _mockBsdRepository
-                .Setup(r => r.GetEmployeeBsdEntitiesByDateRangeAsync(startDate, endDate))
-                .ReturnsAsync(TestEmployeeBsdEntitiesList);
+            _mockBsdRepository.Setup(r => r.GetEmployeeBsdEntitiesByDateRangeAsync(startDate, endDate))
+                .ReturnsAsync(testBsdEntitiesList.SelectMany(eb => eb.EmployeeBsdEntities));
 
-            // Act
+            _mockEmployeeService.Setup(s => s.CalculateEmployeeWorkedDays(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .ReturnsAsync(daysWorked);
+
+            var expectedRubricHours = TestEmployeeRubricHours;
+
+            // Acta
             var result = await _rubricService.CalculateTotalHoursPerMonthByRubrics(startDate, endDate);
 
             // Assert
-
+            Assert.Equal(expectedRubricHours.Count(), result.Count);
         }
-
     }
 }
