@@ -1,5 +1,8 @@
+using System.Globalization;
+using Bsd.API.Helpers;
 using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
+using Bsd.Domain.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bsd.API.Controllers
@@ -9,33 +12,97 @@ namespace Bsd.API.Controllers
     public class BsdController : ControllerBase
     {
         private readonly IBsdRepository _bsdRepository;
+        private readonly IGeralRepository _geralRepository;
+        private readonly IBsdService _bsdService;
 
-        public BsdController(IBsdRepository bsdRepository)
+        public BsdController(IBsdRepository bsdRepository,
+                             IGeralRepository geralRepository,
+                             IBsdService bsdService)
         {
             _bsdRepository = bsdRepository;
+            _geralRepository = geralRepository;
+            _bsdService = bsdService;
         }
 
         [HttpGet("{startDate}-{endDate}")]
-        public async Task<ActionResult<IEnumerable<EmployeeBsdEntity>>> GetEmployeeBsdEntities(string startDate, string endDate)
+        public async Task<IActionResult> GetEmployeeBsdEntities(string startDate, string endDate)
         {
-            var parseStartDate = DateTime.Parse(startDate);
-            var parseEndDate = DateTime.Parse(endDate);
-            var employeeBsdEntities = await _bsdRepository.GetEmployeeBsdEntitiesByDateRangeAsync(parseStartDate, parseEndDate);
-            return Ok(employeeBsdEntities);
+            try
+            {
+                var parseStartDate = DateHelper.ParseDate(startDate);
+                var parseEndDate = DateHelper.ParseDate(endDate);
+
+                var employeeBsdEntities = await _bsdRepository.GetEmployeeBsdEntitiesByDateRangeAsync(parseStartDate, parseEndDate);
+
+                return Ok(employeeBsdEntities);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EmployeeBsdEntity>>> GetAllBsdEntiteis()
+        public async Task<IActionResult> GetAllBsdEntiteis()
         {
-            var bsdEntities = await _bsdRepository.GetAllBsdAsync();
-            return Ok(bsdEntities);
+            try
+            {
+                var bsdEntities = await _bsdRepository.GetAllBsdAsync();
+                return Ok(bsdEntities);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("{bsdNumber}")]
-        public async Task<ActionResult<IEnumerable<EmployeeBsdEntity>>> GetBsdEntity(int bsdNumber)
+        public async Task<IActionResult> GetBsdEntity(int bsdNumber)
         {
-            var bsdEntity = await _bsdRepository.GetBsdByIdAsync(bsdNumber);
-            return Ok(bsdEntity);
+            try
+            {
+                var bsdEntity = await _bsdRepository.GetBsdByIdAsync(bsdNumber);
+                return Ok(bsdEntity);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("created/{bsdNumber}")]
+        public async Task<IActionResult> CreatedBsdEntity(int bsdNumber, string dateService, int employeeRegistration, int digit)
+        {
+            try
+            {
+                var parseDateService = DateHelper.ParseDate(dateService);
+                var bsdEntity = await _bsdService.CreateBsdAsync(bsdNumber, parseDateService, employeeRegistration, digit);
+
+                await _geralRepository.SaveChangesAsync();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("{bsdNumber}/{employeeRegistration}")]
+        public async Task<IActionResult> AddEmployeeToBsdEntity(int bsdNumber, int employeeRegistration, int digit)
+        {
+            try
+            {
+                var bsdEntity = await _bsdRepository.GetBsdByIdAsync(bsdNumber);
+                await _bsdService.AddEmployeesToBsdAsync(bsdEntity, employeeRegistration, digit);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
