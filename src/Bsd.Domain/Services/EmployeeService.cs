@@ -10,6 +10,15 @@ namespace Bsd.Domain.Services
             _bsdRepository = bsdRepository;
         }
 
+        public async Task<int> CalculateEmployeeWorkedDays(int employeeRegistration, DateTime startDate, DateTime endDate)
+        {
+            var bsdEntities = await _bsdRepository.GetAllBsdAsync();
+            return bsdEntities
+                .Where(bsdDate => bsdDate.DateService >= startDate && bsdDate.DateService <= endDate)
+                .SelectMany(bsdEntity => bsdEntity.EmployeeBsdEntities)
+                .Count(employeeBsdEntity => employeeRegistration == employeeBsdEntity.Employee.Registration);
+        }
+
         public int CalculateModulo11CheckDigit(int registrationValue)
         {
             string registration = registrationValue.ToString();
@@ -53,15 +62,6 @@ namespace Bsd.Domain.Services
             }
 
             return sum;
-        }
-        
-        public async Task<int> CalculateEmployeeWorkedDays(int employeeRegistration, DateTime startDate, DateTime endDate)
-        {
-            var bsdEntities = await _bsdRepository.GetAllBsdAsync();
-            return bsdEntities
-                .Where(bsdDate => bsdDate.DateService >= startDate && bsdDate.DateService <= endDate)
-                .SelectMany(bsdEntity => bsdEntity.EmployeeBsdEntities)
-                .Count(employeeBsdEntity => employeeRegistration == employeeBsdEntity.Employee.Registration);
         }
     }
 }
