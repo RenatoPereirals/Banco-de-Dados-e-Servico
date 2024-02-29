@@ -17,7 +17,14 @@ namespace Bsd.Infrastructure.Data
         {
             return new List<Rubric>
             {
-                new("1902", "3h/dia de 50% (hora extra)", 3.0M, DayType.Workday, ServiceType.P140),
+                new()
+                {
+                    Code = "1902",
+                    Description = "3h/dia de 50% (hora extra)",
+                    HoursPerDay = 3.0M,
+                    DayType = DayType.Workday,
+                    ServiceType = ServiceType.P140
+                },
             };
         }
     }

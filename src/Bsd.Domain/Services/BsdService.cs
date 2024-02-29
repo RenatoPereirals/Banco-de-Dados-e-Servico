@@ -34,9 +34,10 @@ namespace Bsd.Domain.Services
                 throw new Exception("O digito está incorreto.");
 
             var dayType = _daytypeChecker.GetDayType(dateService);
-            var bsdEntity = new BsdEntity(bsdNumber, dateService)
+            var bsdEntity = new BsdEntity()
             {
-                DayType = dayType
+                BsdNumber = bsdNumber,
+                DayType = dayType,
             };
 
             await AddEmployeesToBsdAsync(bsdEntity, employeeRegistration, digit);
@@ -54,7 +55,13 @@ namespace Bsd.Domain.Services
             if (currentDigit != digit)
                 throw new Exception("O digito está incorreto.");
 
-            var employeeBsdEntity = new EmployeeBsdEntity(employeeRegistration, employee, bsdEntity.BsdNumber, bsdEntity);
+            var employeeBsdEntity = new EmployeeBsdEntity()
+            {
+                EmployeeRegistration = employeeRegistration,
+                Employee = employee,
+                BsdEntityNumber = bsdEntity.BsdNumber,
+                BsdEntity = bsdEntity
+            };
             bsdEntity.EmployeeBsdEntities.Add(employeeBsdEntity);
 
             await AssignRubricsToEmployeeByServiceTypeAndDayAsync(employeeBsdEntity, bsdEntity.DayType);
