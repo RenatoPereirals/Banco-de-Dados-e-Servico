@@ -11,39 +11,54 @@ namespace Bsd.Domain.Services
         private readonly IRubricService _rubricService;
         private readonly IDayTypeChecker _daytypeChecker;
         private readonly IEmployeeService _employeeService;
+        private readonly IGeralRepository _geralRepository;
 
         public BsdService(IEmployeeRepository employeeRepository,
                           IRubricService rubricService,
                           IDayTypeChecker dayTypeChecker,
-                          IEmployeeService employeeService)
+                          IEmployeeService employeeService,
+                          IGeralRepository geralRepository)
         {
             _employeeRepository = employeeRepository;
             _rubricService = rubricService;
             _daytypeChecker = dayTypeChecker;
             _employeeService = employeeService;
+            _geralRepository = geralRepository;
         }
 
         public async Task<BsdEntity> CreateBsdAsync(int bsdNumber, DateTime dateService, int employeeRegistration, int digit)
         {
-            _ = _employeeRepository.GetEmployeeByRegistrationAsync(employeeRegistration)
-                ?? throw new ArgumentException("Mátricula do funcionário não encontrada.");
-
-            var currentDigit = _employeeService.CalculateModulo11CheckDigit(employeeRegistration);
-
-            if (currentDigit != digit)
-                throw new Exception("O digito está incorreto.");
-
-            var dayType = _daytypeChecker.GetDayType(dateService);
-            var bsdEntity = new BsdEntity()
+            try
             {
-                BsdNumber = bsdNumber,
-                DayType = dayType,
-            };
+                _ = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeRegistration)
+                    ?? throw new ArgumentException("Matrícula do funcionário não encontrada.");
 
-            await AddEmployeesToBsdAsync(bsdEntity, employeeRegistration, digit);
+                var currentDigit = _employeeService.CalculateModulo11CheckDigit(employeeRegistration);
 
-            return bsdEntity;
+                if (currentDigit != digit)
+                    throw new Exception("O dígito está incorreto.");
+
+                var dayType = _daytypeChecker.GetDayType(dateService);
+                
+                var bsdEntity = new BsdEntity()
+                {
+                    BsdNumber = bsdNumber,
+                    DateService = dateService,
+                    DayType = dayType,
+                };
+
+                _geralRepository.Create(bsdEntity);
+                await _geralRepository.SaveChangesAsync();
+
+                return bsdEntity;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating BSD: {ex}");
+                throw;
+            }
         }
+
 
         public async Task AddEmployeesToBsdAsync(BsdEntity bsdEntity, int employeeRegistration, int digit)
         {
