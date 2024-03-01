@@ -23,6 +23,9 @@ namespace Bsd.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("DateService")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("DayType")
                         .HasColumnType("INTEGER");
 
@@ -41,6 +44,9 @@ namespace Bsd.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Digit")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ServiceType")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Registration");
