@@ -1,6 +1,4 @@
-using System.Globalization;
 using Bsd.API.Helpers;
-using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +22,7 @@ namespace Bsd.API.Controllers
             _bsdService = bsdService;
         }
 
-        [HttpGet("{startDate}-{endDate}")]
+        [HttpGet("{startDate}/{endDate}")]
         public async Task<IActionResult> GetEmployeeBsdEntities(string startDate, string endDate)
         {
             try
@@ -71,7 +69,7 @@ namespace Bsd.API.Controllers
             }
         }
 
-        [HttpPost("created/{bsdNumber}")]
+        [HttpPost("create")]
         public async Task<IActionResult> CreatedBsdEntity(int bsdNumber, string dateService, int employeeRegistration, int digit)
         {
             try
@@ -89,7 +87,7 @@ namespace Bsd.API.Controllers
             }
         }
 
-        [HttpPost("{bsdNumber}/{employeeRegistration}")]
+        [HttpPost("addEmployee")]
         public async Task<IActionResult> AddEmployeeToBsdEntity(int bsdNumber, int employeeRegistration, int digit)
         {
             try
