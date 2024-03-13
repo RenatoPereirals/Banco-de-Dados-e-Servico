@@ -5,9 +5,8 @@ namespace Bsd.Domain.Entities
         public int EmployeeRegistration { get; set; }
         public Employee Employee { get; set; } = new();
 
-        public int BsdEntityNumber { get; set; }
+        public int BsdNumber { get; set; }
         public BsdEntity BsdEntity { get; set; } = new();
-
-        public List<Rubric> Rubrics { get; set; } = new();
+        public IEnumerable<Rubric> Rubrics { get; set; } = new List<Rubric>();
     }
 }
