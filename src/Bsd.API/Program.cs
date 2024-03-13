@@ -1,3 +1,6 @@
+using Bsd.Application.Interfaces;
+using Bsd.Application.Services;
+
 using Bsd.Domain.Entities;
 using Bsd.Domain.Persistence.RepositoryImpl;
 using Bsd.Domain.Repository.Interfaces;
@@ -6,7 +9,9 @@ using Bsd.Domain.Service.Interfaces;
 using Bsd.Domain.Services;
 using Bsd.Domain.Services.Interfaces;
 using Bsd.Infrastructure.Context;
+using Bsd.Infrastructure.Data;
 using Bsd.Infrastructure.RepositoryImpl;
+
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +19,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<BsdDbContext>(options => options.UseSqlite(connectionString));
+
+builder.Services.AddTransient<EmployeeSeeder>();
+builder.Services.AddTransient<RubricSeeder>();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IBsdService, BsdService>();
@@ -26,6 +36,10 @@ builder.Services.AddScoped<IGeralRepository, GeralRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IBsdRepository, BsdRepository>();
 builder.Services.AddScoped<IRubricRepository, RubricRepository>();
+
+builder.Services.AddScoped<IBsdApplicationService, BsdApplicationService>();
+builder.Services.AddScoped<IEmployeeApplicationService, EmployeeApplicationService>();
+builder.Services.AddScoped<IRubricApplicationService, RubricApplicationService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
