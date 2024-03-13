@@ -20,33 +20,31 @@ namespace Bsd.Domain.Services
             _employeeService = employeeService;
         }
 
-        public async Task<List<Rubric>> FilterRubricsByServiceTypeAndDayAsync(ServiceType serviceType, DayType dayType)
+        public async Task<IEnumerable<Rubric>> FilterRubricsByServiceTypeAndDayAsync(ServiceType serviceType, DayType dayType)
         {
             var allRubrics = await _rubricRepository.GetAllRubricsAsync();
             return allRubrics.Where(r => r.ServiceType == serviceType && r.DayType == dayType).ToList();
         }
 
-        public async Task<List<EmployeeRubricHours>> CalculateTotalHoursPerMonthByRubrics(DateTime startDate, DateTime endDate)
+        public async Task<List<EmployeeRubricHours>> CalculateTotalHoursPerMonthByRubricsForEmployeeAsync(int registration, DateTime startDate, DateTime endDate)
         {
-            var employeeBsdEntities = await _bsdRepository.GetEmployeeBsdEntitiesByDateRangeAsync(startDate, endDate);
-
+            IEnumerable<BsdEntity> bsdEntities = await _bsdRepository.GetEmployeeBsdEntitiesByDateRangeAsync(startDate, endDate);
             var result = new List<EmployeeRubricHours>();
+            int totalDays = await _employeeService.CalculateEmployeeWorkedDays(registration, startDate, endDate);
+            IEnumerable<Rubric> rubrics = GetRubricsInEmployeeBsdEntity(bsdEntities);
 
-            foreach (var employeeBsdEntity in employeeBsdEntities)
+            foreach (var bsdEntity in bsdEntities)
             {
-                var totalDays = await _employeeService.CalculateEmployeeWorkedDays(employeeBsdEntity.Employee.Registration, startDate, endDate);
-
-                foreach (var rubric in employeeBsdEntity.Rubrics)
+                foreach (var rubric in rubrics)
                 {
                     result.Add(new EmployeeRubricHours
                     {
-                        EmployeeRegistration = employeeBsdEntity.Employee.Registration,
+                        EmployeeRegistration = registration,
                         RubricCode = rubric.Code,
                         TotalHours = GetRubricHour(rubric) * totalDays
                     });
                 }
             }
-
             return result;
         }
 
@@ -54,6 +52,29 @@ namespace Bsd.Domain.Services
         {
             var rubricHour = rubric.HoursPerDay;
             return rubricHour;
+        }
+
+        private IEnumerable<Rubric> GetRubricsInEmployeeBsdEntity(IEnumerable<BsdEntity> employeeBsdEntities)
+        {
+            IEnumerable<EmployeeBsdEntity> employeeBsds = GetEmployeeBsdEntitiesInBsdEntity(employeeBsdEntities);
+            var rubricList = new List<Rubric>();
+
+            foreach (var employeeBsdEntity in employeeBsds)
+            {
+                rubricList.AddRange(employeeBsdEntity.Rubrics);
+            }
+            return rubricList;
+        }
+
+        private IEnumerable<EmployeeBsdEntity> GetEmployeeBsdEntitiesInBsdEntity(IEnumerable<BsdEntity> bsdEntities)
+        {
+            var employeeBsdEntities = new List<EmployeeBsdEntity>();
+
+            foreach (var bsdEntity in bsdEntities)
+            {
+                employeeBsdEntities.AddRange(bsdEntity.EmployeeBsdEntities);
+            }
+            return employeeBsdEntities;
         }
     }
 }

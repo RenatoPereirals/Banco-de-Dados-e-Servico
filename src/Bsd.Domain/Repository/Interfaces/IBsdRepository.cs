@@ -6,6 +6,7 @@ namespace Bsd.Domain.Repository.Interfaces
     {
         Task<BsdEntity> GetBsdByIdAsync(int bsdId);
         Task<IEnumerable<BsdEntity>> GetAllBsdAsync();
-        Task<IEnumerable<EmployeeBsdEntity>> GetEmployeeBsdEntitiesByDateRangeAsync(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<BsdEntity>> GetEmployeeBsdEntitiesByDateRangeAsync(DateTime startDate, DateTime endDate);
+        Task CreateBsdAsync(int bsdNumber, DateTime dateService, int employeeRegistration, int digit);
     }
 }

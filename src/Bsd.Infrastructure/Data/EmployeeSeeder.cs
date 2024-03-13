@@ -17,7 +17,7 @@ namespace Bsd.Infrastructure.Data
         {
             return new List<Employee>
             {
-                new(1234, ServiceType.P110),
+                new(),
             };
         }
     }

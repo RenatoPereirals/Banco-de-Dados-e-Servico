@@ -15,7 +15,10 @@ namespace Bsd.Infrastructure.RepositoryImpl
 
         public async Task<IEnumerable<Employee>> GetAllEmployees()
         {
-            return await GetEmployeeQuery().ToListAsync();
+            var query = GetEmployeeQuery();
+            var queryString = query.ToQueryString();
+            Console.WriteLine(queryString);
+            return await query.ToListAsync();
         }
 
         public async Task<Employee> GetEmployeeByRegistrationAsync(int employeeId)
@@ -28,9 +31,9 @@ namespace Bsd.Infrastructure.RepositoryImpl
         private IQueryable<Employee> GetEmployeeQuery()
         {
             return _context.Employees
-            .Include(e => e.EmployeeBsdEntities)
-            .ThenInclude(eb => eb.BsdEntity)
-            .AsNoTracking();
+                .AsNoTracking()
+                .Include(e => e.EmployeeBsdEntities)
+                .OrderBy(e => e.Registration);
         }
     }
 }

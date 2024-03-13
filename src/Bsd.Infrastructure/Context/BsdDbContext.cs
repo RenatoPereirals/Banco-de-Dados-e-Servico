@@ -1,5 +1,9 @@
 ﻿using Bsd.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+
 
 namespace Bsd.Infrastructure.Context
 {
@@ -20,17 +24,25 @@ namespace Bsd.Infrastructure.Context
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<EmployeeBsdEntity>()
-                        .HasKey(EB => new { EB.BsdEntityNumber, EB.EmployeeRegistration });
+                        .HasKey(eb => new { eb.EmployeeRegistration, eb.BsdNumber });
 
-            modelBuilder.Entity<EmployeeBsdEntity>()
-                        .HasOne(eb => eb.Employee)
-                        .WithMany(e => e.EmployeeBsdEntities)
-                        .HasForeignKey(eb => eb.EmployeeRegistration);
+            modelBuilder.Entity<BsdEntity>()
+                        .HasKey(b => b.BsdNumber);
 
-            modelBuilder.Entity<EmployeeBsdEntity>()
-                        .HasOne(eb => eb.BsdEntity)
-                        .WithMany(b => b.EmployeeBsdEntities)
-                        .HasForeignKey(eb => eb.BsdEntityNumber);
+            modelBuilder.Entity<Employee>()
+                        .HasKey(e => e.Registration);
+
+            modelBuilder.Entity<Rubric>()
+                        .HasKey(r => r.Code);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
+            }
+            optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
         }
     }
 }

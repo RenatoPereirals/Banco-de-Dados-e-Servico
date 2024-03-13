@@ -5,7 +5,7 @@ namespace Bsd.Domain.Services.Interfaces
 {
     public interface IRubricService
     {
-        Task<List<Rubric>> FilterRubricsByServiceTypeAndDayAsync(ServiceType serviceType, DayType dayType);
-        Task<List<EmployeeRubricHours>> CalculateTotalHoursPerMonthByRubrics(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<Rubric>> FilterRubricsByServiceTypeAndDayAsync(ServiceType serviceType, DayType dayType);
+        Task<List<EmployeeRubricHours>> CalculateTotalHoursPerMonthByRubricsForEmployeeAsync(int registration, DateTime startDate, DateTime endDate);
     }
 }
