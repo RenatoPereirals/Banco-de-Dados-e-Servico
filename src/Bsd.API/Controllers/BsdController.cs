@@ -1,4 +1,4 @@
-using Bsd.API.Helpers;
+using Bsd.Application.Interfaces;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -12,14 +12,18 @@ namespace Bsd.API.Controllers
         private readonly IBsdRepository _bsdRepository;
         private readonly IGeralRepository _geralRepository;
         private readonly IBsdService _bsdService;
+        private readonly IBsdApplicationService _bsdApplication;
 
         public BsdController(IBsdRepository bsdRepository,
                              IGeralRepository geralRepository,
-                             IBsdService bsdService)
+                             IBsdService bsdService,
+                             IBsdApplicationService bsdApplication)
         {
             _bsdRepository = bsdRepository;
             _geralRepository = geralRepository;
             _bsdService = bsdService;
+            _bsdApplication = bsdApplication;
+
         }
 
         [HttpGet("{startDate}/{endDate}")]
@@ -27,10 +31,10 @@ namespace Bsd.API.Controllers
         {
             try
             {
-                var parseStartDate = DateHelper.ParseDate(startDate);
-                var parseEndDate = DateHelper.ParseDate(endDate);
+                var employeeBsdEntities = await _bsdApplication.GetBsdEntitiesDtoByDateRangeAsync(startDate, endDate);
 
-                var employeeBsdEntities = await _bsdRepository.GetEmployeeBsdEntitiesByDateRangeAsync(parseStartDate, parseEndDate);
+                if (employeeBsdEntities == Empty || employeeBsdEntities == null)
+                    return BadRequest($"Nenhum BSD pode ser encontrado entre as datas {startDate} e {endDate}.");
 
                 return Ok(employeeBsdEntities);
             }
@@ -74,11 +78,7 @@ namespace Bsd.API.Controllers
         {
             try
             {
-                var parseDateService = DateHelper.ParseDate(dateService);
-                var bsdEntity = await _bsdService.CreateBsdAsync(bsdNumber, parseDateService, employeeRegistration, digit);
-
-                await _geralRepository.SaveChangesAsync();
-
+                await _bsdApplication.CreateBsdAsync(bsdNumber, dateService, employeeRegistration, digit);
                 return Ok();
             }
             catch (Exception ex)
@@ -88,13 +88,11 @@ namespace Bsd.API.Controllers
         }
 
         [HttpPost("addEmployee")]
-        public async Task<IActionResult> AddEmployeeToBsdEntity(int bsdNumber, int employeeRegistration, int digit)
+        public async Task<IActionResult> AddEmployeeToBsdEntity(int bsdNumber)
         {
             try
             {
                 var bsdEntity = await _bsdRepository.GetBsdByIdAsync(bsdNumber);
-                await _bsdService.AddEmployeesToBsdAsync(bsdEntity, employeeRegistration, digit);
-
                 return Ok();
             }
             catch (Exception ex)
