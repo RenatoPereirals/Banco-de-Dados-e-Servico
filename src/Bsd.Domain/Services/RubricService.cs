@@ -20,7 +20,7 @@ namespace Bsd.Domain.Services
             _employeeService = employeeService;
         }
 
-        public async Task<List<Rubric>> FilterRubricsByServiceTypeAndDayAsync(ServiceType serviceType, DayType dayType)
+        public async Task<IEnumerable<Rubric>> FilterRubricsByServiceTypeAndDayAsync(ServiceType serviceType, DayType dayType)
         {
             var allRubrics = await _rubricRepository.GetAllRubricsAsync();
             return allRubrics.Where(r => r.ServiceType == serviceType && r.DayType == dayType).ToList();
