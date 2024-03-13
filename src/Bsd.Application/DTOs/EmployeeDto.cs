@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Bsd.Application.DTOs
 {
-    public class EmployeeDtos
+    public class EmployeeDto
     {
         public int Registration { get; set; }
         public int Digit { get; set; }
