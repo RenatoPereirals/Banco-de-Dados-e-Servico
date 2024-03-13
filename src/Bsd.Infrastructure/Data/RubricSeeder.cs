@@ -25,6 +25,14 @@ namespace Bsd.Infrastructure.Data
                     DayType = DayType.Workday,
                     ServiceType = ServiceType.P140
                 },
+                new()
+                {
+                    Code = "1335",
+                    Description = "3h/dia de 50% (hora extra)",
+                    HoursPerDay = 3.0M,
+                    DayType = DayType.Workday,
+                    ServiceType = ServiceType.P110
+                },
             };
         }
     }
