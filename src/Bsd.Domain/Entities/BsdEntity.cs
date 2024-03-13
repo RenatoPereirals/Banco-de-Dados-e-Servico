@@ -6,6 +6,6 @@ namespace Bsd.Domain.Entities
         public int BsdNumber { get; set; }
         public DateTime DateService { get; set; }
         public DayType DayType { get; set; }
-        public ICollection<EmployeeBsdEntity> EmployeeBsdEntities { get; set; } = new List<EmployeeBsdEntity>();
+        public IEnumerable<EmployeeBsdEntity> EmployeeBsdEntities { get; set; } = new List<EmployeeBsdEntity>();
     }
 }
