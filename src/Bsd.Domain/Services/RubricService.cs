@@ -20,61 +20,38 @@ namespace Bsd.Domain.Services
             _employeeService = employeeService;
         }
 
-        public async Task<IEnumerable<Rubric>> FilterRubricsByServiceTypeAndDayAsync(ServiceType serviceType, DayType dayType)
+        public async Task<List<EmployeeRubricHours>> GetEmployeeRubricHoursAsync(DateTime startDate, DateTime endDate)
+        {
+            var bsdEntities = await _bsdRepository.GetBsdEntitiesByDateRangeAsync(startDate, endDate);
+            var result = new List<EmployeeRubricHours>();
+
+            foreach (var bsdEntity in bsdEntities)
+            {
+                var employee = bsdEntity.EmployeeBsdEntities.First().Employee;
+                var totalDays = await _employeeService.CalculateEmployeeWorkedDays(employee.Registration, startDate, endDate);
+                var rubrics = await FilterRubricsByServiceTypeAndDayAsync(employee.ServiceType, bsdEntity.DayType);
+
+                var employeeRubricHours = rubrics.Select(rubric => new EmployeeRubricHours
+                {
+                    EmployeeRegistration = employee.Registration,
+                    RubricCode = rubric.Code,
+                    TotalHours = GetRubricHour(rubric) * totalDays
+                });
+                result.AddRange(employeeRubricHours);
+            }
+            return result;
+        }
+
+        private async Task<IEnumerable<Rubric>> FilterRubricsByServiceTypeAndDayAsync(ServiceType serviceType, DayType dayType)
         {
             var allRubrics = await _rubricRepository.GetAllRubricsAsync();
             return allRubrics.Where(r => r.ServiceType == serviceType && r.DayType == dayType).ToList();
         }
 
-        public async Task<List<EmployeeRubricHours>> CalculateTotalHoursPerMonthByRubricsForEmployeeAsync(int registration, DateTime startDate, DateTime endDate)
-        {
-            IEnumerable<BsdEntity> bsdEntities = await _bsdRepository.GetEmployeeBsdEntitiesByDateRangeAsync(startDate, endDate);
-            var result = new List<EmployeeRubricHours>();
-            int totalDays = await _employeeService.CalculateEmployeeWorkedDays(registration, startDate, endDate);
-            IEnumerable<Rubric> rubrics = GetRubricsInEmployeeBsdEntity(bsdEntities);
-
-            foreach (var bsdEntity in bsdEntities)
-            {
-                foreach (var rubric in rubrics)
-                {
-                    result.Add(new EmployeeRubricHours
-                    {
-                        EmployeeRegistration = registration,
-                        RubricCode = rubric.Code,
-                        TotalHours = GetRubricHour(rubric) * totalDays
-                    });
-                }
-            }
-            return result;
-        }
-
         private static decimal GetRubricHour(Rubric rubric)
         {
-            var rubricHour = rubric.HoursPerDay;
-            return rubricHour;
+            return rubric.HoursPerDay;
         }
 
-        private IEnumerable<Rubric> GetRubricsInEmployeeBsdEntity(IEnumerable<BsdEntity> employeeBsdEntities)
-        {
-            IEnumerable<EmployeeBsdEntity> employeeBsds = GetEmployeeBsdEntitiesInBsdEntity(employeeBsdEntities);
-            var rubricList = new List<Rubric>();
-
-            foreach (var employeeBsdEntity in employeeBsds)
-            {
-                rubricList.AddRange(employeeBsdEntity.Rubrics);
-            }
-            return rubricList;
-        }
-
-        private IEnumerable<EmployeeBsdEntity> GetEmployeeBsdEntitiesInBsdEntity(IEnumerable<BsdEntity> bsdEntities)
-        {
-            var employeeBsdEntities = new List<EmployeeBsdEntity>();
-
-            foreach (var bsdEntity in bsdEntities)
-            {
-                employeeBsdEntities.AddRange(bsdEntity.EmployeeBsdEntities);
-            }
-            return employeeBsdEntities;
-        }
     }
 }
