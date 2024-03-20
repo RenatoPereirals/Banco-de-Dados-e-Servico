@@ -13,18 +13,15 @@ namespace Bsd.Infrastructure.RepositoryImpl
         private readonly IGeralRepository _geralRepository;
         private readonly IDayTypeChecker _dayTypeChecker;
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly IRubricService _rubricService;
         public BsdRepository(BsdDbContext context,
                              IGeralRepository geralRepository,
                              IDayTypeChecker dayTypeChecker,
-                             IEmployeeRepository employeeRepository,
-                             IRubricService rubricService) : base(context)
+                             IEmployeeRepository employeeRepository) : base(context)
         {
             _context = context;
             _geralRepository = geralRepository;
             _dayTypeChecker = dayTypeChecker;
             _employeeRepository = employeeRepository;
-            _rubricService = rubricService;
         }
 
         public async Task CreateBsdAsync(int bsdNumber, DateTime dateService, int employeeRegistration, int digit)
@@ -41,7 +38,6 @@ namespace Bsd.Infrastructure.RepositoryImpl
                     DayType = day,
                 };
 
-                var employeeBsdEntity = CreateEmployeeBsdEntityAsync(bsdEntity, employee);
                 _geralRepository.Create(bsdEntity);
                 await _geralRepository.SaveChangesAsync();
             }
@@ -52,7 +48,7 @@ namespace Bsd.Infrastructure.RepositoryImpl
             }
         }
 
-        public async Task<IEnumerable<BsdEntity>> GetEmployeeBsdEntitiesByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<BsdEntity>> GetBsdEntitiesByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
             return await GetBsdQuery()
                .Where(b => b.DateService.Date >= startDate.Date && b.DateService.Date <= endDate.Date)
@@ -70,25 +66,6 @@ namespace Bsd.Infrastructure.RepositoryImpl
                 .OrderBy(b => b.BsdNumber)
                 .FirstOrDefaultAsync(b => b.BsdNumber == bsdId)
                 ?? throw new InvalidOperationException($"Bsd com o número {bsdId} não encontrado.");
-        }
-
-        private async Task<EmployeeBsdEntity> CreateEmployeeBsdEntityAsync(BsdEntity bsdEntity, Employee employee)
-        {
-            var rubrics = await _rubricService.FilterRubricsByServiceTypeAndDayAsync(employee.ServiceType, bsdEntity.DayType);
-            if (rubrics == null || !rubrics.Any())
-                throw new Exception("Nenhuma rubrica encontrada.");
-
-            var employeeBsdEntity = new EmployeeBsdEntity()
-            {
-                EmployeeRegistration = employee.Registration,
-                Employee = employee,
-                BsdNumber = bsdEntity.BsdNumber,
-                BsdEntity = bsdEntity,
-                Rubrics = rubrics
-            };
-            _geralRepository.Create(employeeBsdEntity);
-
-            return employeeBsdEntity;
         }
 
         private IQueryable<BsdEntity> GetBsdQuery()

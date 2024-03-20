@@ -2,6 +2,7 @@ using Bsd.Application.Interfaces;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.IIS.Core;
 
 namespace Bsd.API.Controllers
 {
@@ -10,33 +11,31 @@ namespace Bsd.API.Controllers
     public class BsdController : ControllerBase
     {
         private readonly IBsdRepository _bsdRepository;
-        private readonly IGeralRepository _geralRepository;
-        private readonly IBsdService _bsdService;
         private readonly IBsdApplicationService _bsdApplication;
+        private readonly IEmployeeRepository _employeeRepository;
+
 
         public BsdController(IBsdRepository bsdRepository,
-                             IGeralRepository geralRepository,
-                             IBsdService bsdService,
-                             IBsdApplicationService bsdApplication)
+                             IBsdApplicationService bsdApplication,
+                             IEmployeeRepository employeeRepository)
         {
             _bsdRepository = bsdRepository;
-            _geralRepository = geralRepository;
-            _bsdService = bsdService;
             _bsdApplication = bsdApplication;
+            _employeeRepository = employeeRepository;
 
         }
 
         [HttpGet("{startDate}/{endDate}")]
-        public async Task<IActionResult> GetEmployeeBsdEntities(string startDate, string endDate)
+        public async Task<IActionResult> GetBsdEntities(string startDate, string endDate)
         {
             try
             {
-                var employeeBsdEntities = await _bsdApplication.GetBsdEntitiesDtoByDateRangeAsync(startDate, endDate);
-
-                if (employeeBsdEntities == Empty || employeeBsdEntities == null)
+                var bsd = await _bsdApplication.GetBsdEntitiesDtoByDateRangeAsync(startDate, endDate);
+                if (bsd == Empty || bsd == null)
                     return BadRequest($"Nenhum BSD pode ser encontrado entre as datas {startDate} e {endDate}.");
 
-                return Ok(employeeBsdEntities);
+
+                return Ok(bsd);
             }
             catch (Exception ex)
             {
@@ -78,6 +77,9 @@ namespace Bsd.API.Controllers
         {
             try
             {
+                var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeRegistration)
+                    ?? throw new Exception($"Funcionário com a matrícula {employeeRegistration} não encontrado.");
+
                 await _bsdApplication.CreateBsdAsync(bsdNumber, dateService, employeeRegistration, digit);
                 return Ok();
             }

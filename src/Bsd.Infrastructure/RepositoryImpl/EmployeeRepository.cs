@@ -21,11 +21,11 @@ namespace Bsd.Infrastructure.RepositoryImpl
             return await query.ToListAsync();
         }
 
-        public async Task<Employee> GetEmployeeByRegistrationAsync(int employeeId)
+        public async Task<Employee> GetEmployeeByRegistrationAsync(int registration)
         {
             return await GetEmployeeQuery()
-                .FirstOrDefaultAsync(e => e.Registration == employeeId)
-                    ?? throw new InvalidOperationException($"Funcionário com o matrícula {employeeId} não encontrado.");
+                .FirstOrDefaultAsync(e => e.Registration == registration)
+                    ?? throw new InvalidOperationException($"Funcionário com o matrícula {registration} não encontrado.");
         }
 
         private IQueryable<Employee> GetEmployeeQuery()

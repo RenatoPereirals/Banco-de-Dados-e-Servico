@@ -14,10 +14,5 @@ namespace Bsd.Domain.Services
             _geralRepository = geralRepository;
             _bsdRepository = bsdRepository;
         }
-
-        public async Task CreateBsdAsync(int bsdNumber, DateTime dateService, int employeeRegistration, int digit)
-        {
-            await _bsdRepository.CreateBsdAsync(bsdNumber, dateService, employeeRegistration, digit);
-        }
     }
 }

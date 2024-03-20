@@ -24,17 +24,25 @@ namespace Bsd.Domain.Persistence.RepositoryImpl
 
         public async Task CreateRubricAsync(string code, string description, decimal hoursPerDay, DayType dayType, ServiceType serviceType)
         {
-            var rubric = new Rubric
+            try
             {
-                Code = code,
-                Description = description,
-                HoursPerDay = hoursPerDay,
-                DayType = dayType,
-                ServiceType = serviceType
-            };
 
-            _geralRepository.Create(rubric);
-            await _geralRepository.SaveChangesAsync();
+                var rubric = new Rubric
+                {
+                    Code = code,
+                    Description = description,
+                    HoursPerDay = hoursPerDay,
+                    DayType = dayType,
+                    ServiceType = serviceType
+                };
+
+                _geralRepository.Create(rubric);
+                await _geralRepository.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception($"Erro ao tentar criar rubica. Error: {ex.InnerException}");
+            }
         }
     }
 }

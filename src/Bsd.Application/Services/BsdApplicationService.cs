@@ -2,6 +2,7 @@ using AutoMapper;
 using Bsd.API.Helpers;
 using Bsd.Application.DTOs;
 using Bsd.Application.Interfaces;
+using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 
@@ -10,19 +11,13 @@ namespace Bsd.Application.Services
     public class BsdApplicationService : IBsdApplicationService
     {
         private readonly IBsdRepository _bsdRepository;
-        private readonly IMapper _mapper;
-        private readonly IGeralRepository _geralRepository;
-        private readonly IBsdService _bsdService;
+        private readonly IRubricService _rubricService;
 
-        public BsdApplicationService(IMapper mapper,
-                                     IBsdRepository bsdRepository,
-                                     IGeralRepository geralRepository,
-                                     IBsdService bsdService)
+        public BsdApplicationService(IBsdRepository bsdRepository,
+                                     IRubricService rubricService)
         {
-            _mapper = mapper;
             _bsdRepository = bsdRepository;
-            _geralRepository = geralRepository;
-            _bsdService = bsdService;
+            _rubricService = rubricService;
         }
 
         public async Task CreateBsdAsync(int bsdNumber, string dateService, int employeeRegistration, int digit)
@@ -30,8 +25,7 @@ namespace Bsd.Application.Services
             try
             {
                 var parseDateService = DateHelper.ParseDate(dateService);
-                await _bsdService.CreateBsdAsync(bsdNumber, parseDateService, employeeRegistration, digit);
-                await _geralRepository.SaveChangesAsync();
+                await _bsdRepository.CreateBsdAsync(bsdNumber, parseDateService, employeeRegistration, digit);
             }
             catch (Exception ex)
             {
@@ -39,15 +33,15 @@ namespace Bsd.Application.Services
             }
         }
 
-        public async Task<IEnumerable<BsdEntityDto>> GetBsdEntitiesDtoByDateRangeAsync(string startDate, string endDate)
+        public async Task<IEnumerable<EmployeeRubricHours>> GetBsdEntitiesDtoByDateRangeAsync(string startDate, string endDate)
         {
             try
             {
                 var parseStartDate = DateHelper.ParseDate(startDate);
                 var parseEndDate = DateHelper.ParseDate(endDate);
-                var bsdEntities = await _bsdRepository.GetEmployeeBsdEntitiesByDateRangeAsync(parseStartDate, parseEndDate);
+                var bsdEntities = await _rubricService.GetEmployeeRubricHoursAsync(parseStartDate, parseEndDate);
 
-                return _mapper.Map<IEnumerable<BsdEntityDto>>(bsdEntities);
+                return bsdEntities;
             }
             catch (Exception ex)
             {

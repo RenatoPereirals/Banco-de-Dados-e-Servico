@@ -18,21 +18,20 @@ namespace Bsd.Application.Services
     {
         private readonly IEmployeeService _employeeService;
         private readonly IGeralRepository _geralRepository;
-        private readonly IMapper _mapper;
 
         public EmployeeApplicationService(IGeralRepository geralRepository,
-                                          IEmployeeService employeeService,
-                                          IMapper mapper)
+                                          IEmployeeService employeeService)
         {
             _employeeService = employeeService;
             _geralRepository = geralRepository;
-            _mapper = mapper;
         }
 
         public async Task CreateEmployeeAsync(int registration, string serviceType)
         {
             try
             {
+                serviceType = serviceType.Replace(" ", "");
+
                 if (!Enum.TryParse(serviceType, out ServiceType service))
                 {
                     throw new ArgumentException($"O tipo de serviço {serviceType} não existe.", nameof(serviceType));
