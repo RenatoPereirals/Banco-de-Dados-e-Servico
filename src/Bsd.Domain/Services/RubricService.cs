@@ -1,3 +1,4 @@
+using System.Net;
 using Bsd.Domain.Entities;
 using Bsd.Domain.Enums;
 using Bsd.Domain.Repository.Interfaces;
@@ -22,12 +23,15 @@ namespace Bsd.Domain.Services
 
         public async Task<List<EmployeeRubricHours>> GetEmployeeRubricHoursAsync(DateTime startDate, DateTime endDate)
         {
-            var bsdEntities = await _bsdRepository.GetBsdEntitiesByDateRangeAsync(startDate, endDate);
+            var bsdEntities = await _bsdRepository.GetBsdEntitiesByDateRangeAsync(startDate, endDate)
+                ?? throw new Exception("Não foi possivel encontrar nenhum BSD entre as datas {startDate} e {endDate}");
             var result = new List<EmployeeRubricHours>();
 
             foreach (var bsdEntity in bsdEntities)
             {
-                var employee = bsdEntity.EmployeeBsdEntities.First().Employee;
+                var employeeBsdEntity = bsdEntity.EmployeeBsdEntities.FirstOrDefault()
+                    ?? throw new Exception("Erro ao tentar resgatar BSD. Relação entre Employess e BSD nula.");
+                var employee = employeeBsdEntity.Employee;
                 var totalDays = await _employeeService.CalculateEmployeeWorkedDays(employee.Registration, startDate, endDate);
                 var rubrics = await FilterRubricsByServiceTypeAndDayAsync(employee.ServiceType, bsdEntity.DayType);
 
