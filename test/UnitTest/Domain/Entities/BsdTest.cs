@@ -2,23 +2,25 @@
 namespace test.Domain.Entities
 {
     public class BsdTest
-    {        
-
+    {
         [Fact]
-        public void BsdConstructor_ShouldCreateInstance()
+        public void BsdEntity_ShouldInitializePropertiesWithValues()
         {
             // Arrange
-            var bsdNumber = 25123;
-            var dateService = DateTime.Now;
-            var employeeList = new List<EmployeeBsdEntity>();
+            var bsd = new BsdEntity();
+            var expectedBsdNumber = 25123;
+            var expectedDateService = DateTime.UtcNow;
+            var expectedEmployeeList = new List<EmployeeBsdEntity>();
 
             // Act
-            var bsd = new BsdEntity(bsdNumber, dateService);
+            bsd.BsdNumber = expectedBsdNumber;
+            bsd.DateService = expectedDateService;
+            bsd.EmployeeBsdEntities = expectedEmployeeList;
 
             // Assert
-            Assert.Equal(bsdNumber, bsd.BsdNumber);
-            Assert.Equal(dateService, bsd.DateService);
-            Assert.Equal(employeeList, bsd.EmployeeBsdEntities);
+            Assert.Equal(expectedBsdNumber, bsd.BsdNumber);
+            Assert.Equal(expectedDateService, bsd.DateService);
+            Assert.Same(expectedEmployeeList, bsd.EmployeeBsdEntities);
         }
     }
 }
