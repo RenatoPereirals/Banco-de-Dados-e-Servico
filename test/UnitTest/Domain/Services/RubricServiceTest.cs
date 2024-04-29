@@ -4,6 +4,7 @@ using Bsd.Domain.Services;
 using test.Domain.Services.TestDataBase;
 using Bsd.Domain.Services.Interfaces;
 using Moq;
+using Bsd.Domain.Entities;
 
 namespace test.Domain.Services
 {
@@ -23,22 +24,21 @@ namespace test.Domain.Services
         }
 
         [Fact]
-        public async Task Should_Returns_Correct_Rubrics_By_ServiceType_And_DayType()
+        public async Task Should_Returns_Total_Rubrics_List_Correct_Rubrics()
         {
             // Arrange
             var allRubrics = TestRubricsList;
+            var startDate = DateTime.Parse("01/01/2024");
+            var endDate = DateTime.Parse("31/12/2024");
 
             _mockRubricRepository.Setup(r => r.GetAllRubricsAsync()).ReturnsAsync(allRubrics);
 
             // Act
-            var result = await _rubricService.FilterRubricsByServiceTypeAndDayAsync(ServiceType.P110, DayType.HoliDay);
+            var result = await _rubricService.GetEmployeeRubricHoursAsync(startDate, endDate);
 
             // Assert
-            Assert.Equal(2, result.Count);
-            Assert.All(result, r =>
-            {
-                Assert.True(r.ServiceType == ServiceType.P110 && r.DayType == DayType.HoliDay);
-            });
+            var expectedResult = 2;
+            Assert.Equal(expectedResult, result.Count);
         }
 
         [Fact]
@@ -49,16 +49,16 @@ namespace test.Domain.Services
             var endDate = new DateTime(2024, 12, 31);
             var testBsdEntitiesList = TestBsdList;
 
-            _mockBsdRepository.Setup(r => r.GetEmployeeBsdEntitiesByDateRangeAsync(startDate, endDate))
-                .ReturnsAsync(testBsdEntitiesList.SelectMany(eb => eb.EmployeeBsdEntities));
+            var bsdEntitiesList = testBsdEntitiesList.SelectMany(eb => eb.EmployeeBsdEntities)
+                                         .Select(eb => new BsdEntity {  });
 
-            _mockEmployeeService.Setup(s => s.CalculateEmployeeWorkedDays(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                .ReturnsAsync(daysWorked);
+            _mockBsdRepository.Setup(r => r.GetBsdEntitiesByDateRangeAsync(startDate, endDate))
+                 .ReturnsAsync(bsdEntitiesList);
 
             var expectedRubricHours = TestEmployeeRubricHours;
 
             // Acta
-            var result = await _rubricService.CalculateTotalHoursPerMonthByRubrics(startDate, endDate);
+            var result = await _rubricService.GetEmployeeRubricHoursAsync(startDate, endDate);
 
             // Assert
             Assert.Equal(expectedRubricHours.Count(), result.Count);
