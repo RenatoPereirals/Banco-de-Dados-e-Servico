@@ -14,17 +14,57 @@ namespace test.Domain.Services.TestDataBase
         protected static List<Rubric> TestRubricsList => new()
         {
             // Codigo, Descrição, Horas/dia, Tipo de dia, Tipo de servico
-            new("1", "a", 3M, DayType.HoliDay, ServiceType.P110),
-            new("2", "b", 2M, DayType.HoliDay, ServiceType.P110),
-            new("3", "c", 1M, DayType.Sunday, ServiceType.P140),
-            new("4", "d", 1M, DayType.Workday, ServiceType.P140),
+            new()
+            {
+                Code = "1",
+                Description = "a",
+                HoursPerDay = 3M,
+                DayType= DayType.HoliDay,
+                ServiceType = ServiceType.P110
+            },
+            new()
+            {
+                Code ="2",
+                Description = "b",
+                HoursPerDay = 2M,
+                DayType = DayType.HoliDay,
+                ServiceType = ServiceType.P110
+            },
+            new()
+            {
+                Code ="3",
+                Description = "c",
+                HoursPerDay = 1M,
+                DayType = DayType.Sunday,
+                ServiceType = ServiceType.P140
+            },
+            new()
+            {
+                Code ="4",
+                Description = "d",
+                HoursPerDay = 1M,
+                DayType = DayType.Workday,
+                ServiceType = ServiceType.P140
+            }
         };
 
         protected static List<Employee> TestEmployeeList => new()
         {
-                new(1234, ServiceType.P110),
-                new(2345, ServiceType.P140),
-                new(3456, ServiceType.P140)
+                new()
+                {
+                    Registration =1234,
+                    ServiceType = ServiceType.P110
+                },
+                new()
+                {
+                    Registration =2345,
+                    ServiceType =ServiceType.P140
+                },
+                new()
+                {
+                    Registration = 3456,
+                    ServiceType = ServiceType.P140
+                }
         };
 
         private static List<BsdEntity> GenerateTestBsdList()
@@ -35,11 +75,18 @@ namespace test.Domain.Services.TestDataBase
 
             for (int i = 0; i < daysWorked; i++)
             {
-                var bsdEntity = new BsdEntity(employeeRegistration, dateService.AddDays(i * 2));
-                var employee = new Employee(employeeRegistration, ServiceType.P140);
+                var bsdEntity = new BsdEntity()
+                {
+                    DateService = dateService.AddDays(i * 2)
+                };
+                var employee = new Employee()
+                {
+                    Registration = employeeRegistration,
+                    ServiceType = ServiceType.P140
+                };
                 var employeeBsdEntity = GenerateTestEmployeeBsdEntitiesList(employee, bsdEntity);
 
-                bsdEntity.EmployeeBsdEntities.Add(employeeBsdEntity);
+                bsdEntity.EmployeeBsdEntities.ToList().Add(employeeBsdEntity);
 
                 testBsdList.Add(bsdEntity);
                 // employeeRegistration += 1111;
@@ -50,8 +97,12 @@ namespace test.Domain.Services.TestDataBase
 
         private static EmployeeBsdEntity GenerateTestEmployeeBsdEntitiesList(Employee employee, BsdEntity bsdEntity)
         {
-            var employeeBsdEntity = new EmployeeBsdEntity(employee.Registration, employee, bsdEntity.BsdNumber, bsdEntity)
+            var employeeBsdEntity = new EmployeeBsdEntity()
             {
+                EmployeeRegistration = employee.Registration,
+                Employee = employee,
+                BsdNumber = bsdEntity.BsdNumber,
+                BsdEntity = bsdEntity,
                 Rubrics = TestRubricsList
             };
 
