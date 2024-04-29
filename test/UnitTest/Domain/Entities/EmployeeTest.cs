@@ -6,18 +6,23 @@ namespace test.Domain.Entities
     public class EmployeeTest
     {
         [Fact]
-        public void EmployeeConstructor_ShouldCreateInstance()
+        public void Employee_ShouldInitializePropertiesWithValues()
         {
             // Arrange
-            var bsdList = new List<EmployeeBsdEntity>();
-            Employee employee = new(1525, ServiceType.P140);
+            var employee = new Employee();
+            var expectedregistration = 1234;
+            var expectedService = ServiceType.P140;
+            var expectedEmployeeList = new List<EmployeeBsdEntity>();
 
             // Act
-            var typeServiceString = employee.ServiceType.ToString();
+            employee.Registration = expectedregistration;
+            employee.ServiceType = expectedService;
+            employee.EmployeeBsdEntities = expectedEmployeeList;
 
             // Assert
-            Assert.Equal("P140", typeServiceString);
-            Assert.Equal(bsdList, employee.EmployeeBsdEntities);
+            Assert.Equal(expectedregistration, employee.Registration);
+            Assert.Equal(expectedService, employee.ServiceType);
+            Assert.Same(expectedEmployeeList, employee.EmployeeBsdEntities);
         }
     }
 }
