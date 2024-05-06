@@ -6,7 +6,7 @@ namespace Bsd.Domain.Entities
         private int _bsdNumber;
         private DateTime _dateService;
         private DayType _dayTape;
-        private IEnumerable<EmployeeBsdEntity> _employeeBsdEntities = new List<EmployeeBsdEntity>();
+        private ICollection<EmployeeBsdEntity> _employeeBsdEntities = new List<EmployeeBsdEntity>();
 
         public int BsdNumber
         {
@@ -26,7 +26,7 @@ namespace Bsd.Domain.Entities
             set { _dayTape = value; }
         }
 
-        public IEnumerable<EmployeeBsdEntity> EmployeeBsdEntities
+        public ICollection<EmployeeBsdEntity> EmployeeBsdEntities
         {
             get { return _employeeBsdEntities; }
             set { _employeeBsdEntities = value; }
