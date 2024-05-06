@@ -70,7 +70,7 @@ namespace test.Domain.Services.TestDataBase
         private static List<BsdEntity> GenerateTestBsdList()
         {
             var testBsdList = new List<BsdEntity>();
-            var dateService = DateTime.Parse("1/1/2024");
+            var dateService = new DateTime(2024, 1, 1);
             var employeeRegistration = 1234;
 
             for (int i = 0; i < daysWorked; i++)
@@ -86,7 +86,7 @@ namespace test.Domain.Services.TestDataBase
                 };
                 var employeeBsdEntity = GenerateTestEmployeeBsdEntitiesList(employee, bsdEntity);
 
-                bsdEntity.EmployeeBsdEntities.ToList().Add(employeeBsdEntity);
+                bsdEntity.EmployeeBsdEntities.Add(employeeBsdEntity);
 
                 testBsdList.Add(bsdEntity);
                 // employeeRegistration += 1111;
@@ -94,7 +94,6 @@ namespace test.Domain.Services.TestDataBase
 
             return testBsdList;
         }
-
         private static EmployeeBsdEntity GenerateTestEmployeeBsdEntitiesList(Employee employee, BsdEntity bsdEntity)
         {
             var employeeBsdEntity = new EmployeeBsdEntity()
