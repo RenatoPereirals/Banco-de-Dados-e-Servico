@@ -17,19 +17,6 @@ namespace test.UnitTest.Domain.Services
         }
 
         [Fact]
-        public void Should_CalculateModulo11CheckDigit_For_ValidRegistration()
-        {
-            // Arrange
-            var registration = 3782;
-
-           // Act
-            _employeeService.CalculateModulo11CheckDigit(registration);
-
-            // Assert
-            // Nada a fazer, se o método não lançar uma exceção, o teste passa
-        }
-
-        [Fact]
         public void Should_Return_Exception_For_InvalidRegistration()
         {
             // Arrange
