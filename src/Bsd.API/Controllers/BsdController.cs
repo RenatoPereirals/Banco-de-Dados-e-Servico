@@ -1,8 +1,7 @@
+using Bsd.Application.DTOs;
 using Bsd.Application.Interfaces;
 using Bsd.Domain.Repository.Interfaces;
-using Bsd.Domain.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.IIS.Core;
 
 namespace Bsd.API.Controllers
 {
@@ -73,19 +72,22 @@ namespace Bsd.API.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreatedBsdEntity(int bsdNumber, string dateService, int employeeRegistration, int digit)
+        public async Task<IActionResult> Post([FromBody] CreateBsdRequest request)
         {
             try
             {
-                var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeRegistration)
-                    ?? throw new Exception($"Funcionário com a matrícula {employeeRegistration} não encontrado.");
+                var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(request.EmployeeRegistration)
+                    ?? throw new Exception($"Funcionário com a matrícula {request.EmployeeRegistration} não encontrado.");
 
-                await _bsdApplication.CreateBsdAsync(bsdNumber, dateService, employeeRegistration, digit);
-                return Ok();
+                await _bsdApplication.CreateBsdAsync(request.BsdNumber, request.DateService, request.EmployeeRegistration, request.Digit);
+                return CreatedAtAction(nameof(Post), new { request.BsdNumber, request.DateService, request.EmployeeRegistration, request.Digit });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(ex.Message);
+                // TO DO: Log the exception
+                //_logger.LogError(ex, "Erro ao tentar criar BSD.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                  $"Ocorreu um erro interno. Por favor, tente novamente.");
             }
         }
 
