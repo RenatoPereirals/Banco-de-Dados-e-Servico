@@ -24,7 +24,7 @@ namespace Bsd.Infrastructure.RepositoryImpl
             _employeeRepository = employeeRepository;
         }
 
-        public async Task CreateBsdAsync(int bsdNumber, DateTime dateService, int employeeRegistration, int digit)
+        public async Task<bool> CreateBsdAsync(int bsdNumber, DateTime dateService, int employeeRegistration, int digit)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace Bsd.Infrastructure.RepositoryImpl
                 };
 
                 _geralRepository.Create(bsdEntity);
-                await _geralRepository.SaveChangesAsync();
+                return await _geralRepository.SaveChangesAsync();
             }
             catch (DbUpdateException ex)
             {
