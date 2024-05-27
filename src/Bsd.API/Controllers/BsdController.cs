@@ -79,14 +79,25 @@ namespace Bsd.API.Controllers
 
             try
             {
-                var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(request.EmployeeRegistration)
-                    ?? throw new Exception($"Funcionário com a matrícula {request.EmployeeRegistration} não encontrado.");
+                var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(request.EmployeeRegistration);
 
-                await _bsdApplication.CreateBsdAsync(request.BsdNumber, request.DateService, request.EmployeeRegistration, request.Digit);
+                if (employee == null)
+                    return BadRequest($"Funcionário com a matrícula {request.EmployeeRegistration} não encontrado.");
 
-                return CreatedAtAction(nameof(Post), new { request.BsdNumber, request.DateService, request.EmployeeRegistration, request.Digit });
+                await _bsdApplication.CreateBsdAsync(request);
+
+                var isCreated = await _bsdApplication.CreateBsdAsync(request);
+
+                if (isCreated)
+                {
+                    return CreatedAtAction(nameof(Post), new { request });
+                }
+                else
+                {
+                    return BadRequest("Falha ao criar o BSD.");
+                }
             }
-            catch (Exception)
+            catch (ApplicationException)
             {
                 // TO DO: Log the exception
                 //_logger.LogError(ex, "Erro ao tentar criar BSD.");
