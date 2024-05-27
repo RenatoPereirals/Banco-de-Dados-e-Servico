@@ -13,6 +13,7 @@ public class BsdControllerTests
     private readonly Mock<IEmployeeRepository> _mockEmployeeRepository;
     private readonly Mock<IBsdApplicationService> _mockBsdApplication;
     private readonly BsdController _bsdController;
+    private readonly CreateBsdRequest _request;
 
     public BsdControllerTests()
     {
@@ -24,7 +25,13 @@ public class BsdControllerTests
                                            _mockBsdApplication.Object,
                                            _mockEmployeeRepository.Object);
 
-
+        _request = new CreateBsdRequest
+        {
+            BsdNumber = 1234,
+            EmployeeRegistration = 1235,
+            DateService = DateTime.UtcNow.ToString(),
+            Digit = 8
+        };
     }
 
     public override bool Equals(object? obj)
@@ -41,29 +48,38 @@ public class BsdControllerTests
     public async void Post_ReturnsCreatedAtActionResult_WhenBSDIsSuccessfullyInserted()
     {
         // Arrange
-        var request = new CreateBsdRequest
-        {
-            BsdNumber = 1234,
-            EmployeeRegistration = 1235,
-            DateService = DateTime.UtcNow.ToString(),
-            Digit = 8
-        };
-
         var employee = new Employee { Registration = 1234 };
 
         _mockEmployeeRepository
-            .Setup(repo => repo.GetEmployeeByRegistrationAsync(request.EmployeeRegistration))
+            .Setup(repo => repo.GetEmployeeByRegistrationAsync(_request.EmployeeRegistration))
             .ReturnsAsync(employee);
 
         _mockBsdApplication
-            .Setup(app => app.CreateBsdAsync(request.BsdNumber, request.DateService, request.EmployeeRegistration, request.Digit))
+            .Setup(app => app.CreateBsdAsync(_request.BsdNumber, _request.DateService, _request.EmployeeRegistration, _request.Digit))
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _bsdController.Post(request);
+        var result = await _bsdController.Post(_request);
 
         // Assert
         var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
         Assert.Equal(201, createdAtActionResult.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async void Post_ReturnsBadRequestObjectResult_WhenBSDIsInvalid(string dateService)
+    {
+        // Arrange
+        _request.DateService = dateService;
+
+        // Act
+        var result = await _bsdController.Post(_request);
+
+        // Assert
+        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+        Assert.Equal(400, badRequestResult.StatusCode);
+        Assert.Equal("A data do serviço é obrigatória.", badRequestResult.Value);
     }
 }
