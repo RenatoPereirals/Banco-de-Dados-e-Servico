@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using AutoMapper;
 using Bsd.API.Helpers;
 using Bsd.Application.DTOs;
@@ -20,12 +21,12 @@ namespace Bsd.Application.Services
             _rubricService = rubricService;
         }
 
-        public async Task CreateBsdAsync(int bsdNumber, string dateService, int employeeRegistration, int digit)
+        public async Task<bool> CreateBsdAsync(CreateBsdRequest request)
         {
             try
             {
-                var parseDateService = DateHelper.ParseDate(dateService);
-                await _bsdRepository.CreateBsdAsync(bsdNumber, parseDateService, employeeRegistration, digit);
+                var parseDateService = DateHelper.ParseDate(request.DateService);
+                return await _bsdRepository.CreateBsdAsync(request.BsdNumber, parseDateService, request.EmployeeRegistration, request.Digit);
             }
             catch (Exception ex)
             {
