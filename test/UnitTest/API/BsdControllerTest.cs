@@ -3,6 +3,7 @@ using Bsd.Application.DTOs;
 using Bsd.Application.Interfaces;
 using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -55,8 +56,8 @@ public class BsdControllerTests
             .ReturnsAsync(employee);
 
         _mockBsdApplication
-            .Setup(app => app.CreateBsdAsync(_request.BsdNumber, _request.DateService, _request.EmployeeRegistration, _request.Digit))
-            .Returns(Task.CompletedTask);
+            .Setup(app => app.CreateBsdAsync(_request))
+            .ReturnsAsync(true);
 
         // Act
         var result = await _bsdController.Post(_request);
@@ -66,20 +67,37 @@ public class BsdControllerTests
         Assert.Equal(201, createdAtActionResult.StatusCode);
     }
 
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    public async void Post_ReturnsBadRequestObjectResult_WhenBSDIsInvalid(string dateService)
+    [Fact]
+    public async void Post_ReturnsBadRequestObjectResult_WhenEmployeeNotFound()
     {
-        // Arrange
-        _request.DateService = dateService;
-
-        // Act
+        // Arrange & Act
         var result = await _bsdController.Post(_request);
 
         // Assert
-        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+        var badRequestResult = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
         Assert.Equal(400, badRequestResult.StatusCode);
-        Assert.Equal("A data do serviço é obrigatória.", badRequestResult.Value);
+        Assert.Equal("Funcionário com a matrícula 1235 não encontrado.", badRequestResult.Value);
+    }
+
+    [Fact]
+    public async Task Post_ReturnsInternalServerError_WhenExceptionIsThrown()
+    {
+        // Arrange & Act
+        var employee = new Employee { Registration = 1234 };
+
+        _mockEmployeeRepository
+            .Setup(repo => repo.GetEmployeeByRegistrationAsync(_request.EmployeeRegistration))
+            .ReturnsAsync(employee);
+        _mockBsdApplication.Setup(app => app.CreateBsdAsync(_request))
+                            .ThrowsAsync(new ApplicationException(
+                                "Ocorreu um erro interno. Por favor, tente novamente."));
+
+        var result = await _bsdController.Post(_request);
+
+
+        // Assert
+        var statusCodeResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+        Assert.Equal("Ocorreu um erro interno. Por favor, tente novamente.", statusCodeResult.Value);
     }
 }
