@@ -74,12 +74,16 @@ namespace Bsd.API.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> Post([FromBody] CreateBsdRequest request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(request.EmployeeRegistration)
                     ?? throw new Exception($"Funcionário com a matrícula {request.EmployeeRegistration} não encontrado.");
 
                 await _bsdApplication.CreateBsdAsync(request.BsdNumber, request.DateService, request.EmployeeRegistration, request.Digit);
+
                 return CreatedAtAction(nameof(Post), new { request.BsdNumber, request.DateService, request.EmployeeRegistration, request.Digit });
             }
             catch (Exception)
