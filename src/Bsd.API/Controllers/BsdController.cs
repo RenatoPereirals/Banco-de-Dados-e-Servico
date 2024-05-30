@@ -25,7 +25,7 @@ namespace Bsd.API.Controllers
         }
 
         [HttpGet("{startDate}/{endDate}")]
-        public async Task<IActionResult> GetBsdEntities(string startDate, string endDate)
+        public async Task<IActionResult> GetBsdByDate(string startDate, string endDate)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace Bsd.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllBsdEntiteis()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
@@ -57,7 +57,7 @@ namespace Bsd.API.Controllers
         }
 
         [HttpGet("{bsdNumber}")]
-        public async Task<IActionResult> GetBsdEntity(int bsdNumber)
+        public async Task<IActionResult> GetBsdById(int bsdNumber)
         {
             try
             {
@@ -84,25 +84,24 @@ namespace Bsd.API.Controllers
                 if (employee == null)
                     return BadRequest($"Funcionário com a matrícula {request.EmployeeRegistration} não encontrado.");
 
-                await _bsdApplication.CreateBsdAsync(request);
+                var createdBsd = await _bsdApplication.CreateBsdAsync(request);
 
-                var isCreated = await _bsdApplication.CreateBsdAsync(request);
+                if (createdBsd == null)
+                    return NoContent();
 
-                if (isCreated)
-                {
-                    return CreatedAtAction(nameof(Post), new { request });
-                }
-                else
-                {
-                    return BadRequest("Falha ao criar o BSD.");
-                }
+                return CreatedAtAction(nameof(GetBsdById), new { id = createdBsd.BsdNumber }, createdBsd);
             }
             catch (ApplicationException)
             {
-                // TO DO: Log the exception
-                //_logger.LogError(ex, "Erro ao tentar criar BSD.");
+                // _logger.LogError(ex, "Erro ao tentar criar BSD.");
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                                  $"Ocorreu um erro interno. Por favor, tente novamente.");
+                                  "Ocorreu um erro interno. Por favor, tente novamente.");
+            }
+            catch (Exception)
+            {
+                // _logger.LogError(ex, "Erro inesperado ao tentar criar BSD.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                  "Ocorreu um erro inesperado. Por favor, tente novamente.");
             }
         }
 
