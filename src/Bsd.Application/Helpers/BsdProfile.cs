@@ -10,6 +10,7 @@ namespace Bsd.Application.Helpers
         public BsdProfile()
         {
             CreateMap<BsdEntity, BsdEntityDto>().ReverseMap();
+            CreateMap<CreateBsdRequest, BsdEntityDto>().ReverseMap();
         }
     }
 }
