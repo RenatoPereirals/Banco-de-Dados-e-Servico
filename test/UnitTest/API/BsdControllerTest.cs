@@ -50,14 +50,15 @@ public class BsdControllerTests
     {
         // Arrange
         var employee = new Employee { Registration = 1234 };
+        var createdBsd = new CreateBsdRequest();
 
         _mockEmployeeRepository
             .Setup(repo => repo.GetEmployeeByRegistrationAsync(_request.EmployeeRegistration))
             .ReturnsAsync(employee);
 
         _mockBsdApplication
-            .Setup(app => app.CreateBsdAsync(_request))
-            .ReturnsAsync(true);
+        .Setup(app => app.CreateBsdAsync(_request))
+        .ReturnsAsync(createdBsd);
 
         // Act
         var result = await _bsdController.Post(_request);
