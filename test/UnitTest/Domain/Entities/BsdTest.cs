@@ -10,17 +10,17 @@ namespace test.Domain.Entities
             var bsd = new BsdEntity();
             var expectedBsdNumber = 25123;
             var expectedDateService = DateTime.UtcNow;
-            var expectedEmployeeList = new List<EmployeeBsdEntity>();
+            var expectedEmployeeList = new List<Employee>();
 
             // Act
             bsd.BsdNumber = expectedBsdNumber;
             bsd.DateService = expectedDateService;
-            bsd.EmployeeBsdEntities = expectedEmployeeList;
+            bsd.Employees = expectedEmployeeList;
 
             // Assert
             Assert.Equal(expectedBsdNumber, bsd.BsdNumber);
             Assert.Equal(expectedDateService, bsd.DateService);
-            Assert.Same(expectedEmployeeList, bsd.EmployeeBsdEntities);
+            Assert.Same(expectedEmployeeList, bsd.Employees);
         }
     }
 }
