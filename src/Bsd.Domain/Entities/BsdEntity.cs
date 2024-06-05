@@ -1,36 +1,18 @@
-﻿using Bsd.Domain.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using Bsd.Domain.Enums;
 namespace Bsd.Domain.Entities
 {
     public class BsdEntity
     {
-        private int _bsdNumber;
-        private DateTime _dateService;
-        private DayType _dayTape;
-        private ICollection<EmployeeBsdEntity> _employeeBsdEntities = new List<EmployeeBsdEntity>();
-
-        public int BsdNumber
+        public BsdEntity()
         {
-            get { return _bsdNumber; }
-            set { _bsdNumber = value; }
+            Employees = new HashSet<Employee>();
         }
-
-        public DateTime DateService
-        {
-            get { return _dateService; }
-            set { _dateService = value; }
-        }
-
-        public DayType DayType
-        {
-            get { return _dayTape; }
-            set { _dayTape = value; }
-        }
-
-        public ICollection<EmployeeBsdEntity> EmployeeBsdEntities
-        {
-            get { return _employeeBsdEntities; }
-            set { _employeeBsdEntities = value; }
-        }
-
+        
+        [Key]
+        public int BsdNumber { get; set; }
+        public DateTime DateService { get; set; }
+        public DayType DayType { get; set; }
+        public ICollection<Employee> Employees { get; set; }
     }
 }
