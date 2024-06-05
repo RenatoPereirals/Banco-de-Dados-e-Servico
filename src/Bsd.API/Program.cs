@@ -21,7 +21,6 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<BsdDbContext>(options => options.UseSqlite(connectionString));
 
 builder.Services.AddTransient<EmployeeSeeder>();
-builder.Services.AddTransient<RubricSeeder>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
