@@ -32,7 +32,7 @@ namespace Bsd.Infrastructure.RepositoryImpl
         {
             return _context.Employees
                 .AsNoTracking()
-                .Include(e => e.EmployeeBsdEntities)
+                .Include(e => e.BsdEntities)
                 .OrderBy(e => e.Registration);
         }
     }
