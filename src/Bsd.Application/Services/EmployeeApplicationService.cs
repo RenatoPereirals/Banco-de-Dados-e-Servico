@@ -1,15 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Bsd.Application.DTOs;
+
 using Bsd.Application.Interfaces;
 using Bsd.Domain.Entities;
 using Bsd.Domain.Enums;
 using Bsd.Domain.Repository.Interfaces;
-using Bsd.Domain.Services;
 using Bsd.Domain.Services.Interfaces;
 
 namespace Bsd.Application.Services
@@ -41,10 +34,6 @@ namespace Bsd.Application.Services
 
                 var employee = new Employee();
                 _geralRepository.Create(employee);
-
-                employee.SetRegistration(registration);
-                employee.SetServiceType(service);
-                employee.SetDigit(digit);
 
                 await _geralRepository.SaveChangesAsync();
 
