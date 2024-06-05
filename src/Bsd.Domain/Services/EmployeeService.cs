@@ -1,3 +1,4 @@
+using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 namespace Bsd.Domain.Services
@@ -15,8 +16,8 @@ namespace Bsd.Domain.Services
             var bsdEntities = await _bsdRepository.GetAllBsdAsync();
             return bsdEntities
                 .Where(bsdDate => bsdDate.DateService >= startDate && bsdDate.DateService <= endDate)
-                .SelectMany(bsdEntity => bsdEntity.EmployeeBsdEntities)
-                .Count(employeeBsdEntity => employeeRegistration == employeeBsdEntity.Employee.Registration);
+                .SelectMany(bsdEntity => bsdEntity.Employees)
+                .Count(employee => employeeRegistration == employee.Registration);
         }
 
         public int CalculateModulo11CheckDigit(int registrationValue)
