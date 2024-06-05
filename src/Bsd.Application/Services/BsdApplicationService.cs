@@ -35,9 +35,7 @@ namespace Bsd.Application.Services
                 var parseDateService = DateHelper.ParseDate(request.DateService);
                 var bsd = _mapper.Map<BsdEntity>(request);
 
-                _geralRepository.Create<BsdEntity>(bsd);
-
-                if (await _geralRepository.SaveChangesAsync())
+                if (await _bsdRepository.CreateBsdAsync(bsd))
                 {
                     var bsdReturn = await _bsdRepository.GetBsdByIdAsync(bsd.BsdNumber);
                     return _mapper.Map<CreateBsdRequest>(bsdReturn);
