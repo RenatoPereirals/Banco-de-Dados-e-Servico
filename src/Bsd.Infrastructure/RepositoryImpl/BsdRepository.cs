@@ -1,5 +1,4 @@
 using Bsd.Domain.Entities;
-using Bsd.Domain.Enums;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 using Bsd.Infrastructure.Context;
@@ -12,30 +11,30 @@ namespace Bsd.Infrastructure.RepositoryImpl
         private readonly BsdDbContext _context;
         private readonly IGeralRepository _geralRepository;
         private readonly IDayTypeChecker _dayTypeChecker;
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeService _employeeService;
         public BsdRepository(BsdDbContext context,
                              IGeralRepository geralRepository,
                              IDayTypeChecker dayTypeChecker,
-                             IEmployeeRepository employeeRepository) : base(context)
+                             IEmployeeService employeeService) : base(context)
         {
             _context = context;
             _geralRepository = geralRepository;
             _dayTypeChecker = dayTypeChecker;
-            _employeeRepository = employeeRepository;
+            _employeeService = employeeService;
         }
 
-        public async Task<bool> CreateBsdAsync(int bsdNumber, DateTime dateService, int employeeRegistration, int digit)
+        public async Task<bool> CreateBsdAsync(BsdEntity bsd)
         {
             try
             {
-                var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeRegistration);
+                var day = _dayTypeChecker.GetDayType(bsd.DateService);
 
-                var day = _dayTypeChecker.GetDayType(dateService);
                 var bsdEntity = new BsdEntity
                 {
-                    BsdNumber = bsdNumber,
-                    DateService = dateService,
+                    BsdNumber = bsd.BsdNumber,
+                    DateService = bsd.DateService,
                     DayType = day,
+                    Employees = bsd.Employees
                 };
 
                 _geralRepository.Create(bsdEntity);
@@ -44,7 +43,11 @@ namespace Bsd.Infrastructure.RepositoryImpl
             catch (DbUpdateException ex)
             {
                 var innerException = ex.InnerException;
-                throw new Exception($"Erro ao tentar criar BSD. Error: {innerException!.Message}");
+                throw new DbUpdateException($"Erro ao tentar criar BSD.");
+            }
+            catch (Exception)
+            {
+                throw new Exception("Erro interno inesperado, tente novamente.");
             }
         }
 
@@ -71,8 +74,7 @@ namespace Bsd.Infrastructure.RepositoryImpl
         private IQueryable<BsdEntity> GetBsdQuery()
         {
             return _context.BsdEntities
-                .Include(b => b.EmployeeBsdEntities)
-                .ThenInclude(eb => eb.Employee)
+                .Include(eb => eb.Employees)
                 .AsNoTracking();
         }
     }
