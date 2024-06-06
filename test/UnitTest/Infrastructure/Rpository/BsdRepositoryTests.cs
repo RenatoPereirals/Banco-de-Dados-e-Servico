@@ -6,8 +6,10 @@ using Bsd.Infrastructure.Context;
 using Bsd.Infrastructure.RepositoryImpl;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Xunit;
+using System.Linq;
 
-namespace test.UnitTest.Infrastructure.Rpository
+namespace Test.UnitTest.Infrastructure.Repository
 {
     public class BsdRepositoryTests : IDisposable
     {
@@ -31,18 +33,38 @@ namespace test.UnitTest.Infrastructure.Rpository
             _bsdRepository = new BsdRepository(_context, _mockGeralRepository.Object, _mockDayTypeChecker.Object);
         }
 
-        [Fact]
-        public async Task CreateBsdAsync_ReturnsTrue_WhenValidInput()
+        private static BsdEntity CreateValidBsdEntity()
         {
-            // Arrange
-            var bsd = new BsdEntity
+            return new BsdEntity
             {
                 BsdNumber = 1234,
                 DateService = DateTime.Today,
                 Employees = new List<Employee>()
             };
-            _mockDayTypeChecker.Setup(d => d.GetDayType(bsd.DateService)).Returns(DayType.HoliDay);
-            _mockGeralRepository.Setup(r => r.SaveChangesAsync()).ReturnsAsync(true);
+        }
+
+        private void SetupDayTypeChecker(DayType dayType)
+        {
+            _mockDayTypeChecker.Setup(d => d.GetDayType(It.IsAny<DateTime>())).Returns(dayType);
+        }
+
+        private void SetupGeralRepositorySaveChangesAsync(bool result)
+        {
+            _mockGeralRepository.Setup(r => r.SaveChangesAsync()).ReturnsAsync(result);
+        }
+
+        private void SetupGeralRepositorySaveChangesAsyncException(Exception exception)
+        {
+            _mockGeralRepository.Setup(r => r.SaveChangesAsync()).ThrowsAsync(exception);
+        }
+
+        [Fact]
+        public async Task CreateBsdAsync_ReturnsTrue_WhenValidInput()
+        {
+            // Arrange
+            var bsd = CreateValidBsdEntity();
+            SetupDayTypeChecker(DayType.HoliDay);
+            SetupGeralRepositorySaveChangesAsync(true);
 
             // Act
             var result = await _bsdRepository.CreateBsdAsync(bsd);
@@ -54,41 +76,59 @@ namespace test.UnitTest.Infrastructure.Rpository
         }
 
         [Fact]
-        public async Task CreateBsdAsync_ReturnDbUpdateException_WhenDbUpdateException()
+        public async Task CreateBsdAsync_ThrowsDbUpdateException_WhenDbUpdateException()
         {
             // Arrange
-            var bsd = new BsdEntity
-            {
-                BsdNumber = 1234,
-                DateService = DateTime.Today,
-                Employees = new List<Employee>()
-            };
-            _mockDayTypeChecker.Setup(d => d.GetDayType(bsd.DateService)).Returns(DayType.Sunday);
-            _mockGeralRepository.Setup(r => r.SaveChangesAsync()).ThrowsAsync(new DbUpdateException());
+            var bsd = CreateValidBsdEntity();
+            SetupDayTypeChecker(DayType.Sunday);
+            SetupGeralRepositorySaveChangesAsyncException(new DbUpdateException());
 
             // Act & Assert
             await Assert.ThrowsAsync<DbUpdateException>(() => _bsdRepository.CreateBsdAsync(bsd));
         }
 
         [Fact]
-        public async Task CreateBsdAsync_ReturnException_WhenGenericException()
+        public async Task CreateBsdAsync_ThrowsException_WhenGenericException()
         {
             // Arrange
-            var bsd = new BsdEntity
-            {
-                BsdNumber = 1234,
-                DateService = DateTime.Today,
-                Employees = new List<Employee>()
-            };
-            _mockDayTypeChecker.Setup(d => d.GetDayType(bsd.DateService)).Throws(new Exception());
+            var bsd = CreateValidBsdEntity();
+            _mockDayTypeChecker.Setup(d => d.GetDayType(It.IsAny<DateTime>())).Throws(new Exception());
 
             // Act & Assert
             await Assert.ThrowsAsync<Exception>(() => _bsdRepository.CreateBsdAsync(bsd));
         }
 
+        [Fact]
+        public async Task CreateBsdAsync_PersistsDataCorrectly()
+        {
+            // Arrange
+            var bsd = CreateValidBsdEntity();
+            SetupDayTypeChecker(DayType.HoliDay);
+
+            // Configurar o mock para adicionar a entidade ao contexto real
+            _mockGeralRepository.Setup(r => r.Create(It.IsAny<BsdEntity>())).Callback<BsdEntity>(bsdEntity =>
+            {
+                _context.BsdEntities.Add(bsdEntity);
+                _context.SaveChanges();
+            });
+            SetupGeralRepositorySaveChangesAsync(true);
+
+            // Act
+            var result = await _bsdRepository.CreateBsdAsync(bsd);
+
+            // Assert
+            Assert.True(result);
+            var persistedEntity = _context.BsdEntities.FirstOrDefault(e => e.BsdNumber == bsd.BsdNumber);
+            Assert.NotNull(persistedEntity);
+            Assert.Equal(bsd.BsdNumber, persistedEntity.BsdNumber);
+            Assert.Equal(bsd.DateService, persistedEntity.DateService);
+            Assert.Equal(DayType.HoliDay, persistedEntity.DayType);
+        }
+
         public void Dispose()
         {
             _context.Database.EnsureDeleted(); // Excluir o banco de dados após os testes
+            GC.SuppressFinalize(this);
             _context.Dispose();
         }
     }
