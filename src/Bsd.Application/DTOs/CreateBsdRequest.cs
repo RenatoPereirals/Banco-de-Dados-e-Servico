@@ -10,9 +10,9 @@ namespace Bsd.Application.DTOs
         [Required(ErrorMessage = "A data do serviço é obrigatória.")]
         [DataType(DataType.Date)]
         public string DateService { get; set; } = string.Empty;
-
+        public DateTime DateServiceDate { get; set; }
         [Required(ErrorMessage = "A matrícula do funcionário é obrigatória.")]
-        public int EmployeeRegistration { get; set; }
+        public List<int> EmployeeRegistrations { get; set; } = new();
 
         [Required(ErrorMessage = "O dígito é obrigatório.")]
         [Range(0, 9, ErrorMessage = "O dígito deve estar entre 0 e 9.")]
