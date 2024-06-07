@@ -11,16 +11,13 @@ namespace Bsd.Infrastructure.RepositoryImpl
         private readonly BsdDbContext _context;
         private readonly IGeralRepository _geralRepository;
         private readonly IDayTypeChecker _dayTypeChecker;
-        private readonly IEmployeeService _employeeService;
         public BsdRepository(BsdDbContext context,
                              IGeralRepository geralRepository,
-                             IDayTypeChecker dayTypeChecker,
-                             IEmployeeService employeeService) : base(context)
+                             IDayTypeChecker dayTypeChecker) : base(context)
         {
             _context = context;
             _geralRepository = geralRepository;
             _dayTypeChecker = dayTypeChecker;
-            _employeeService = employeeService;
         }
 
         public async Task<bool> CreateBsdAsync(BsdEntity bsd)
@@ -29,12 +26,19 @@ namespace Bsd.Infrastructure.RepositoryImpl
             {
                 var day = _dayTypeChecker.GetDayType(bsd.DateService);
 
+                ICollection<Employee> employees = new List<Employee>();
+                foreach (var employee in bsd.Employees)
+                {
+                    employees.Add(employee);
+                }
+
                 var bsdEntity = new BsdEntity
                 {
-                    BsdNumber = bsd.BsdNumber,
+                    BsdId = bsd.BsdId,
                     DateService = bsd.DateService,
                     DayType = day,
-                    Employees = bsd.Employees
+                    Employees = employees,
+                    Rubrics = bsd.Rubrics
                 };
 
                 _geralRepository.Create(bsdEntity);
@@ -66,8 +70,8 @@ namespace Bsd.Infrastructure.RepositoryImpl
         public async Task<BsdEntity> GetBsdByIdAsync(int bsdId)
         {
             return await GetBsdQuery()
-                .OrderBy(b => b.BsdNumber)
-                .FirstOrDefaultAsync(b => b.BsdNumber == bsdId)
+                .OrderBy(b => b.BsdId)
+                .FirstOrDefaultAsync(b => b.BsdId == bsdId)
                 ?? throw new InvalidOperationException($"Bsd com o número {bsdId} não encontrado.");
         }
 
@@ -76,6 +80,11 @@ namespace Bsd.Infrastructure.RepositoryImpl
             return _context.BsdEntities
                 .Include(eb => eb.Employees)
                 .AsNoTracking();
+        }
+
+        public Task<BsdEntity> AddEmployeeToBsdAsync(int bsdId, int employeeId)
+        {
+            throw new NotImplementedException();
         }
     }
 }
