@@ -4,25 +4,21 @@ using Bsd.Application.DTOs;
 using Bsd.Application.Interfaces;
 using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
-using Bsd.Domain.Services.Interfaces;
 
 namespace Bsd.Application.Services
 {
     public class BsdApplicationService : IBsdApplicationService
     {
         private readonly IBsdRepository _bsdRepository;
-        private readonly IRubricService _rubricService;
-        private readonly IGeralRepository _geralRepository;
+        private readonly IEmployeeRepository _employeeRepository;
         private readonly IMapper _mapper;
 
         public BsdApplicationService(IBsdRepository bsdRepository,
-                                     IRubricService rubricService,
-                                     IGeralRepository geralRepository,
+                                     IEmployeeRepository employeeRepository,
                                      IMapper mapper)
         {
             _bsdRepository = bsdRepository;
-            _rubricService = rubricService;
-            _geralRepository = geralRepository;
+            _employeeRepository = employeeRepository;
             _mapper = mapper;
         }
 
@@ -32,12 +28,21 @@ namespace Bsd.Application.Services
 
             try
             {
-                var parseDateService = DateHelper.ParseDate(request.DateService);
+                request.DateServiceDate = DateHelper.ParseDate(request.DateService);
+
                 var bsd = _mapper.Map<BsdEntity>(request);
 
                 if (await _bsdRepository.CreateBsdAsync(bsd))
                 {
-                    var bsdReturn = await _bsdRepository.GetBsdByIdAsync(bsd.BsdNumber);
+                    foreach (var registration in request.EmployeeRegistrations)
+                    {
+                        var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(registration);
+                        if (employee != null)
+                        {
+                            await _bsdRepository.AddEmployeeToBsdAsync(bsd.BsdId, employee.EmployeeId);
+                        }
+                    }
+                    var bsdReturn = await _bsdRepository.GetBsdByIdAsync(bsd.BsdId);
                     return _mapper.Map<CreateBsdRequest>(bsdReturn);
                 }
 
@@ -47,22 +52,6 @@ namespace Bsd.Application.Services
             {
                 //_logger.LogError(ex, "Erro ao tentar criar BSD.");
                 throw new ApplicationException("Erro ao tentar criar BSD. Consulte o log para mais detalhes.");
-            }
-        }
-
-        public async Task<IEnumerable<EmployeeRubricHours>> GetBsdEntitiesDtoByDateRangeAsync(string startDate, string endDate)
-        {
-            try
-            {
-                var parseStartDate = DateHelper.ParseDate(startDate);
-                var parseEndDate = DateHelper.ParseDate(endDate);
-                var bsdEntities = await _rubricService.GetEmployeeRubricHoursAsync(parseStartDate, parseEndDate);
-
-                return bsdEntities;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao tentar resgatar bsd. Error: {ex.Message}");
             }
         }
 
@@ -79,10 +68,6 @@ namespace Bsd.Application.Services
             if (string.IsNullOrWhiteSpace(request.DateService))
             {
                 throw new ArgumentException("DateService não pode ser vazio ou nulo", nameof(request));
-            }
-            if (request.EmployeeRegistration <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(request), "EmployeeRegistration deve ser maior que zero");
             }
             if (request.Digit < 0)
             {
