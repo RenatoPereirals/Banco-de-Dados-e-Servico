@@ -1,4 +1,6 @@
+using Bsd.API.Helpers;
 using Bsd.Application.DTOs;
+using Bsd.Application.Helpers.Interfaces;
 using Bsd.Application.Interfaces;
 using Bsd.Domain.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -12,35 +14,38 @@ namespace Bsd.API.Controllers
         private readonly IBsdRepository _bsdRepository;
         private readonly IBsdApplicationService _bsdApplication;
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeValidationService _employeeValidationService;
 
 
         public BsdController(IBsdRepository bsdRepository,
                              IBsdApplicationService bsdApplication,
-                             IEmployeeRepository employeeRepository)
+                             IEmployeeRepository employeeRepository,
+                             IEmployeeValidationService employeeValidationService)
         {
             _bsdRepository = bsdRepository;
             _bsdApplication = bsdApplication;
             _employeeRepository = employeeRepository;
+            _employeeValidationService = employeeValidationService;
 
         }
 
-        [HttpGet("{startDate}/{endDate}")]
-        public async Task<IActionResult> GetBsdByDate(string startDate, string endDate)
-        {
-            try
-            {
-                var bsd = await _bsdApplication.GetBsdEntitiesDtoByDateRangeAsync(startDate, endDate);
-                if (bsd == Empty || bsd == null)
-                    return BadRequest($"Nenhum BSD pode ser encontrado entre as datas {startDate} e {endDate}.");
+        // [HttpGet("{startDate}/{endDate}")]
+        // public async Task<IActionResult> GetBsdByDate(string startDate, string endDate)
+        // {
+        //     try
+        //     {
+        //         var bsd = await _bsdApplication.GetBsdEntitiesDtoByDateRangeAsync(startDate, endDate);
+        //         if (bsd == Empty || bsd == null)
+        //             return BadRequest($"Nenhum BSD pode ser encontrado entre as datas {startDate} e {endDate}.");
 
 
-                return Ok(bsd);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        //         return Ok(bsd);
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return BadRequest(ex.Message);
+        //     }
+        // }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -79,10 +84,12 @@ namespace Bsd.API.Controllers
 
             try
             {
-                var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(request.EmployeeRegistration);
+                var invalidRegistrations = await _employeeValidationService.ValidateEmployeeRegistrationsAsync(request.EmployeeRegistrations);
 
-                if (employee == null)
-                    return BadRequest($"Funcionário com a matrícula {request.EmployeeRegistration} não encontrado.");
+                if (!invalidRegistrations)
+                {
+                    return BadRequest($"Funcionários com as matrículas {string.Join(", ", request.EmployeeRegistrations)} não encontrados.");
+                }
 
                 var createdBsd = await _bsdApplication.CreateBsdAsync(request);
 
