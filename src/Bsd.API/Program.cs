@@ -1,3 +1,5 @@
+using Bsd.API.Helpers;
+using Bsd.Application.Helpers.Interfaces;
 using Bsd.Application.Interfaces;
 using Bsd.Application.Services;
 
@@ -39,6 +41,8 @@ builder.Services.AddScoped<IRubricRepository, RubricRepository>();
 builder.Services.AddScoped<IBsdApplicationService, BsdApplicationService>();
 builder.Services.AddScoped<IEmployeeApplicationService, EmployeeApplicationService>();
 builder.Services.AddScoped<IRubricApplicationService, RubricApplicationService>();
+
+builder.Services.AddScoped<IEmployeeValidationService, EmployeeValidationService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
