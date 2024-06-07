@@ -33,31 +33,6 @@ namespace Test.UnitTest.Infrastructure.Repository
             _bsdRepository = new BsdRepository(_context, _mockGeralRepository.Object, _mockDayTypeChecker.Object);
         }
 
-        private static BsdEntity CreateValidBsdEntity()
-        {
-            return new BsdEntity
-            {
-                BsdNumber = 1234,
-                DateService = DateTime.Today,
-                Employees = new List<Employee>()
-            };
-        }
-
-        private void SetupDayTypeChecker(DayType dayType)
-        {
-            _mockDayTypeChecker.Setup(d => d.GetDayType(It.IsAny<DateTime>())).Returns(dayType);
-        }
-
-        private void SetupGeralRepositorySaveChangesAsync(bool result)
-        {
-            _mockGeralRepository.Setup(r => r.SaveChangesAsync()).ReturnsAsync(result);
-        }
-
-        private void SetupGeralRepositorySaveChangesAsyncException(Exception exception)
-        {
-            _mockGeralRepository.Setup(r => r.SaveChangesAsync()).ThrowsAsync(exception);
-        }
-
         [Fact]
         public async Task CreateBsdAsync_ReturnsTrue_WhenValidInput()
         {
@@ -118,11 +93,36 @@ namespace Test.UnitTest.Infrastructure.Repository
 
             // Assert
             Assert.True(result);
-            var persistedEntity = _context.BsdEntities.FirstOrDefault(e => e.BsdNumber == bsd.BsdNumber);
+            var persistedEntity = _context.BsdEntities.FirstOrDefault(e => e.BsdId == bsd.BsdId);
             Assert.NotNull(persistedEntity);
-            Assert.Equal(bsd.BsdNumber, persistedEntity.BsdNumber);
+            Assert.Equal(bsd.BsdId, persistedEntity.BsdId);
             Assert.Equal(bsd.DateService, persistedEntity.DateService);
             Assert.Equal(DayType.HoliDay, persistedEntity.DayType);
+        }
+
+        private static BsdEntity CreateValidBsdEntity()
+        {
+            return new BsdEntity
+            {
+                BsdId = 1234,
+                DateService = DateTime.Today,
+                Employees = new List<Employee>()
+            };
+        }
+
+        private void SetupDayTypeChecker(DayType dayType)
+        {
+            _mockDayTypeChecker.Setup(d => d.GetDayType(It.IsAny<DateTime>())).Returns(dayType);
+        }
+
+        private void SetupGeralRepositorySaveChangesAsync(bool result)
+        {
+            _mockGeralRepository.Setup(r => r.SaveChangesAsync()).ReturnsAsync(result);
+        }
+
+        private void SetupGeralRepositorySaveChangesAsyncException(Exception exception)
+        {
+            _mockGeralRepository.Setup(r => r.SaveChangesAsync()).ThrowsAsync(exception);
         }
 
         public void Dispose()
