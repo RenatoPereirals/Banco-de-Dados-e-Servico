@@ -15,11 +15,11 @@ namespace Bsd.API.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateRubric(string code, string description, decimal hoursPerDay, string dayType, string serviceType)
+        public async Task<IActionResult> CreateRubric(int rubricId, string description, decimal hoursPerDay, string dayType, string serviceType)
         {
             try
             {
-                await _rubricApplication.CreateRubricAsync(code, description, hoursPerDay, dayType, serviceType);
+                await _rubricApplication.CreateRubricAsync(rubricId, description, hoursPerDay, dayType, serviceType);
                 return Ok();
             }
             catch (Exception ex)
