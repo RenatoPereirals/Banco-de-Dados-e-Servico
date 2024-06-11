@@ -7,19 +7,16 @@ namespace Bsd.Infrastructure.Data
     {
         private readonly BsdDbContext _context;
         private readonly EmployeeSeeder _employeeSeeder;
-        private readonly RubricSeeder _rubricSeeder;
 
-        public BsdDbInitializer(BsdDbContext context, EmployeeSeeder employeeSeeder, RubricSeeder rubricSeeder)
+        public BsdDbInitializer(BsdDbContext context, EmployeeSeeder employeeSeeder)
         {
             _context = context;
             _employeeSeeder = employeeSeeder;
-            _rubricSeeder = rubricSeeder;
         }
 
         public void Initialize()
         {
             _employeeSeeder.Seed(_context, AddEntitiesIfNotExists);
-            _rubricSeeder.Seed(_context, AddEntitiesIfNotExists);
             _context.SaveChanges();
         }
 
