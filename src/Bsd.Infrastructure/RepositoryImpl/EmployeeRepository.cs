@@ -24,7 +24,7 @@ namespace Bsd.Infrastructure.RepositoryImpl
         public async Task<Employee> GetEmployeeByRegistrationAsync(int registration)
         {
             return await GetEmployeeQuery()
-                .FirstOrDefaultAsync(e => e.Registration == registration)
+                .FirstOrDefaultAsync(e => e.EmployeeId == registration)
                     ?? throw new InvalidOperationException($"Funcionário com o matrícula {registration} não encontrado.");
         }
 
@@ -33,7 +33,7 @@ namespace Bsd.Infrastructure.RepositoryImpl
             return _context.Employees
                 .AsNoTracking()
                 .Include(e => e.BsdEntities)
-                .OrderBy(e => e.Registration);
+                .OrderBy(e => e.EmployeeId);
         }
     }
 }
