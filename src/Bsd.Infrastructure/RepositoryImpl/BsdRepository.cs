@@ -11,13 +11,16 @@ namespace Bsd.Infrastructure.RepositoryImpl
         private readonly BsdDbContext _context;
         private readonly IGeralRepository _geralRepository;
         private readonly IDayTypeChecker _dayTypeChecker;
+        private readonly IBsdService _bsdServece;
         public BsdRepository(BsdDbContext context,
                              IGeralRepository geralRepository,
-                             IDayTypeChecker dayTypeChecker) : base(context)
+                             IDayTypeChecker dayTypeChecker,
+                             IBsdService bsdService) : base(context)
         {
             _context = context;
             _geralRepository = geralRepository;
             _dayTypeChecker = dayTypeChecker;
+            _bsdServece = bsdService;
         }
 
         public async Task<bool> CreateBsdAsync(BsdEntity bsd)
@@ -26,19 +29,13 @@ namespace Bsd.Infrastructure.RepositoryImpl
             {
                 var day = _dayTypeChecker.GetDayType(bsd.DateService);
 
-                ICollection<Employee> employees = new List<Employee>();
-                foreach (var employee in bsd.Employees)
-                {
-                    employees.Add(employee);
-                }
-
                 var bsdEntity = new BsdEntity
                 {
                     BsdId = bsd.BsdId,
                     DateService = bsd.DateService,
                     DayType = day,
-                    Employees = employees,
-                    Rubrics = bsd.Rubrics
+                    Employees = await AddEmployeeToBsdAsync(bsd),
+                    EmployeeRubrics = await _bsdServece.AssociateRubricsToEmployeesAsync(bsd, day)
                 };
 
                 _geralRepository.Create(bsdEntity);
@@ -82,9 +79,11 @@ namespace Bsd.Infrastructure.RepositoryImpl
                 .AsNoTracking();
         }
 
-        public Task<BsdEntity> AddEmployeeToBsdAsync(int bsdId, int employeeId)
+        public async Task<ICollection<Employee>> AddEmployeeToBsdAsync(BsdEntity bsd)
         {
-            throw new NotImplementedException();
+            var employees = bsd.Employees.Where(employee => employee != null).ToList();
+
+            return await Task.FromResult(employees);
         }
     }
 }
