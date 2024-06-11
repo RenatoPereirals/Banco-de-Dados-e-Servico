@@ -11,6 +11,7 @@ namespace Bsd.Infrastructure.Context
 
         public DbSet<BsdEntity> BsdEntities { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<Rubric> Rubrics { get; set; }
 
 #pragma warning restore CS8618
     }
