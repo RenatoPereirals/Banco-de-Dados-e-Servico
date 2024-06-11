@@ -15,12 +15,12 @@ namespace test.Domain.Entities
             var expectedEmployeeList = new List<BsdEntity>();
 
             // Act
-            employee.Registration = expectedregistration;
+            employee.EmployeeId = expectedregistration;
             employee.ServiceType = expectedService;
             employee.BsdEntities = expectedEmployeeList;
 
             // Assert
-            Assert.Equal(expectedregistration, employee.Registration);
+            Assert.Equal(expectedregistration, employee.EmployeeId);
             Assert.Equal(expectedService, employee.ServiceType);
             Assert.Same(expectedEmployeeList, employee.BsdEntities);
         }
