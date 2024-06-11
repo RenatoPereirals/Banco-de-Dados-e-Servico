@@ -7,14 +7,14 @@ namespace Bsd.Domain.Entities
         public BsdEntity()
         {
             Employees = new HashSet<Employee>();
-            Rubrics = new HashSet<Rubric>();
+            EmployeeRubrics = new HashSet<EmployeeRubric>();
         }
-        
+
         [Key]
         public int BsdId { get; set; }
         public DateTime DateService { get; set; }
         public DayType DayType { get; set; }
         public ICollection<Employee> Employees { get; set; }
-        public ICollection<Rubric> Rubrics { get; set; }
+        public ICollection<EmployeeRubric> EmployeeRubrics { get; set; }
     }
 }
