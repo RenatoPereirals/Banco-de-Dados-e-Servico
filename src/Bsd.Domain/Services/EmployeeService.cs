@@ -17,7 +17,7 @@ namespace Bsd.Domain.Services
             return bsdEntities
                 .Where(bsdDate => bsdDate.DateService >= startDate && bsdDate.DateService <= endDate)
                 .SelectMany(bsdEntity => bsdEntity.Employees)
-                .Count(employee => employeeRegistration == employee.Registration);
+                .Count(employee => employeeRegistration == employee.EmployeeId);
         }
 
         public int CalculateModulo11CheckDigit(int registrationValue)
