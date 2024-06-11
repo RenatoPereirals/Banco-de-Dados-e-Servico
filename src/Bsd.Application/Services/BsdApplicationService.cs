@@ -39,7 +39,7 @@ namespace Bsd.Application.Services
                         var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(registration);
                         if (employee != null)
                         {
-                            await _bsdRepository.AddEmployeeToBsdAsync(bsd.BsdId, employee.EmployeeId);
+                            await _bsdRepository.AddEmployeeToBsdAsync(bsd);
                         }
                     }
                     var bsdReturn = await _bsdRepository.GetBsdByIdAsync(bsd.BsdId);
