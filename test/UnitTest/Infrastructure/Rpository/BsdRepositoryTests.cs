@@ -17,6 +17,7 @@ namespace Test.UnitTest.Infrastructure.Repository
         private readonly BsdRepository _bsdRepository;
         private readonly Mock<IGeralRepository> _mockGeralRepository;
         private readonly Mock<IDayTypeChecker> _mockDayTypeChecker;
+        private readonly Mock<IBsdService> _mockBsdService;
 
         public BsdRepositoryTests()
         {
@@ -27,10 +28,14 @@ namespace Test.UnitTest.Infrastructure.Repository
             _context = new BsdDbContext(options);
             _context.Database.OpenConnection(); // Abrir conexão
             _context.Database.EnsureCreated(); // Garantir que o banco de dados foi criado
+
             _mockGeralRepository = new Mock<IGeralRepository>();
             _mockDayTypeChecker = new Mock<IDayTypeChecker>();
+            _mockBsdService = new Mock<IBsdService>();
 
-            _bsdRepository = new BsdRepository(_context, _mockGeralRepository.Object, _mockDayTypeChecker.Object);
+            _bsdRepository = new BsdRepository(_context, _mockGeralRepository.Object,
+                                               _mockDayTypeChecker.Object,
+                                               _mockBsdService.Object);
         }
 
         [Fact]
@@ -80,7 +85,6 @@ namespace Test.UnitTest.Infrastructure.Repository
             var bsd = CreateValidBsdEntity();
             SetupDayTypeChecker(DayType.HoliDay);
 
-            // Configurar o mock para adicionar a entidade ao contexto real
             _mockGeralRepository.Setup(r => r.Create(It.IsAny<BsdEntity>())).Callback<BsdEntity>(bsdEntity =>
             {
                 _context.BsdEntities.Add(bsdEntity);
