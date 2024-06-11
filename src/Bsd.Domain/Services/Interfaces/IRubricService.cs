@@ -5,6 +5,6 @@ namespace Bsd.Domain.Services.Interfaces
 {
     public interface IRubricService
     {
-        Task<List<EmployeeRubricHours>> GetEmployeeRubricHoursAsync(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<Rubric>> FilterRubricsByServiceTypeAndDayAsync(ServiceType serviceType, DayType dayType);
     }
 }
