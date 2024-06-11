@@ -11,7 +11,7 @@ namespace Bsd.Domain.Entities
         }
 
         [Key]
-        public int Registration { get; set; }
+        public int EmployeeId { get; set; }
         public int Digit { get; set; }
         public ServiceType ServiceType { get; set; }
         public DateTime DateService { get; set; }
