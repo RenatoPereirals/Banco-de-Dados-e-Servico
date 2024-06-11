@@ -17,19 +17,19 @@ namespace Bsd.Domain.Persistence.RepositoryImpl
             _context = context;
             _geralRepository = geralRepository;
         }
-        public async Task<IEnumerable<Rubric>> GetAllRubricsAsync()
+        public Task<IEnumerable<Rubric>> GetAllRubricsAsync()
         {
-            return await _context.Rubrics.ToListAsync();
+            throw new NotImplementedException();
         }
 
-        public async Task CreateRubricAsync(string code, string description, decimal hoursPerDay, DayType dayType, ServiceType serviceType)
+        public async Task CreateRubricAsync(int rubricId, string description, decimal hoursPerDay, DayType dayType, ServiceType serviceType)
         {
             try
             {
 
                 var rubric = new Rubric
                 {
-                    Code = code,
+                    RubricId = rubricId,
                     Description = description,
                     HoursPerDay = hoursPerDay,
                     DayType = dayType,
@@ -43,6 +43,15 @@ namespace Bsd.Domain.Persistence.RepositoryImpl
             {
                 throw new Exception($"Erro ao tentar criar rubica. Error: {ex.InnerException}");
             }
+        }
+
+        public async Task<IEnumerable<Rubric>> GetRubricsByServiceTypeAndDayTypeAsync(ServiceType serviceType, DayType dayType)
+        {
+            var rubrics = await _context.Rubrics
+                .Where(rubric => rubric.ServiceType == serviceType && rubric.DayType == dayType)
+                .ToListAsync();
+
+            return rubrics;
         }
     }
 }
