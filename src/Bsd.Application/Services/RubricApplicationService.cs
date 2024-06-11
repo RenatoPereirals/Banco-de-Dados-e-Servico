@@ -13,7 +13,7 @@ namespace Bsd.Application.Services
             _rubricRepository = rubricRepository;
         }
 
-        public async Task CreateRubricAsync(string code, string description, decimal hoursPerDay, string dayType, string serviceType)
+        public async Task CreateRubricAsync(int rubricId, string description, decimal hoursPerDay, string dayType, string serviceType)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace Bsd.Application.Services
                     throw new ArgumentException($"O tipo de serviço {serviceType} não existe.", nameof(serviceType));
                 }
 
-                await _rubricRepository.CreateRubricAsync(code, description, hoursPerDay, day, service);
+                await _rubricRepository.CreateRubricAsync(rubricId, description, hoursPerDay, day, service);
             }
             catch (ArgumentException ex)
             {
