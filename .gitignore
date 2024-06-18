@@ -486,3 +486,7 @@ $RECYCLE.BIN/
 serviceDependencies.json
 serviceDependencies.local.json
 
+# Ignorar arquivos de banco de dados
+*.db
+*.db-shm
+*.db-wal
