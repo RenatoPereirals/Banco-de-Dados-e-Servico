@@ -481,3 +481,8 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Ignorar arquivos de dependências de serviço
+serviceDependencies.json
+serviceDependencies.local.json
+
