@@ -24,11 +24,27 @@ namespace test.Domain.Services.TestDataBase
             },
             new()
             {
+                RubricId = 1,
+                Description = "a",
+                HoursPerDay = 3M,
+                DayType= DayType.HoliDay,
+                ServiceType = ServiceType.P140
+            },
+            new()
+            {
                 RubricId =2,
                 Description = "b",
                 HoursPerDay = 2M,
-                DayType = DayType.HoliDay,
+                DayType = DayType.Workday,
                 ServiceType = ServiceType.P110
+            },
+            new()
+            {
+                RubricId =2,
+                Description = "b",
+                HoursPerDay = 2M,
+                DayType = DayType.Workday,
+                ServiceType = ServiceType.P140
             },
             new()
             {
@@ -40,11 +56,27 @@ namespace test.Domain.Services.TestDataBase
             },
             new()
             {
+                RubricId =3,
+                Description = "c",
+                HoursPerDay = 1M,
+                DayType = DayType.Sunday,
+                ServiceType = ServiceType.P110
+            },
+            new()
+            {
                 RubricId = 4,
                 Description = "d",
                 HoursPerDay = 1M,
-                DayType = DayType.Workday,
+                DayType = DayType.SundayAndHoliday,
                 ServiceType = ServiceType.P140
+            },
+            new()
+            {
+                RubricId = 4,
+                Description = "d",
+                HoursPerDay = 1M,
+                DayType = DayType.SundayAndHoliday,
+                ServiceType = ServiceType.P110
             }
         };
 
@@ -88,25 +120,9 @@ namespace test.Domain.Services.TestDataBase
                 bsdEntity.Employees.Add(employee);
 
                 testBsdList.Add(bsdEntity);
-                // employeeRegistration += 1111;
             }
 
             return testBsdList;
         }
-
-        // private static List<EmployeeRubricHours> GenerateExpectedRubricHours()
-        // {
-        //     var list = new List<EmployeeRubricHours>();
-
-        //     for (int i = 0; i < daysWorked; i++)
-        //     {
-        //         list.Add(new EmployeeRubricHours { EmployeeId = testEmployeeRegistration, RubricId = 1, TotalHours = 3M });
-        //         list.Add(new EmployeeRubricHours { EmployeeId = testEmployeeRegistration, RubricId = 2, TotalHours = 2M });
-        //         list.Add(new EmployeeRubricHours { EmployeeId = testEmployeeRegistration, RubricId = 3, TotalHours = 1M });
-        //         list.Add(new EmployeeRubricHours { EmployeeId = testEmployeeRegistration, RubricId = 4, TotalHours = 1M });
-        //     }
-
-        //     return list;
-        // }
     }
 }
