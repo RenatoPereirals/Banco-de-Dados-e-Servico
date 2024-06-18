@@ -19,7 +19,7 @@ namespace Bsd.Infrastructure.Migrations
 
             modelBuilder.Entity("Bsd.Domain.Entities.BsdEntity", b =>
                 {
-                    b.Property<int>("BsdNumber")
+                    b.Property<int>("BsdId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -29,14 +29,14 @@ namespace Bsd.Infrastructure.Migrations
                     b.Property<int>("DayType")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("BsdNumber");
+                    b.HasKey("BsdId");
 
                     b.ToTable("BsdEntities");
                 });
 
             modelBuilder.Entity("Bsd.Domain.Entities.Employee", b =>
                 {
-                    b.Property<int>("Registration")
+                    b.Property<int>("EmployeeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -49,30 +49,42 @@ namespace Bsd.Infrastructure.Migrations
                     b.Property<int>("ServiceType")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("Registration");
+                    b.HasKey("EmployeeId");
 
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("Bsd.Domain.Entities.EmployeeBsdEntity", b =>
+            modelBuilder.Entity("Bsd.Domain.Entities.EmployeeRubric", b =>
                 {
-                    b.Property<int>("EmployeeRegistration")
+                    b.Property<int>("EmployeeRubricId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("BsdNumber")
+                    b.Property<int>("BsdEntityId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("EmployeeRegistration", "BsdNumber");
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("INTEGER");
 
-                    b.HasIndex("BsdNumber");
+                    b.Property<int>("RubricId")
+                        .HasColumnType("INTEGER");
 
-                    b.ToTable("EmployeesBsdEntities");
+                    b.HasKey("EmployeeRubricId");
+
+                    b.HasIndex("BsdEntityId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("RubricId");
+
+                    b.ToTable("EmployeeRubrics");
                 });
 
             modelBuilder.Entity("Bsd.Domain.Entities.Rubric", b =>
                 {
-                    b.Property<string>("Code")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("RubricId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("DayType")
                         .HasColumnType("INTEGER");
@@ -81,64 +93,77 @@ namespace Bsd.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("EmployeeBsdEntityBsdNumber")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("EmployeeBsdEntityEmployeeRegistration")
-                        .HasColumnType("INTEGER");
-
                     b.Property<decimal>("HoursPerDay")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ServiceType")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("Code");
-
-                    b.HasIndex("EmployeeBsdEntityEmployeeRegistration", "EmployeeBsdEntityBsdNumber");
+                    b.HasKey("RubricId");
 
                     b.ToTable("Rubrics");
                 });
 
-            modelBuilder.Entity("Bsd.Domain.Entities.EmployeeBsdEntity", b =>
+            modelBuilder.Entity("BsdEntityEmployee", b =>
+                {
+                    b.Property<int>("BsdEntitiesBsdId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EmployeesEmployeeId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("BsdEntitiesBsdId", "EmployeesEmployeeId");
+
+                    b.HasIndex("EmployeesEmployeeId");
+
+                    b.ToTable("BsdEntityEmployee");
+                });
+
+            modelBuilder.Entity("Bsd.Domain.Entities.EmployeeRubric", b =>
                 {
                     b.HasOne("Bsd.Domain.Entities.BsdEntity", "BsdEntity")
-                        .WithMany("EmployeeBsdEntities")
-                        .HasForeignKey("BsdNumber")
+                        .WithMany("EmployeeRubrics")
+                        .HasForeignKey("BsdEntityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Bsd.Domain.Entities.Employee", "Employee")
-                        .WithMany("EmployeeBsdEntities")
-                        .HasForeignKey("EmployeeRegistration")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bsd.Domain.Entities.Rubric", "Rubric")
+                        .WithMany()
+                        .HasForeignKey("RubricId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("BsdEntity");
 
                     b.Navigation("Employee");
+
+                    b.Navigation("Rubric");
                 });
 
-            modelBuilder.Entity("Bsd.Domain.Entities.Rubric", b =>
+            modelBuilder.Entity("BsdEntityEmployee", b =>
                 {
-                    b.HasOne("Bsd.Domain.Entities.EmployeeBsdEntity", null)
-                        .WithMany("Rubrics")
-                        .HasForeignKey("EmployeeBsdEntityEmployeeRegistration", "EmployeeBsdEntityBsdNumber");
+                    b.HasOne("Bsd.Domain.Entities.BsdEntity", null)
+                        .WithMany()
+                        .HasForeignKey("BsdEntitiesBsdId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bsd.Domain.Entities.Employee", null)
+                        .WithMany()
+                        .HasForeignKey("EmployeesEmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Bsd.Domain.Entities.BsdEntity", b =>
                 {
-                    b.Navigation("EmployeeBsdEntities");
-                });
-
-            modelBuilder.Entity("Bsd.Domain.Entities.Employee", b =>
-                {
-                    b.Navigation("EmployeeBsdEntities");
-                });
-
-            modelBuilder.Entity("Bsd.Domain.Entities.EmployeeBsdEntity", b =>
-                {
-                    b.Navigation("Rubrics");
+                    b.Navigation("EmployeeRubrics");
                 });
 #pragma warning restore 612, 618
         }

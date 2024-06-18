@@ -35,8 +35,13 @@ try
     builder.Host.UseSerilog();
 
     // Configuração do DbContext
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    builder.Services.AddDbContext<BsdDbContext>(options => options.UseSqlite(connectionString));
+    builder.Services.AddDbContext<BsdDbContext>(options =>
+    options.UseSqlite(builder.Configuration
+        .GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Connection string not found.")));
+
+
+
 
     // Configuração dos serviços
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -60,6 +65,7 @@ try
     builder.Services.AddScoped<IEmployeeValidationService, EmployeeValidationService>();
 
     // Configuração dos controllers e Swagger
+    builder.Services.AddControllersWithViews();
     builder.Services.AddControllers();
     IServiceCollection serviceCollection = builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
