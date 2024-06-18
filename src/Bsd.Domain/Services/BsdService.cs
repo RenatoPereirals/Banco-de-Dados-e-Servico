@@ -16,6 +16,7 @@ namespace Bsd.Domain.Services
             _rubricRepository = rubricRepository;
             _employeeRepository = employeeRepository;
         }
+   
         public async Task<ICollection<EmployeeRubric>> AssociateRubricsToEmployeesAsync(BsdEntity bsd, DayType day)
         {
             var employeeRubricsList = new List<EmployeeRubric>();

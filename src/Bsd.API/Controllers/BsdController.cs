@@ -1,4 +1,3 @@
-using Bsd.API.Helpers;
 using Bsd.Application.DTOs;
 using Bsd.Application.Helpers.Interfaces;
 using Bsd.Application.Interfaces;
@@ -50,30 +49,16 @@ namespace Bsd.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            try
-            {
-                var bsdEntities = await _bsdRepository.GetAllBsdAsync();
-                return Ok(bsdEntities);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var bsdEntities = await _bsdRepository.GetAllBsdAsync();
+            //return Ok(bsdEntities);
+            throw new ArgumentException();
         }
 
         [HttpGet("{bsdNumber}")]
         public async Task<IActionResult> GetBsdById(int bsdNumber)
         {
-            try
-            {
-                var bsdEntity = await _bsdRepository.GetBsdByIdAsync(bsdNumber);
-                return Ok(bsdEntity);
-            }
-            catch (Exception ex)
-            {
-
-                return BadRequest(ex.Message);
-            }
+            var bsdEntity = await _bsdRepository.GetBsdByIdAsync(bsdNumber);
+            return Ok(bsdEntity);
         }
 
         [HttpPost("create")]
@@ -82,15 +67,15 @@ namespace Bsd.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var invalidRegistrations = await _employeeValidationService.ValidateEmployeeRegistrationsAsync(request.EmployeeRegistrations);
+
+            if (!invalidRegistrations)
+            {
+                return BadRequest($"Funcionários com as matrículas {string.Join(", ", request.EmployeeRegistrations)} não encontrados.");
+            }
+
             try
             {
-                var invalidRegistrations = await _employeeValidationService.ValidateEmployeeRegistrationsAsync(request.EmployeeRegistrations);
-
-                if (!invalidRegistrations)
-                {
-                    return BadRequest($"Funcionários com as matrículas {string.Join(", ", request.EmployeeRegistrations)} não encontrados.");
-                }
-
                 var createdBsd = await _bsdApplication.CreateBsdAsync(request);
 
                 if (createdBsd == null)
@@ -98,32 +83,19 @@ namespace Bsd.API.Controllers
 
                 return CreatedAtAction(nameof(GetBsdById), new { id = createdBsd.BsdNumber }, createdBsd);
             }
-            catch (ApplicationException)
+            catch (Exception ex) 
             {
-                // _logger.LogError(ex, "Erro ao tentar criar BSD.");
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                  "Ocorreu um erro interno. Por favor, tente novamente.");
+                throw new Exception("Erro interno de servidor", ex);
             }
-            catch (Exception)
-            {
-                // _logger.LogError(ex, "Erro inesperado ao tentar criar BSD.");
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                  "Ocorreu um erro inesperado. Por favor, tente novamente.");
-            }
+
+ 
         }
 
         [HttpPost("addEmployee")]
         public async Task<IActionResult> AddEmployeeToBsdEntity(int bsdNumber)
         {
-            try
-            {
-                var bsdEntity = await _bsdRepository.GetBsdByIdAsync(bsdNumber);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var bsdEntity = await _bsdRepository.GetBsdByIdAsync(bsdNumber);
+            return Ok();
         }
     }
 }
