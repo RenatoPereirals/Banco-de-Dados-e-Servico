@@ -15,10 +15,10 @@ namespace test.Domain.Services
         [InlineData("28/1/2025")]
         [InlineData("29/1/2024")]
         [InlineData("30/1/2034")]
-        public void Should_Return_True_For_Variable_Date_Holiday(string data)
+        public void Should_Return_True_For_Variable_Date_Holiday(string date)
         {
             // Arrange
-            var portuaryDay = DateTime.Parse(data);
+            var portuaryDay = DateTime.Parse(date);
 
             // Act
             var result = _variableDateHolidayAdjuster.IsVariableHoliday(portuaryDay);
