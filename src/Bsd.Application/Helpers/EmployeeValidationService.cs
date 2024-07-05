@@ -1,5 +1,5 @@
-
 using Bsd.Application.Helpers.Interfaces;
+
 using Bsd.Domain.Repository.Interfaces;
 
 namespace Bsd.API.Helpers
@@ -14,15 +14,21 @@ namespace Bsd.API.Helpers
             _employeeRepository = employeeRepository;
         }
 
+        public async Task<bool> ValidateEmployeeRegistrationAsync(int employeeRegistrations)
+        {
+            var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(employeeRegistrations);
+            if (employee == null)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public async Task<bool> ValidateEmployeeRegistrationsAsync(List<int> employeeRegistrations)
         {
             foreach (var registration in employeeRegistrations)
             {
-                var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(registration);
-                if (employee == null)
-                {
-                    return false;
-                }
+                await ValidateEmployeeRegistrationAsync(registration);
             }
             return true;
         }
