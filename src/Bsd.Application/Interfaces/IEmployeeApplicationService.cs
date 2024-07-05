@@ -1,7 +1,9 @@
+using Bsd.Application.DTOs;
+
 namespace Bsd.Application.Interfaces
 {
     public interface IEmployeeApplicationService
     {
-        Task CreateEmployeeAsync(int registration, string serviceType);
+        Task<EmployeeRequestDto> CreateEmployeeAsync(EmployeeRequestDto request);
     }
 }
