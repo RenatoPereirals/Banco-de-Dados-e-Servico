@@ -2,12 +2,12 @@ using Bsd.Domain.Service.Interfaces;
 
 namespace Bsd.Domain.Entities
 {
-    public class HoliDayChecker : IHoliDayChecker
+    public class HolidayChecker : IHolidayChecker
     {
-        
+
         private readonly IVariableDateHolidayAdjuster _variableDateHolidayAdjuster;
 
-        public HoliDayChecker(IVariableDateHolidayAdjuster variableDateHolidayAdjuster)
+        public HolidayChecker(IVariableDateHolidayAdjuster variableDateHolidayAdjuster)
         {
             _variableDateHolidayAdjuster = variableDateHolidayAdjuster;
         }
@@ -21,10 +21,20 @@ namespace Bsd.Domain.Entities
 
         public bool IsHoliday(DateTime date)
         {
-            bool isFixedHoliday = FixedHolidays.Any(h => h.Item1 == date.Month && h.Item2 == date.Day);
-            bool isVariableHolidays = _variableDateHolidayAdjuster.IsVariableHoliday(date);
+            return CheckHoliday(date);
+        }
 
-            return isFixedHoliday || isVariableHolidays;
+        public bool IsHolidayEve(DateTime date)
+        {
+            return CheckHoliday(date.AddDays(1));
+        }
+
+        private bool CheckHoliday(DateTime date)
+        {
+            bool isFixedHoliday = FixedHolidays.Any(h => h.Item1 == date.Month && h.Item2 == date.Day);
+            bool isVariableHoliday = _variableDateHolidayAdjuster.IsVariableHoliday(date);
+
+            return isFixedHoliday || isVariableHoliday;
         }
     }
 }
