@@ -1,17 +1,17 @@
-using Bsd.Domain.Enums;
 using Bsd.Domain.Service.Interfaces;
 using Bsd.Domain.Services.Interfaces;
+using Bsd.Domain.Enums;
 
 namespace Bsd.Domain.Services
 {
     public class DayTypeChecker : IDayTypeChecker
     {
-        private readonly IHoliDayChecker _holiDayChecker;
-        public DayTypeChecker(IHoliDayChecker holiDayChecker)
+        private readonly IHolidayChecker _holidayChecker;
+        public DayTypeChecker(IHolidayChecker holidayChecker)
         {
-            _holiDayChecker = holiDayChecker;
-
+            _holidayChecker = holidayChecker;
         }
+
         public DayType GetDayType(DateTime date)
         {
             if (IsSundayAndHoliday(date))
@@ -22,7 +22,7 @@ namespace Bsd.Domain.Services
             {
                 return DayType.Sunday;
             }
-            else if (_holiDayChecker.IsHoliday(date))
+            else if (_holidayChecker.IsHoliday(date))
             {
                 return DayType.HoliDay;
             }
@@ -34,7 +34,7 @@ namespace Bsd.Domain.Services
 
         private bool IsSundayAndHoliday(DateTime date)
         {
-            if (date.DayOfWeek == DayOfWeek.Sunday && _holiDayChecker.IsHoliday(date))
+            if (date.DayOfWeek == DayOfWeek.Sunday && _holidayChecker.IsHoliday(date))
             {
                 return true;
             }
