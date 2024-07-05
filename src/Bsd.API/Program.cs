@@ -1,16 +1,17 @@
 using Bsd.API.Helpers;
 using Bsd.API.Middlewares;
+
 using Bsd.Application.Helpers.Interfaces;
 using Bsd.Application.Interfaces;
 using Bsd.Application.Services;
 
+using Bsd.Domain.Services.Interfaces;
+using Bsd.Domain.Repository.Interfaces;
+using Bsd.Domain.Service.Interfaces;
 using Bsd.Domain.Entities;
 using Bsd.Domain.Persistence.RepositoryImpl;
-using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Service;
-using Bsd.Domain.Service.Interfaces;
 using Bsd.Domain.Services;
-using Bsd.Domain.Services.Interfaces;
 
 using Bsd.Infrastructure.Context;
 using Bsd.Infrastructure.RepositoryImpl;
@@ -40,9 +41,6 @@ try
         .GetConnectionString("DefaultConnection")
         ?? throw new InvalidOperationException("Connection string not found.")));
 
-
-
-
     // Configuração dos serviços
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -50,7 +48,7 @@ try
     builder.Services.AddScoped<IBsdService, BsdService>();
     builder.Services.AddScoped<IRubricService, RubricService>();
     builder.Services.AddScoped<IDayTypeChecker, DayTypeChecker>();
-    builder.Services.AddScoped<IHoliDayChecker, HoliDayChecker>();
+    builder.Services.AddScoped<IHolidayChecker, HolidayChecker>();
     builder.Services.AddScoped<IVariableDateHolidayAdjuster, VariableDateHolidayAdjuster>();
 
     builder.Services.AddScoped<IGeralRepository, GeralRepository>();
