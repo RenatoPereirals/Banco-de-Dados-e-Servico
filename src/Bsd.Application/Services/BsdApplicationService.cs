@@ -1,9 +1,12 @@
-using AutoMapper;
 using Bsd.API.Helpers;
-using Bsd.Application.DTOs;
+
 using Bsd.Application.Interfaces;
-using Bsd.Domain.Entities;
+using Bsd.Application.DTOs;
+
 using Bsd.Domain.Repository.Interfaces;
+using Bsd.Domain.Entities;
+
+using AutoMapper;
 
 namespace Bsd.Application.Services
 {
@@ -26,33 +29,25 @@ namespace Bsd.Application.Services
         {
             RequestValidation(request);
 
-            try
+            request.DateServiceDate = DateHelper.ParseDate(request.DateService);
+
+            var bsd = _mapper.Map<BsdEntity>(request);
+
+            if (await _bsdRepository.CreateBsdAsync(bsd))
             {
-                request.DateServiceDate = DateHelper.ParseDate(request.DateService);
-
-                var bsd = _mapper.Map<BsdEntity>(request);
-
-                if (await _bsdRepository.CreateBsdAsync(bsd))
+                foreach (var registration in request.EmployeeRegistrations)
                 {
-                    foreach (var registration in request.EmployeeRegistrations)
+                    var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(registration);
+                    if (employee != null)
                     {
-                        var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(registration);
-                        if (employee != null)
-                        {
-                            await _bsdRepository.AddEmployeeToBsdAsync(bsd);
-                        }
+                        await _bsdRepository.AddEmployeeToBsdAsync(bsd);
                     }
-                    var bsdReturn = await _bsdRepository.GetBsdByIdAsync(bsd.BsdId);
-                    return _mapper.Map<CreateBsdRequest>(bsdReturn);
                 }
+                var bsdReturn = await _bsdRepository.GetBsdByIdAsync(bsd.BsdId);
+                return _mapper.Map<CreateBsdRequest>(bsdReturn);
+            }
 
-                throw new ApplicationException("Falha ao salvar as alterações no banco de dados.");
-            }
-            catch (Exception)
-            {
-                //_logger.LogError(ex, "Erro ao tentar criar BSD.");
-                throw new ApplicationException("Erro ao tentar criar BSD. Consulte o log para mais detalhes.");
-            }
+            throw new ApplicationException("Falha ao criar BSD no banco de dados.");
         }
 
         private static void RequestValidation(CreateBsdRequest request)
@@ -61,17 +56,27 @@ namespace Bsd.Application.Services
             {
                 throw new ArgumentNullException(nameof(request), "Você precisa preencher todos os dados.");
             }
+
+            var bsdNumer = request.BsdNumber.ToString();
+
+            if (bsdNumer.Length != 6)
+            {
+                throw new ArgumentOutOfRangeException(nameof(request), "O número do BSD deve conter 6 digitos.");
+            }
+
             if (request.BsdNumber <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(request));
+                throw new ArgumentOutOfRangeException(nameof(request), "O número do BSD não pode ser negativo.");
             }
+
             if (string.IsNullOrWhiteSpace(request.DateService))
             {
-                throw new ArgumentException("DateService não pode ser vazio ou nulo", nameof(request));
+                throw new ArgumentException("DateService não pode ser vazio ou nulo.", nameof(request));
             }
-            if (request.Digit < 0)
+
+            if (request.Digit < 0 || request.Digit > 11)
             {
-                throw new ArgumentOutOfRangeException(nameof(request), "Digit não pode ser negativo");
+                throw new ArgumentOutOfRangeException(nameof(request), "Digito incorreto.");
             }
         }
 
