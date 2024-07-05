@@ -1,8 +1,10 @@
-using Bsd.Application.DTOs;
-using Bsd.Application.Helpers.Interfaces;
-using Bsd.Application.Interfaces;
-using Bsd.Domain.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+
+using Bsd.Application.Interfaces;
+using Bsd.Application.Helpers.Interfaces;
+using Bsd.Application.DTOs;
+
+using Bsd.Domain.Repository.Interfaces;
 
 namespace Bsd.API.Controllers
 {
@@ -13,45 +15,26 @@ namespace Bsd.API.Controllers
         private readonly IBsdRepository _bsdRepository;
         private readonly IBsdApplicationService _bsdApplication;
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly IEmployeeValidationService _employeeValidationService;
+        private readonly IEmployeeValidationService _employeeValidation;
 
 
         public BsdController(IBsdRepository bsdRepository,
                              IBsdApplicationService bsdApplication,
                              IEmployeeRepository employeeRepository,
-                             IEmployeeValidationService employeeValidationService)
+                             IEmployeeValidationService employeeValidation)
         {
             _bsdRepository = bsdRepository;
             _bsdApplication = bsdApplication;
             _employeeRepository = employeeRepository;
-            _employeeValidationService = employeeValidationService;
+            _employeeValidation = employeeValidation;
 
         }
-
-        // [HttpGet("{startDate}/{endDate}")]
-        // public async Task<IActionResult> GetBsdByDate(string startDate, string endDate)
-        // {
-        //     try
-        //     {
-        //         var bsd = await _bsdApplication.GetBsdEntitiesDtoByDateRangeAsync(startDate, endDate);
-        //         if (bsd == Empty || bsd == null)
-        //             return BadRequest($"Nenhum BSD pode ser encontrado entre as datas {startDate} e {endDate}.");
-
-
-        //         return Ok(bsd);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return BadRequest(ex.Message);
-        //     }
-        // }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var bsdEntities = await _bsdRepository.GetAllBsdAsync();
-            //return Ok(bsdEntities);
-            throw new ArgumentException();
+            return Ok(bsdEntities);
         }
 
         [HttpGet("{bsdNumber}")]
@@ -61,34 +44,29 @@ namespace Bsd.API.Controllers
             return Ok(bsdEntity);
         }
 
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("create")]
         public async Task<IActionResult> Post([FromBody] CreateBsdRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var invalidRegistrations = await _employeeValidationService.ValidateEmployeeRegistrationsAsync(request.EmployeeRegistrations);
+            var invalidRegistrations = await _employeeValidation.ValidateEmployeeRegistrationsAsync(request.EmployeeRegistrations);
 
             if (!invalidRegistrations)
-            {
-                return BadRequest($"Funcionários com as matrículas {string.Join(", ", request.EmployeeRegistrations)} não encontrados.");
-            }
+                return NotFound($"Funcionários com as matrículas {string.Join(", ", request.EmployeeRegistrations)} não encontrados.");
 
-            try
-            {
-                var createdBsd = await _bsdApplication.CreateBsdAsync(request);
+            var createdBsd = await _bsdApplication.CreateBsdAsync(request);
 
-                if (createdBsd == null)
-                    return NoContent();
+            if (createdBsd == null)
+                return NoContent();
 
-                return CreatedAtAction(nameof(GetBsdById), new { id = createdBsd.BsdNumber }, createdBsd);
-            }
-            catch (Exception ex) 
-            {
-                throw new Exception("Erro interno de servidor", ex);
-            }
-
- 
+            return CreatedAtAction(nameof(GetBsdById), new { id = createdBsd.BsdNumber }, createdBsd);
         }
 
         [HttpPost("addEmployee")]
