@@ -1,6 +1,3 @@
-
-using AutoMapper;
-
 using Bsd.Application.Interfaces;
 using Bsd.Application.DTOs;
 
@@ -8,6 +5,8 @@ using Bsd.Domain.Services.Interfaces;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Entities;
 using Bsd.Domain.Enums;
+
+using AutoMapper;
 
 namespace Bsd.Application.Services
 {
@@ -36,7 +35,7 @@ namespace Bsd.Application.Services
 
             if (!Enum.TryParse(serviceType, out ServiceType service))
             {
-                throw new ArgumentException($"O tipo de serviço {serviceType} não existe.", nameof(serviceType));
+                throw new ArgumentException(nameof(serviceType), $"O tipo de serviço {serviceType} não existe.");
             }
 
             var digit = _employeeService.CalculateModulo11CheckDigit(request.EmployeeId);
@@ -63,12 +62,12 @@ namespace Bsd.Application.Services
 
             if (bsdNumer.Length != 4)
             {
-                throw new ArgumentOutOfRangeException("O número da matrícula deve conter 4 digitos.", nameof(request));
+                throw new ArgumentOutOfRangeException(nameof(request), "O número da matrícula deve conter 4 digitos.");
             }
 
             if (request.EmployeeId <= 0)
             {
-                throw new ArgumentOutOfRangeException("O número da matrícula não pode ser negativo.", nameof(request));
+                throw new ArgumentOutOfRangeException(nameof(request), "O número da matrícula não pode ser negativo.");
             }
 
             if (string.IsNullOrWhiteSpace(request.ServiceType))

@@ -6,5 +6,6 @@ namespace Bsd.Domain.Repository.Interfaces
     {
         Task<Employee> GetEmployeeByRegistrationAsync(int employeeId);
         Task<IEnumerable<Employee>> GetAllEmployees();
+        Task<bool> CreateEmployeeAsync(Employee employee);
     }
 }
