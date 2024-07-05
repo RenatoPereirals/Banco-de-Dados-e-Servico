@@ -201,35 +201,6 @@ Após a geração, o relatório CSV é armazenado e pode ser exportado para uso 
 
 ---
 
-### Padrão de Commits
-
-Para esse projeto, adotei um padrão de commits baseados em emojis, visando facilitar a identificação e categorização das mudanças realizadas. Abaixo está o padrão estabelecido, junto com uma breve descrição de cada tipo de mudança:
-
-| Tipo de Mudança       | Símbolo |
-| --------------------- | ------- |
-| Correção de Bugs      | 🐛      |
-| Nova Funcionalidade   | ✨      |
-| Documentação          | 📚      |
-| Estilo                | 🎨      |
-| Refatoração           | 🔨      |
-| Manutenção            | 🛠️      |
-| Testes                | ✅      |
-| Pequena Alteração     | 🔄      |
-| Adição de Atributo    | ➕      |
-| Melhoria de Estrutura | 🏗️      |
-| Simplificação         | 🎯      |
-| Performance           | 🚀      |
-| Segurança             | 🔒      |
-| Depreciação           | 💤      |
-| Versão                | 📦      |
-| Exclusão de Arquivos  | 🗑️      |
-| Mover Arquivos        | 🚚      |
-| Renomear              | 📝      |
-
-Espero que este padrão facilite a comunicação e o acompanhamento das mudanças ao longo do desenvolvimento do projeto. Estou aberto a sugestões de melhorias e ajustes conforme necessário.
-
----
-
 ### Estado do Projeto:
 
 Por favor, note que o BSD ainda está em desenvolvimento e pode sofrer alterações à medida que o projeto avança. Manterei atualizações regulares sobre o progresso do projeto.
