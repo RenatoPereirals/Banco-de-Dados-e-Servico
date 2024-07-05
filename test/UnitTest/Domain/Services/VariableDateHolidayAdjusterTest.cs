@@ -1,5 +1,7 @@
 using Bsd.Domain.Service;
 
+using System.Globalization;
+
 namespace test.Domain.Services
 {
     public class VariableDateHolidayAdjusterTest
@@ -9,6 +11,11 @@ namespace test.Domain.Services
         public VariableDateHolidayAdjusterTest()
         {
             _variableDateHolidayAdjuster = new VariableDateHolidayAdjuster();
+        }
+        private static DateTime ParseExactDate(string date)
+        {
+            var dateFormat = "dd/MM/yyyy";
+            return DateTime.ParseExact(date, dateFormat, CultureInfo.InvariantCulture);
         }
 
         #region IsPortuaryDay Tests
@@ -20,7 +27,7 @@ namespace test.Domain.Services
         public void IsVariableHoliday_ReturnsTrue_ForPortuaryDay(string date)
         {
             // Arrange
-            var portuaryDay = DateTime.Parse(date);
+            var portuaryDay = ParseExactDate(date);
 
             // Act
             var result = _variableDateHolidayAdjuster.IsVariableHoliday(portuaryDay);
@@ -36,7 +43,7 @@ namespace test.Domain.Services
         public void IsVariableHoliday_ReturnsFalse_ForNonPortuaryDay(string date)
         {
             // Arrange
-            var nonPortuaryDay = DateTime.Parse(date);
+            var nonPortuaryDay = ParseExactDate(date);
 
             // Act
             var result = _variableDateHolidayAdjuster.IsVariableHoliday(nonPortuaryDay);
@@ -56,7 +63,7 @@ namespace test.Domain.Services
         public void IsVariableHoliday_ReturnsTrue_ForEaster(string date)
         {
             // Arrange
-            var easterDate = DateTime.Parse(date);
+            var easterDate = ParseExactDate(date);
 
             // Act
             var result = _variableDateHolidayAdjuster.IsVariableHoliday(easterDate);
@@ -72,7 +79,7 @@ namespace test.Domain.Services
         public void IsVariableHoliday_ReturnsFalse_ForNonEaster(string date)
         {
             // Arrange
-            var nonEasterDate = DateTime.Parse(date);
+            var nonEasterDate = ParseExactDate(date);
 
             // Act
             var result = _variableDateHolidayAdjuster.IsVariableHoliday(nonEasterDate);
@@ -92,7 +99,7 @@ namespace test.Domain.Services
         public void IsVariableHoliday_ReturnsTrue_ForGoodFriday(string date)
         {
             // Arrange
-            var goodFridayDate = DateTime.Parse(date);
+            var goodFridayDate = ParseExactDate(date);
 
             // Act
             var result = _variableDateHolidayAdjuster.IsVariableHoliday(goodFridayDate);
@@ -108,7 +115,7 @@ namespace test.Domain.Services
         public void IsVariableHoliday_ReturnsFalse_ForNonGoodFriday(string date)
         {
             // Arrange
-            var nonGoodFridayDate = DateTime.Parse(date);
+            var nonGoodFridayDate = ParseExactDate(date);
 
             // Act
             var result = _variableDateHolidayAdjuster.IsVariableHoliday(nonGoodFridayDate);
@@ -128,7 +135,7 @@ namespace test.Domain.Services
         public void IsVariableHoliday_ReturnsTrue_ForCorpusChristi(string date)
         {
             // Arrange
-            var corpusChristiDate = DateTime.Parse(date);
+            var corpusChristiDate = ParseExactDate(date);
 
             // Act
             var result = _variableDateHolidayAdjuster.IsVariableHoliday(corpusChristiDate);
@@ -144,7 +151,7 @@ namespace test.Domain.Services
         public void IsVariableHoliday_ReturnsFalse_ForNonCorpusChristi(string date)
         {
             // Arrange
-            var nonCorpusChristiDate = DateTime.Parse(date);
+            var nonCorpusChristiDate = ParseExactDate(date);
 
             // Act
             var result = _variableDateHolidayAdjuster.IsVariableHoliday(nonCorpusChristiDate);
