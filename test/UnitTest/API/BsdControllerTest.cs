@@ -1,14 +1,16 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
 
 using Bsd.API.Controllers;
-using Bsd.Application.DTOs;
-using Bsd.Application.Helpers.Interfaces;
+
 using Bsd.Application.Interfaces;
+using Bsd.Application.Helpers.Interfaces;
+using Bsd.Application.DTOs;
+
 using Bsd.Domain.Repository.Interfaces;
-using Newtonsoft.Json;
-using Bsd.API.ViewModels;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+using Moq;
 
 namespace test.API
 {
@@ -68,30 +70,10 @@ namespace test.API
 
             // Assert
             var expectedErrorMessage = "Funcionários com as matrículas 1234, 5678 não encontrados.";
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
-            Assert.Equal(expectedErrorMessage, badRequestResult.Value);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal(StatusCodes.Status404NotFound, notFoundResult.StatusCode);
+            Assert.Equal(expectedErrorMessage, notFoundResult.Value);
         }
-
-        //[Fact]
-        //public async Task Post_ReturnsInternalServerError_WhenExceptionIsThrown()
-        //{
-        //    // Arrange
-        //    SetupEmployeeValidationService(true);
-        //    SetupBsdApplicationService(_request, exception: new ApplicationException("Ocorreu um erro interno. Por favor, tente novamente."));
-
-        //    // Act
-        //    var result = await _bsdController.Post(_request);
-
-        //    // Assert
-        //    var statusCodeResult = Assert.IsType<ObjectResult>(result);
-        //    Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
-
-        //    var actualErrorResponse = JsonConvert.DeserializeObject<ErrorResponseVm>(statusCodeResult.Value!.ToString()!);
-
-        //    Assert.Equal(StatusCodes.Status500InternalServerError.ToString(), actualErrorResponse!.Errors.First().Logref);
-        //    Assert.Equal("An internal server error has occurred.", actualErrorResponse.Errors.First().Message);
-        //}
 
         private void SetupEmployeeValidationService(bool isValid)
         {

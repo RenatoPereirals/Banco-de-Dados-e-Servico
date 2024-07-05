@@ -13,6 +13,11 @@ namespace Bsd.Infrastructure.RepositoryImpl
             _context = context;
         }
 
+        public Task<bool> CreateEmployeeAsync(Employee employee)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<Employee>> GetAllEmployees()
         {
             var query = GetEmployeeQuery();
