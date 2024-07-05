@@ -1,18 +1,19 @@
 using Bsd.Domain.Enums;
 using Bsd.Domain.Service.Interfaces;
 using Bsd.Domain.Services;
+
 using Moq;
 
 namespace test.Domain.Services.TestDataBase
 {
     public class DayTypeCheckerTest
     {
-        private readonly Mock<IHoliDayChecker> _mockHolidayChecer;
+        private readonly Mock<IHolidayChecker> _mockHolidayChecer;
         private readonly DayTypeChecker _dayTypeChecker;
 
         public DayTypeCheckerTest()
         {
-            _mockHolidayChecer = new Mock<IHoliDayChecker>();
+            _mockHolidayChecer = new Mock<IHolidayChecker>();
             _dayTypeChecker = new DayTypeChecker(_mockHolidayChecer.Object);
         }
 
