@@ -1,33 +1,42 @@
+using Bsd.Domain.Services.Interfaces;
+
 using System.Globalization;
 
-namespace Bsd.API.Helpers
+namespace Bsd.Application.Helpers
 {
-    public static class DateHelper
+    public class DateHelper : IDateHelper
     {
-        public static DateTime ParseDate(string date)
+        private readonly CultureInfo _culture;
+
+        public DateHelper()
+        {
+            _culture = new CultureInfo("pt-BR");
+        }
+
+        public DateTime ParseDate(string date)
         {
             if (string.IsNullOrEmpty(date))
             {
-                throw new ArgumentNullException(nameof(date), "o campo data é obrigatória");
+                Console.WriteLine("The date field is required.");
+                throw new ArgumentNullException(nameof(date), "The date field is required.");
             }
 
             try
             {
                 string dateDecoded = System.Net.WebUtility.UrlDecode(date);
-                string[] formats = { "dd/MM/yyyy" };
-                if (DateTime.TryParseExact(dateDecoded, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+                string[] formats = { "dd/MM/yyyy", "MM/dd/yyyy","d/M/yyyy", "yyyy-MM-dd" };
+                if (DateTime.TryParseExact(dateDecoded, formats, _culture, DateTimeStyles.None, out DateTime parsedDate))
                 {
                     return parsedDate;
                 }
                 else
                 {
-                    // _logger.LogError(ex, "Invalid date format");
                     throw new FormatException("Invalid date format");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // _logger.LogError(ex, "Failed to parse date");
+                Console.WriteLine($"Failed to parse date: {ex.Message}");
                 throw new FormatException("Failed to parse date");
             }
         }

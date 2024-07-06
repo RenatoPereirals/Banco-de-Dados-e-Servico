@@ -1,3 +1,5 @@
+using Bsd.Application.Helpers;
+
 using Bsd.Domain.Enums;
 using Bsd.Domain.Service.Interfaces;
 using Bsd.Domain.Services;
@@ -8,66 +10,104 @@ namespace test.Domain.Services.TestDataBase
 {
     public class DayTypeCheckerTest
     {
-        private readonly Mock<IHolidayChecker> _mockHolidayChecer;
+        private readonly Mock<IHolidayChecker> _mockHolidayChecker;
         private readonly DayTypeChecker _dayTypeChecker;
+        private readonly DateHelper _dateHelper;
 
         public DayTypeCheckerTest()
         {
-            _mockHolidayChecer = new Mock<IHolidayChecker>();
-            _dayTypeChecker = new DayTypeChecker(_mockHolidayChecer.Object);
+            _mockHolidayChecker = new Mock<IHolidayChecker>();
+            _dayTypeChecker = new DayTypeChecker(_mockHolidayChecker.Object);
+            _dateHelper = new DateHelper();
         }
+
+        #region WorkDay Tests
 
         [Theory]
-        [InlineData("7/1/2024")]
-        [InlineData("14/1/2024")]
-        [InlineData("21/1/2024")]
-        public void Should_Return_DayType_For_Sunday_Correctly(string data)
+        [InlineData("17/07/2024")]
+        [InlineData("24/07/2024")]
+        [InlineData("31/07/2024")]
+        public void GetDayType_ReturnsWorkday_ForGivenWorkDay(string stringDate)
         {
             // Arrange
-            var sundayDate = DateTime.Parse(data);
-            var dayTypeExpected = DayType.Sunday;
+            var workDay = _dateHelper.ParseDate(stringDate);
+            var expectedDayType = DayType.Workday;
+
+            _mockHolidayChecker
+                .Setup(hc => hc.IsHoliday(It.IsAny<DateTime>()))
+                .Returns(false);
 
             // Act
-            var dayTypeResult = _dayTypeChecker.GetDayType(sundayDate);
+            var actualDayType = _dayTypeChecker.GetDayType(workDay);
 
-            //Assert
-            Assert.Equal(dayTypeExpected, dayTypeResult);
+            // Assert
+            Assert.Equal(expectedDayType, actualDayType);
         }
 
-        [Fact]
-        public void Should_Return_DayType_For_Holiday_Correctly()
+        #endregion
+
+        #region Sunday Tests
+
+        [Theory]
+        [InlineData("07/01/2024")]
+        [InlineData("14/01/2024")]
+        [InlineData("21/01/2024")]
+        public void GetDayType_ReturnsSunday_ForGivenDate(string stringDate)
         {
             // Arrange
-            var HolidayDate = DateTime.Parse("1/1/2024");
-            var dayTypeExpected = DayType.HoliDay;
+            var sundayDate = _dateHelper.ParseDate(stringDate);
+            var expectedDayType = DayType.Sunday;
 
-            _mockHolidayChecer
+            // Act
+            var actualDayType = _dayTypeChecker.GetDayType(sundayDate);
+
+            // Assert
+            Assert.Equal(expectedDayType, actualDayType);
+        }
+
+        #endregion
+
+        #region Holiday Tests
+        [Fact]
+        public void GetDayType_ReturnsHoliday_ForGivenHolidayDate()
+        {
+            // Arrange
+            var holidayDate = _dateHelper.ParseDate("01/01/2024");
+            var expectedDayType = DayType.HoliDay;
+
+            _mockHolidayChecker
                 .Setup(hc => hc.IsHoliday(It.IsAny<DateTime>()))
                 .Returns(true);
 
             // Act
-            var dayTypeResult = _dayTypeChecker.GetDayType(HolidayDate);
+            var actualDayType = _dayTypeChecker.GetDayType(holidayDate);
 
-            //Assert
-            Assert.Equal(dayTypeExpected, dayTypeResult);
+            // Assert
+            Assert.Equal(expectedDayType, actualDayType);
         }
 
+        #endregion
+
+        #region HolidayAndSunday Tests
+
         [Fact]
-        public void Should_Return_DayType_For_Holiday_And_Sunday_Correctly()
+        public void GetDayType_ReturnsSundayAndHoliday_ForGivenHolidayAndSundayDate()
         {
             // Arrange
-            var HolidayDate = DateTime.Parse("21/4/2024");
-            var dayTypeExpected = DayType.SundayAndHoliday;
+            var holidayAndSundayDate = _dateHelper.ParseDate("21/04/2024");
+            var expectedDayType = DayType.SundayAndHoliday;
 
-            _mockHolidayChecer
+            _mockHolidayChecker
                 .Setup(hc => hc.IsHoliday(It.IsAny<DateTime>()))
                 .Returns(true);
 
             // Act
-            var dayTypeResult = _dayTypeChecker.GetDayType(HolidayDate);
+            var actualDayType = _dayTypeChecker.GetDayType(holidayAndSundayDate);
 
-            //Assert
-            Assert.Equal(dayTypeExpected, dayTypeResult);
+            // Assert
+            Assert.Equal(expectedDayType, actualDayType);
         }
+
+        #endregion
     }
 }

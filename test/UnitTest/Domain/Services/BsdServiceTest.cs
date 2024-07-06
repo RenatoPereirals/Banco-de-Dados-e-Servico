@@ -1,10 +1,13 @@
-using Bsd.Domain.Entities;
-using Bsd.Domain.Enums;
 using Bsd.Domain.Repository.Interfaces;
+using Bsd.Domain.Enums;
+using Bsd.Domain.Entities;
 using Bsd.Domain.Services;
-using Moq;
+
 using test.Domain.Services.TestDataBase;
+
 using Xunit.Abstractions;
+
+using Moq;
 
 namespace test.UnitTest.Domain.Services
 {
@@ -32,7 +35,7 @@ namespace test.UnitTest.Domain.Services
                 BsdId = 1,
                 Employees = new List<Employee>
                 {
-                    new Employee { EmployeeId = 1234, ServiceType = ServiceType.P110 }
+                    new() { EmployeeId = 1234, ServiceType = ServiceType.P110 }
                 }
             };
 

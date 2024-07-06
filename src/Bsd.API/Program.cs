@@ -4,6 +4,7 @@ using Bsd.API.Middlewares;
 using Bsd.Application.Helpers.Interfaces;
 using Bsd.Application.Interfaces;
 using Bsd.Application.Services;
+using Bsd.Application.Helpers;
 
 using Bsd.Domain.Services.Interfaces;
 using Bsd.Domain.Repository.Interfaces;
@@ -61,6 +62,7 @@ try
     builder.Services.AddScoped<IRubricApplicationService, RubricApplicationService>();
 
     builder.Services.AddScoped<IEmployeeValidationService, EmployeeValidationService>();
+    builder.Services.AddScoped<IDateHelper, DateHelper>();
 
     // Configuração dos controllers e Swagger
     builder.Services.AddControllersWithViews();

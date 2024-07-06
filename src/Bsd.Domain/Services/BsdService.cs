@@ -1,7 +1,7 @@
-using Bsd.Domain.Entities;
-using Bsd.Domain.Enums;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
+using Bsd.Domain.Enums;
+using Bsd.Domain.Entities;
 
 namespace Bsd.Domain.Services
 {
