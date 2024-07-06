@@ -2,8 +2,6 @@ using Bsd.Application.Helpers;
 
 using Bsd.Domain.Service;
 
-using System.Globalization;
-
 namespace test.Domain.Services
 {
     public class VariableDateHolidayAdjusterTest
@@ -19,21 +17,21 @@ namespace test.Domain.Services
 
         #region IsPortuaryDay Tests
 
-        // [Theory]
-        // [InlineData("28/01/2025")]
-        // [InlineData("29/01/2024")]
-        // [InlineData("30/01/2034")]
-        // public void IsVariableHoliday_ReturnsTrue_ForPortuaryDay(string dateString)
-        // {
-        //     // Arrange
-        //     var portuaryDay = _dateHelper.ParseDate(dateString);
+        [Theory]
+        [InlineData("28/01/2025")]
+        [InlineData("29/01/2024")]
+        [InlineData("30/01/2034")]
+        public void IsVariableHoliday_ReturnsTrue_ForPortuaryDay(string dateString)
+        {
+            // Arrange
+            var portuaryDay = _dateHelper.ParseDate(dateString);
 
-        //     // Act
-        //     var result = _variableDateHolidayAdjuster.IsVariableHoliday(portuaryDay);
+            // Act
+            var result = _variableDateHolidayAdjuster.IsVariableHoliday(portuaryDay);
 
-        //     // Assert
-        //     Assert.True(result, $"{dateString} should be a Portuary Day.");
-        // }
+            // Assert
+            Assert.True(result, $"{dateString} should be a Portuary Day.");
+        }
 
         [Theory]
         [InlineData("28/01/2024")]
