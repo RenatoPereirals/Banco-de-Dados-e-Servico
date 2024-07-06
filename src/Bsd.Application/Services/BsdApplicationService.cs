@@ -1,8 +1,7 @@
-using Bsd.API.Helpers;
-
 using Bsd.Application.Interfaces;
 using Bsd.Application.DTOs;
 
+using Bsd.Domain.Services.Interfaces;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Entities;
 
@@ -14,14 +13,17 @@ namespace Bsd.Application.Services
     {
         private readonly IBsdRepository _bsdRepository;
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IDateHelper _dateHelper;
         private readonly IMapper _mapper;
 
         public BsdApplicationService(IBsdRepository bsdRepository,
                                      IEmployeeRepository employeeRepository,
+                                     IDateHelper dateHelper,
                                      IMapper mapper)
         {
             _bsdRepository = bsdRepository;
             _employeeRepository = employeeRepository;
+            _dateHelper = dateHelper;
             _mapper = mapper;
         }
 
@@ -29,7 +31,7 @@ namespace Bsd.Application.Services
         {
             RequestValidation(request);
 
-            request.DateServiceDate = DateHelper.ParseDate(request.DateService);
+            request.DateServiceDate = _dateHelper.ParseDate(request.DateService);
 
             var bsd = _mapper.Map<BsdEntity>(request);
 
