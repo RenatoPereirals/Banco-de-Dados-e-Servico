@@ -36,6 +36,27 @@ namespace Bsd.Domain.Service
             return date.Date == easterDate.Date;
         }
 
+        private static bool IsCarnival(DateTime date)
+        {
+            DateTime easterDate = CalculateEasterDate(date.Year);
+            DateTime carnivalDate = easterDate.AddDays(-47); // Carnaval é 47 dias antes da Páscoa
+            return date.Date == carnivalDate.Date;
+        }
+
+        private static bool IsGoodFriday(DateTime date)
+        {
+            DateTime easterDate = CalculateEasterDate(date.Year);
+            DateTime goodFridayDate = easterDate.AddDays(-2); // Sexta-feira Santa é dois dias antes da Páscoa
+            return date.Date == goodFridayDate.Date;
+        }
+
+        private static bool IsCorpusChristi(DateTime date)
+        {
+            DateTime easterDate = CalculateEasterDate(date.Year);
+            DateTime corpusChristiDate = easterDate.AddDays(60); // Corpus Christi é 60 dias após a Páscoa
+            return date.Date == corpusChristiDate.Date;
+        }
+
         private static DateTime CalculateEasterDate(int year)
         {
             int goldenNumber = year % 19 + 1;
@@ -58,27 +79,6 @@ namespace Bsd.Domain.Service
             int month = fullMoon > 31 ? 4 : 3;
 
             return new DateTime(year, month, day);
-        }
-
-        private static bool IsCarnival(DateTime date)
-        {
-            DateTime easterDate = CalculateEasterDate(date.Year);
-            DateTime carnivalDate = easterDate.AddDays(-47); // Carnaval é 47 dias antes da Páscoa
-            return date.Date == carnivalDate.Date;
-        }
-
-        private static bool IsGoodFriday(DateTime date)
-        {
-            DateTime easterDate = CalculateEasterDate(date.Year);
-            DateTime goodFridayDate = easterDate.AddDays(-2); // Sexta-feira Santa é dois dias antes da Páscoa
-            return date.Date == goodFridayDate.Date;
-        }
-
-        private static bool IsCorpusChristi(DateTime date)
-        {
-            DateTime easterDate = CalculateEasterDate(date.Year);
-            DateTime corpusChristiDate = easterDate.AddDays(60); // Corpus Christi é 60 dias após a Páscoa
-            return date.Date == corpusChristiDate.Date;
         }
     }
 }
