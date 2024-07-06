@@ -6,9 +6,9 @@ namespace test.Domain.Services
     public class HoliDayCheckerTest
     {
         [Theory]
-        [InlineData("28/1/2025")]
-        [InlineData("29/1/2024")]
-        [InlineData("30/1/2034")]
+        [InlineData("28/01/2025")]
+        [InlineData("29/01/2024")]
+        [InlineData("30/01/2034")]
         public void IsVariableHoliday_ReturnsTrue_WhenIsPortuaryDay(string data)
         {
             // Arrange
