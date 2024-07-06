@@ -10,7 +10,9 @@ namespace Bsd.Application.DTOs
         [Required(ErrorMessage = "A data do serviço é obrigatória.")]
         [DataType(DataType.Date)]
         public string DateService { get; set; } = string.Empty;
+
         public DateTime DateServiceDate { get; set; }
+
         [Required(ErrorMessage = "A matrícula do funcionário é obrigatória.")]
         public List<int> EmployeeRegistrations { get; set; } = new();
 
