@@ -1,10 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-
 using Bsd.Application.Interfaces;
-using Bsd.Application.Helpers.Interfaces;
 using Bsd.Application.DTOs;
 
-using Bsd.Domain.Repository.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Bsd.API.Controllers
 {
@@ -12,36 +9,25 @@ namespace Bsd.API.Controllers
     [Route("api/[controller]")]
     public class BsdController : ControllerBase
     {
-        private readonly IBsdRepository _bsdRepository;
         private readonly IBsdApplicationService _bsdApplication;
-        private readonly IEmployeeRepository _employeeRepository;
-        private readonly IEmployeeValidationService _employeeValidation;
 
 
-        public BsdController(IBsdRepository bsdRepository,
-                             IBsdApplicationService bsdApplication,
-                             IEmployeeRepository employeeRepository,
-                             IEmployeeValidationService employeeValidation)
+        public BsdController(IBsdApplicationService bsdApplication)
         {
-            _bsdRepository = bsdRepository;
             _bsdApplication = bsdApplication;
-            _employeeRepository = employeeRepository;
-            _employeeValidation = employeeValidation;
 
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public Task<IActionResult> GetAll()
         {
-            var bsdEntities = await _bsdRepository.GetAllBsdAsync();
-            return Ok(bsdEntities);
+            throw new NotImplementedException();
         }
 
         [HttpGet("{bsdNumber}")]
-        public async Task<IActionResult> GetBsdById(int bsdNumber)
+        public Task<IActionResult> GetBsdById(int bsdNumber)
         {
-            var bsdEntity = await _bsdRepository.GetBsdByIdAsync(bsdNumber);
-            return Ok(bsdEntity);
+            throw new NotImplementedException();
         }
 
         [HttpPost]
@@ -50,16 +36,11 @@ namespace Bsd.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpPost("create")]
+        [HttpPost("bsd")]
         public async Task<IActionResult> Post([FromBody] CreateBsdRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            var invalidRegistrations = await _employeeValidation.ValidateEmployeeRegistrationsAsync(request.EmployeeRegistrations);
-
-            if (!invalidRegistrations)
-                return NotFound($"Funcionários com as matrículas {string.Join(", ", request.EmployeeRegistrations)} não encontrados.");
 
             var createdBsd = await _bsdApplication.CreateBsdAsync(request);
 
@@ -70,10 +51,9 @@ namespace Bsd.API.Controllers
         }
 
         [HttpPost("addEmployee")]
-        public async Task<IActionResult> AddEmployeeToBsdEntity(int bsdNumber)
+        public Task<IActionResult> AddEmployeeToBsdEntity(int bsdNumber)
         {
-            var bsdEntity = await _bsdRepository.GetBsdByIdAsync(bsdNumber);
-            return Ok();
+            throw new NotImplementedException();
         }
     }
 }
