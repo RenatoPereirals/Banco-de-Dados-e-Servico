@@ -7,46 +7,65 @@ namespace Bsd.Domain.Services
 {
     public class BsdService : IBsdService
     {
-        private readonly IEmployeeRepository _employeeRepository;
-        private readonly IRubricRepository _rubricRepository;
+        private readonly IDayTypeChecker _dayTypeChecker;
+        private readonly IBsdRepository _bsdRepository;
+        private readonly IStaticDataService _staticDataService;
 
-        public BsdService(IEmployeeRepository employeeRepository,
-                          IRubricRepository rubricRepository)
+        public BsdService(IDayTypeChecker dayTypeChecker,
+                          IBsdRepository bsdRepository,
+                          IStaticDataService staticDataService)
         {
-            _rubricRepository = rubricRepository;
-            _employeeRepository = employeeRepository;
+            _dayTypeChecker = dayTypeChecker;
+            _bsdRepository = bsdRepository;
+            _staticDataService = staticDataService;
         }
-   
-        public async Task<ICollection<EmployeeRubric>> AssociateRubricsToEmployeesAsync(BsdEntity bsd, DayType day)
+
+        public async Task<bool> CreateBsdAsync(BsdEntity bsd)
         {
-            var employeeRubricsList = new List<EmployeeRubric>();
+            var day = _dayTypeChecker.GetDayType(bsd.DateService);
+
+            bsd.DayType = day;
+            bsd.EmployeeRubricAssignments = AddEmployeeRubricAssignmentToBsd(bsd);
+
+            return await _bsdRepository.CreateBsdAsync(bsd);
+        }
+
+        private List<EmployeeRubricAssignment> AddEmployeeRubricAssignmentToBsd(BsdEntity bsd)
+        {
+            var employeeRubricAssignments = new List<EmployeeRubricAssignment>();
+            var day = _dayTypeChecker.GetDayType(bsd.DateService);
 
             foreach (var employee in bsd.Employees)
             {
-                if (employee != null)
+                var allowedRubrics = GetAllowedRubrics(employee, day);
+                var assignment = new EmployeeRubricAssignment
                 {
-                    var employeeFromRepo = await _employeeRepository.GetEmployeeByRegistrationAsync(employee.EmployeeId);
-
-                    if (employeeFromRepo != null)
-                    {
-                        var filteredRubrics = await _rubricRepository.GetRubricsByServiceTypeAndDayTypeAsync(employeeFromRepo.ServiceType, day);
-
-                        foreach (var rubric in filteredRubrics)
-                        {
-                            employeeRubricsList.Add(new EmployeeRubric
-                            {
-                                BsdEntityId = bsd.BsdId,
-                                BsdEntity = bsd,
-                                EmployeeId = employee.EmployeeId,
-                                Employee = employeeFromRepo,
-                                RubricId = rubric.RubricId,
-                                Rubric = rubric
-                            });
-                        }
-                    }
-                }
+                    EmployeeId = employee.EmployeeId,
+                    AllowedRubrics = allowedRubrics
+                };
+                employeeRubricAssignments.Add(assignment);
             }
-            return employeeRubricsList;
+
+            return employeeRubricAssignments;
+        }
+
+        private List<Rubric> GetAllowedRubrics(Employee employee, DayType dayType)
+        {
+            var rubrics = _staticDataService.GetRubrics();
+
+            return dayType switch
+            {
+                DayType.Workday => rubrics
+                                        .Where(r => r.ServiceType == employee.ServiceType && r.DayType == DayType.Workday)
+                                        .ToList(),
+                DayType.Holiday => rubrics
+                                        .Where(r => r.ServiceType == employee.ServiceType && r.DayType == DayType.Holiday)
+                                        .ToList(),
+                DayType.Sunday => rubrics
+                                        .Where(r => r.ServiceType == employee.ServiceType && r.DayType == DayType.Sunday)
+                                        .ToList(),
+                _ => new List<Rubric>(),
+            };
         }
     }
 }
