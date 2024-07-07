@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Bsd.Domain.Enums;
+﻿using Bsd.Domain.Enums;
+
+using System.ComponentModel.DataAnnotations;
+
 namespace Bsd.Domain.Entities
 {
     public class BsdEntity
@@ -7,7 +9,6 @@ namespace Bsd.Domain.Entities
         public BsdEntity()
         {
             Employees = new HashSet<Employee>();
-            EmployeeRubrics = new HashSet<EmployeeRubric>();
         }
 
         [Key]
@@ -15,6 +16,6 @@ namespace Bsd.Domain.Entities
         public DateTime DateService { get; set; }
         public DayType DayType { get; set; }
         public ICollection<Employee> Employees { get; set; }
-        public ICollection<EmployeeRubric> EmployeeRubrics { get; set; }
+        public List<EmployeeRubricAssignment> EmployeeRubricAssignments { get; set; } = new();
     }
 }
