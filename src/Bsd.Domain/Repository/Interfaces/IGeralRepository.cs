@@ -1,5 +1,3 @@
-using System.Net;
-
 namespace Bsd.Domain.Repository.Interfaces
 {
     public interface IGeralRepository

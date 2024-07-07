@@ -24,7 +24,7 @@ namespace Bsd.Domain.Services
             }
             else if (_holidayChecker.IsHoliday(date))
             {
-                return DayType.HoliDay;
+                return DayType.Holiday;
             }
             else
             {

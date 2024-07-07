@@ -1,4 +1,3 @@
-using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 namespace Bsd.Domain.Services
