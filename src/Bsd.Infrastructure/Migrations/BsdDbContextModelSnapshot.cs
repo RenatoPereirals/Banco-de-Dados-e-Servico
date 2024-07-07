@@ -40,8 +40,8 @@ namespace Bsd.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("DateService")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("BsdEntityBsdId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Digit")
                         .HasColumnType("INTEGER");
@@ -51,33 +51,28 @@ namespace Bsd.Infrastructure.Migrations
 
                     b.HasKey("EmployeeId");
 
-                    b.ToTable("Employees");
+                    b.HasIndex("BsdEntityBsdId");
+
+                    b.ToTable("Employee");
                 });
 
-            modelBuilder.Entity("Bsd.Domain.Entities.EmployeeRubric", b =>
+            modelBuilder.Entity("Bsd.Domain.Entities.EmployeeRubricAssignment", b =>
                 {
-                    b.Property<int>("EmployeeRubricId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("BsdEntityId")
+                    b.Property<int?>("BsdEntityBsdId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("RubricId")
-                        .HasColumnType("INTEGER");
+                    b.HasKey("Id");
 
-                    b.HasKey("EmployeeRubricId");
+                    b.HasIndex("BsdEntityBsdId");
 
-                    b.HasIndex("BsdEntityId");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("RubricId");
-
-                    b.ToTable("EmployeeRubrics");
+                    b.ToTable("EmployeeRubricAssignment");
                 });
 
             modelBuilder.Entity("Bsd.Domain.Entities.Rubric", b =>
@@ -93,6 +88,9 @@ namespace Bsd.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("EmployeeRubricAssignmentId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<decimal>("HoursPerDay")
                         .HasColumnType("TEXT");
 
@@ -101,69 +99,42 @@ namespace Bsd.Infrastructure.Migrations
 
                     b.HasKey("RubricId");
 
-                    b.ToTable("Rubrics");
+                    b.HasIndex("EmployeeRubricAssignmentId");
+
+                    b.ToTable("Rubric");
                 });
 
-            modelBuilder.Entity("BsdEntityEmployee", b =>
-                {
-                    b.Property<int>("BsdEntitiesBsdId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("EmployeesEmployeeId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("BsdEntitiesBsdId", "EmployeesEmployeeId");
-
-                    b.HasIndex("EmployeesEmployeeId");
-
-                    b.ToTable("BsdEntityEmployee");
-                });
-
-            modelBuilder.Entity("Bsd.Domain.Entities.EmployeeRubric", b =>
-                {
-                    b.HasOne("Bsd.Domain.Entities.BsdEntity", "BsdEntity")
-                        .WithMany("EmployeeRubrics")
-                        .HasForeignKey("BsdEntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Bsd.Domain.Entities.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Bsd.Domain.Entities.Rubric", "Rubric")
-                        .WithMany()
-                        .HasForeignKey("RubricId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BsdEntity");
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("Rubric");
-                });
-
-            modelBuilder.Entity("BsdEntityEmployee", b =>
+            modelBuilder.Entity("Bsd.Domain.Entities.Employee", b =>
                 {
                     b.HasOne("Bsd.Domain.Entities.BsdEntity", null)
-                        .WithMany()
-                        .HasForeignKey("BsdEntitiesBsdId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Employees")
+                        .HasForeignKey("BsdEntityBsdId");
+                });
 
-                    b.HasOne("Bsd.Domain.Entities.Employee", null)
-                        .WithMany()
-                        .HasForeignKey("EmployeesEmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            modelBuilder.Entity("Bsd.Domain.Entities.EmployeeRubricAssignment", b =>
+                {
+                    b.HasOne("Bsd.Domain.Entities.BsdEntity", null)
+                        .WithMany("EmployeeRubricAssignments")
+                        .HasForeignKey("BsdEntityBsdId");
+                });
+
+            modelBuilder.Entity("Bsd.Domain.Entities.Rubric", b =>
+                {
+                    b.HasOne("Bsd.Domain.Entities.EmployeeRubricAssignment", null)
+                        .WithMany("AllowedRubrics")
+                        .HasForeignKey("EmployeeRubricAssignmentId");
                 });
 
             modelBuilder.Entity("Bsd.Domain.Entities.BsdEntity", b =>
                 {
-                    b.Navigation("EmployeeRubrics");
+                    b.Navigation("EmployeeRubricAssignments");
+
+                    b.Navigation("Employees");
+                });
+
+            modelBuilder.Entity("Bsd.Domain.Entities.EmployeeRubricAssignment", b =>
+                {
+                    b.Navigation("AllowedRubrics");
                 });
 #pragma warning restore 612, 618
         }
