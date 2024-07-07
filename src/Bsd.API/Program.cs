@@ -1,7 +1,6 @@
 using Bsd.API.Helpers;
 using Bsd.API.Middlewares;
 
-using Bsd.Application.Helpers.Interfaces;
 using Bsd.Application.Interfaces;
 using Bsd.Application.Services;
 using Bsd.Application.Helpers;
@@ -10,7 +9,6 @@ using Bsd.Domain.Services.Interfaces;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Service.Interfaces;
 using Bsd.Domain.Entities;
-using Bsd.Domain.Persistence.RepositoryImpl;
 using Bsd.Domain.Service;
 using Bsd.Domain.Services;
 
@@ -20,6 +18,7 @@ using Bsd.Infrastructure.RepositoryImpl;
 using Microsoft.EntityFrameworkCore;
 
 using Serilog;
+using Bsd.Infrastructure.Data;
 
 // Configuração do Serilog
 Log.Logger = new LoggerConfiguration()
@@ -47,21 +46,16 @@ try
 
     builder.Services.AddScoped<IEmployeeService, EmployeeService>();
     builder.Services.AddScoped<IBsdService, BsdService>();
-    builder.Services.AddScoped<IRubricService, RubricService>();
     builder.Services.AddScoped<IDayTypeChecker, DayTypeChecker>();
     builder.Services.AddScoped<IHolidayChecker, HolidayChecker>();
     builder.Services.AddScoped<IVariableDateHolidayAdjuster, VariableDateHolidayAdjuster>();
 
     builder.Services.AddScoped<IGeralRepository, GeralRepository>();
-    builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
     builder.Services.AddScoped<IBsdRepository, BsdRepository>();
-    builder.Services.AddScoped<IRubricRepository, RubricRepository>();
+    builder.Services.AddScoped<IStaticDataService, DataService>();
 
     builder.Services.AddScoped<IBsdApplicationService, BsdApplicationService>();
-    builder.Services.AddScoped<IEmployeeApplicationService, EmployeeApplicationService>();
-    builder.Services.AddScoped<IRubricApplicationService, RubricApplicationService>();
 
-    builder.Services.AddScoped<IEmployeeValidationService, EmployeeValidationService>();
     builder.Services.AddScoped<IDateHelper, DateHelper>();
 
     // Configuração dos controllers e Swagger
