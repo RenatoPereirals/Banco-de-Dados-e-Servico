@@ -9,9 +9,6 @@ namespace Bsd.Infrastructure.Context
 #pragma warning disable CS8618
         public BsdDbContext(DbContextOptions<BsdDbContext> options) : base(options) { }
         public DbSet<BsdEntity> BsdEntities { get; set; }
-        public DbSet<Employee> Employees { get; set; }
-        public DbSet<Rubric> Rubrics { get; set; }
-        public DbSet<EmployeeRubric> EmployeeRubrics { get; set; }
 
 #pragma warning restore CS8618
 
