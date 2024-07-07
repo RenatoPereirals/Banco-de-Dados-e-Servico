@@ -4,7 +4,7 @@ namespace Bsd.Domain.Enums
     {
         Workday,
         Sunday,
-        HoliDay,
+        Holiday,
         SundayAndHoliday
     }
 }
