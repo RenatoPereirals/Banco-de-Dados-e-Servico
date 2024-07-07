@@ -1,6 +1,6 @@
 using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
-using Bsd.Domain.Services.Interfaces;
+
 using Bsd.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,46 +10,17 @@ namespace Bsd.Infrastructure.RepositoryImpl
     {
         private readonly BsdDbContext _context;
         private readonly IGeralRepository _geralRepository;
-        private readonly IDayTypeChecker _dayTypeChecker;
-        private readonly IBsdService _bsdServece;
         public BsdRepository(BsdDbContext context,
-                             IGeralRepository geralRepository,
-                             IDayTypeChecker dayTypeChecker,
-                             IBsdService bsdService) : base(context)
+                             IGeralRepository geralRepository) : base(context)
         {
             _context = context;
             _geralRepository = geralRepository;
-            _dayTypeChecker = dayTypeChecker;
-            _bsdServece = bsdService;
         }
 
         public async Task<bool> CreateBsdAsync(BsdEntity bsd)
         {
-            try
-            {
-                var day = _dayTypeChecker.GetDayType(bsd.DateService);
-
-                var bsdEntity = new BsdEntity
-                {
-                    BsdId = bsd.BsdId,
-                    DateService = bsd.DateService,
-                    DayType = day,
-                    Employees = await AddEmployeeToBsdAsync(bsd),
-                    EmployeeRubrics = await _bsdServece.AssociateRubricsToEmployeesAsync(bsd, day)
-                };
-
-                _geralRepository.Create(bsdEntity);
-                return await _geralRepository.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                var innerException = ex.InnerException;
-                throw new DbUpdateException($"Erro ao tentar criar BSD.");
-            }
-            catch (Exception)
-            {
-                throw new Exception("Erro interno inesperado, tente novamente.");
-            }
+            _context.Add(bsd);
+            return (await _context.SaveChangesAsync()) > 0;
         }
 
         public async Task<IEnumerable<BsdEntity>> GetBsdEntitiesByDateRangeAsync(DateTime startDate, DateTime endDate)
