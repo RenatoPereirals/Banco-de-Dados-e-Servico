@@ -6,24 +6,28 @@ using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Entities;
 
 using AutoMapper;
+using Bsd.Domain.Enums;
 
 namespace Bsd.Application.Services
 {
     public class BsdApplicationService : IBsdApplicationService
     {
         private readonly IBsdRepository _bsdRepository;
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IBsdService _bsdService;
         private readonly IDateHelper _dateHelper;
+        private readonly IStaticDataService _staticaData;
         private readonly IMapper _mapper;
 
         public BsdApplicationService(IBsdRepository bsdRepository,
-                                     IEmployeeRepository employeeRepository,
+                                     IBsdService bsdService,
                                      IDateHelper dateHelper,
+                                     IStaticDataService staticData,
                                      IMapper mapper)
         {
             _bsdRepository = bsdRepository;
-            _employeeRepository = employeeRepository;
+            _bsdService = bsdService;
             _dateHelper = dateHelper;
+            _staticaData = staticData;
             _mapper = mapper;
         }
 
@@ -35,16 +39,14 @@ namespace Bsd.Application.Services
 
             var bsd = _mapper.Map<BsdEntity>(request);
 
-            if (await _bsdRepository.CreateBsdAsync(bsd))
+            if (await _bsdService.CreateBsdAsync(bsd))
             {
-                foreach (var registration in request.EmployeeRegistrations)
+                var employee = _staticaData.GetEmployeeById(request.EmployeeId);
+                if (employee != null)
                 {
-                    var employee = await _employeeRepository.GetEmployeeByRegistrationAsync(registration);
-                    if (employee != null)
-                    {
-                        await _bsdRepository.AddEmployeeToBsdAsync(bsd);
-                    }
+                    await _bsdRepository.AddEmployeeToBsdAsync(bsd);
                 }
+
                 var bsdReturn = await _bsdRepository.GetBsdByIdAsync(bsd.BsdId);
                 return _mapper.Map<CreateBsdRequest>(bsdReturn);
             }
