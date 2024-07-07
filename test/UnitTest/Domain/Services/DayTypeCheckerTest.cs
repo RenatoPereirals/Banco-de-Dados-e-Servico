@@ -73,7 +73,7 @@ namespace test.Domain.Services.TestDataBase
         {
             // Arrange
             var holidayDate = _dateHelper.ParseDate("01/01/2024");
-            var expectedDayType = DayType.HoliDay;
+            var expectedDayType = DayType.Holiday;
 
             _mockHolidayChecker
                 .Setup(hc => hc.IsHoliday(It.IsAny<DateTime>()))
