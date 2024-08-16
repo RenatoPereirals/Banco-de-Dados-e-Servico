@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bsd.Infrastructure", "src\B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bsd.Application", "src\Bsd.Application\Bsd.Application.csproj", "{2A632B48-84E4-4847-B887-792DDFAF7A97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bsd.API", "src\Bsd.API\Bsd.API.csproj", "{B509FD28-5EF4-45AA-92AD-6F0A6D48FFEC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bsd.API", "src\Bsd.API\Bsd.API.csproj", "{B509FD28-5EF4-45AA-92AD-6F0A6D48FFEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bsd.ExternalService", "src\Bsd.ExternalService\Bsd.ExternalService.csproj", "{742EF0F3-BB01-41DC-B43D-954DF5BF4282}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{B509FD28-5EF4-45AA-92AD-6F0A6D48FFEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B509FD28-5EF4-45AA-92AD-6F0A6D48FFEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B509FD28-5EF4-45AA-92AD-6F0A6D48FFEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{742EF0F3-BB01-41DC-B43D-954DF5BF4282}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{742EF0F3-BB01-41DC-B43D-954DF5BF4282}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{742EF0F3-BB01-41DC-B43D-954DF5BF4282}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{742EF0F3-BB01-41DC-B43D-954DF5BF4282}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,5 +56,9 @@ Global
 		{E44443DC-12B0-479F-B33D-DFE5D34C0345} = {F56482AC-53D0-4118-8AF3-ABA7F96653D1}
 		{2A632B48-84E4-4847-B887-792DDFAF7A97} = {F56482AC-53D0-4118-8AF3-ABA7F96653D1}
 		{B509FD28-5EF4-45AA-92AD-6F0A6D48FFEC} = {F56482AC-53D0-4118-8AF3-ABA7F96653D1}
+		{742EF0F3-BB01-41DC-B43D-954DF5BF4282} = {F56482AC-53D0-4118-8AF3-ABA7F96653D1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {100BD486-1F53-4233-88A7-CA5EF657F48F}
 	EndGlobalSection
 EndGlobal
