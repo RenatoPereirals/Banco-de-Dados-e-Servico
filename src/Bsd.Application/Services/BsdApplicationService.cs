@@ -2,86 +2,79 @@ using Bsd.Application.Interfaces;
 using Bsd.Application.DTOs;
 
 using Bsd.Domain.Services.Interfaces;
-using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Entities;
 
-using AutoMapper;
-using Bsd.Domain.Enums;
 
 namespace Bsd.Application.Services
 {
     public class BsdApplicationService : IBsdApplicationService
     {
-        private readonly IBsdRepository _bsdRepository;
-        private readonly IBsdService _bsdService;
-        private readonly IDateHelper _dateHelper;
-        private readonly IStaticDataService _staticaData;
-        private readonly IMapper _mapper;
+        private readonly IExternalApiService _externalApiService;
+        private readonly IMarkService _markService;
+        private readonly IReportService _reportService;
+        private readonly IStaticDataService _staticDataService;
 
-        public BsdApplicationService(IBsdRepository bsdRepository,
-                                     IBsdService bsdService,
-                                     IDateHelper dateHelper,
-                                     IStaticDataService staticData,
-                                     IMapper mapper)
+        public BsdApplicationService(IExternalApiService externalApiService,
+                                     IMarkService markService,
+                                     IReportService reportService,
+                                     IStaticDataService staticDataService)
         {
-            _bsdRepository = bsdRepository;
-            _bsdService = bsdService;
-            _dateHelper = dateHelper;
-            _staticaData = staticData;
-            _mapper = mapper;
+            _externalApiService = externalApiService;
+            _markService = markService;
+            _reportService = reportService;
+            _staticDataService = staticDataService;
         }
 
-        public async Task<CreateBsdRequest> CreateBsdAsync(CreateBsdRequest request)
+        public async Task<bool> GenerateReportAsync(ReportRequest request)
         {
-            RequestValidation(request);
+            var employees = await GetEmployeesAsync();
+            var marks = await GetMarksForEmployeesAsync(employees, request);
 
-            request.DateServiceDate = _dateHelper.ParseDate(request.DateService);
+            var processedMarks = await _markService.ProcessMarksAsync(marks);
 
-            var bsd = _mapper.Map<BsdEntity>(request);
+            var reportGenerated = await GenerateReportAsync(processedMarks, request.OutputPath);
 
-            if (await _bsdService.CreateBsdAsync(bsd))
+            return reportGenerated;
+        }
+
+        private async Task<IEnumerable<Employee>> GetEmployeesAsync()
+        {
+            return await _staticDataService.GetEmployeesAsync();
+        }
+
+        private async Task<ICollection<MarkResponse>> GetMarksForEmployeesAsync(IEnumerable<Employee> employees, ReportRequest request)
+        {
+            var employeeIds = employees.Select(e => e.EmployeeId).ToList();
+            var markRequest = new MarkRequest(employeeIds)
             {
-                var employee = _staticaData.GetEmployeeById(request.EmployeeId);
-                if (employee != null)
+                DataInicio = request.DataInicio,
+                DataFim = request.DataFim
+            };
+            return await _externalApiService.GetMarkAsync(markRequest);
+        }
+
+        private async Task<bool> GenerateReportAsync(ICollection<BsdEntity> processedMarks, string outputPath)
+        {
+            var reportResponses = processedMarks
+                .SelectMany(bsdEntity => bsdEntity.Employees
+                    .SelectMany(employee => employee.Rubrics.Select(rubric => new
+                    {
+                        employee.EmployeeId,
+                        rubric.RubricId,
+                        TotalHours = rubric.TotalWorkedHours
+                    })))
+                .GroupBy(x => new { x.EmployeeId, x.RubricId })
+                .Select(g => new ReportResponse
                 {
-                    await _bsdRepository.AddEmployeeToBsdAsync(bsd);
-                }
+                    MatriculaPessoa = g.Key.EmployeeId,
+                    Rubric = g.Key.RubricId,
+                    TotalHours = g.Sum(x => x.TotalHours)
+                })
+                .OrderBy(r => r.MatriculaPessoa)
+                .ThenBy(r => r.Rubric)
+                .ToList();
 
-                var bsdReturn = await _bsdRepository.GetBsdByIdAsync(bsd.BsdId);
-                return _mapper.Map<CreateBsdRequest>(bsdReturn);
-            }
-
-            throw new ApplicationException("Falha ao criar BSD no banco de dados.");
-        }
-
-        private static void RequestValidation(CreateBsdRequest request)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request), "Você precisa preencher todos os dados.");
-            }
-
-            var bsdNumer = request.BsdNumber.ToString();
-
-            if (bsdNumer.Length != 6)
-            {
-                throw new ArgumentOutOfRangeException(nameof(request), "O número do BSD deve conter 6 digitos.");
-            }
-
-            if (request.BsdNumber <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(request), "O número do BSD não pode ser negativo.");
-            }
-
-            if (string.IsNullOrWhiteSpace(request.DateService))
-            {
-                throw new ArgumentException("DateService não pode ser vazio ou nulo.", nameof(request));
-            }
-
-            if (request.Digit < 0 || request.Digit > 11)
-            {
-                throw new ArgumentOutOfRangeException(nameof(request), "Digito incorreto.");
-            }
+            return await _reportService.GenerateReport(reportResponses, outputPath);
         }
 
     }
