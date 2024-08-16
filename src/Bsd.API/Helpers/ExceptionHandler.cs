@@ -1,13 +1,26 @@
-using Newtonsoft.Json;
 using Bsd.API.ViewModels;
+
+using Bsd.Application.Utilities;
+
+using Newtonsoft.Json;
+using Serilog;
 using System.Net;
 
 namespace Bsd.API.Helpers
 {
     public class ExceptionHandler
     {
-        public static Task HandleExceptionAsync(HttpContext context, Exception ex)
+        private static readonly bool IsDevelopmentOrQa = AppSettings.DevelopmentEnvironment == "Qa" || AppSettings.DevelopmentEnvironment == "Development";
+
+        public static async Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
+            if (context.Response.HasStarted)
+            {
+                // Log a warning e retorne se a resposta já começou
+                Log.Warning("A resposta já começou, não é possível modificar o status ou escrever no corpo.");
+                return;
+            }
+
             ErrorResponseVm errorResponseVm;
             HttpStatusCode statusCode;
 
@@ -23,8 +36,7 @@ namespace Bsd.API.Helpers
                     break;
                 default:
                     statusCode = HttpStatusCode.InternalServerError;
-                    if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ||
-                        Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Qa")
+                    if (IsDevelopmentOrQa)
                     {
                         errorResponseVm = new ErrorResponseVm(statusCode.ToString(),
                                                               $"{ex.Message} {ex?.InnerException?.Message}");
@@ -37,11 +49,12 @@ namespace Bsd.API.Helpers
                     break;
             }
 
+            context.Response.Clear(); // Limpa a resposta antes de definir novos cabeçalhos
             context.Response.StatusCode = (int)statusCode;
+            context.Response.ContentType = "application/json";
 
             var result = JsonConvert.SerializeObject(errorResponseVm);
-            context.Response.ContentType = "application/json";
-            return context.Response.WriteAsync(result);
+            await context.Response.WriteAsync(result);
         }
     }
 
