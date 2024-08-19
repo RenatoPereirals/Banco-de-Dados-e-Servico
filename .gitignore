@@ -490,3 +490,9 @@ serviceDependencies.local.json
 *.db
 *.db-shm
 *.db-wal
+
+# Ignorar arquivos .txt gerados
+*.txt
+
+# Ignorar arquivos com dados sensíveis
+StaticData.cs
