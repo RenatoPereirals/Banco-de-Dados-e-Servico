@@ -1,3 +1,4 @@
+using Bsd.Domain.Entities;
 using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
 namespace Bsd.Domain.Services
@@ -5,9 +6,45 @@ namespace Bsd.Domain.Services
     public class EmployeeService : IEmployeeService
     {
         private readonly IBsdRepository _bsdRepository;
-        public EmployeeService(IBsdRepository bsdRepository)
+        private readonly IStaticDataService _staticDataService;
+
+        public EmployeeService(IBsdRepository bsdRepository, IStaticDataService staticDataService)
         {
             _bsdRepository = bsdRepository;
+            _staticDataService = staticDataService;
+        }
+
+        public async Task AssociateEmployeesToBsdAsync(ICollection<BsdEntity> bsdEntities, List<int> employeeIds)
+        {
+            var employeeTasks = employeeIds
+                .Distinct()
+                .Select(async id => new { Id = id, Employee = await _staticDataService.GetEmployeeById(id) })
+                .ToList();
+
+            var employees = await Task.WhenAll(employeeTasks);
+
+            var employeeDictionary = employees.ToDictionary(x => x.Id, x => x.Employee);
+
+            foreach (var bsd in bsdEntities)
+            {
+                bsd.Employees = employeeIds
+                    .Where(employeeDictionary.ContainsKey)
+                    .Select(id => employeeDictionary[id])
+                    .ToList();
+            }
+        }
+
+        public async Task<ICollection<Employee>> GetEmployeesByIds(ICollection<int> registrations)
+        {
+            var employees = new List<Employee>();
+
+            foreach (var employeeId in registrations)
+            {
+                var employee = await _staticDataService.GetEmployeeById(employeeId);
+                employees.Add(employee);
+            }
+
+            return employees;
         }
 
         public async Task<int> CalculateEmployeeWorkedDays(int employeeRegistration, DateTime startDate, DateTime endDate)
