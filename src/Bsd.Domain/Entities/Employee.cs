@@ -7,7 +7,7 @@ namespace Bsd.Domain.Entities
     {
         [Key]
         public int EmployeeId { get; set; }
-        public int Digit { get; set; }
         public ServiceType ServiceType { get; set; }
+        public ICollection<Rubric> Rubrics { get; set; } = new List<Rubric>();
     }
 }
