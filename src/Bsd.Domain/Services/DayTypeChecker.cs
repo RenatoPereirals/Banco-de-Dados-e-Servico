@@ -12,25 +12,26 @@ namespace Bsd.Domain.Services
             _holidayChecker = holidayChecker;
         }
 
-        public DayType GetDayType(DateTime date)
+        public Task<DayType> GetDayType(DateTime date)
         {
             if (IsSundayAndHoliday(date))
             {
-                return DayType.SundayAndHoliday;
+                return Task.FromResult(DayType.SundayAndHoliday);
             }
             else if (IsSunday(date))
             {
-                return DayType.Sunday;
+                return Task.FromResult(DayType.Sunday);
             }
             else if (_holidayChecker.IsHoliday(date))
             {
-                return DayType.Holiday;
+                return Task.FromResult(DayType.Holiday);
             }
             else
             {
-                return DayType.Workday;
+                return Task.FromResult(DayType.Workday);
             }
         }
+
 
         private bool IsSundayAndHoliday(DateTime date)
         {
