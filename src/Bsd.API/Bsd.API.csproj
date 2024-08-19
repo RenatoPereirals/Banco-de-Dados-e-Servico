@@ -36,6 +36,7 @@
     <ProjectReference Include="..\Bsd.Domain\Bsd.Domain.csproj" />
     <ProjectReference Include="..\Bsd.Application\Bsd.Application.csproj" />
     <ProjectReference Include="..\Bsd.Infrastructure\Bsd.Infrastructure.csproj" />
+    <ProjectReference Include="..\Bsd.ExternalService\Bsd.ExternalService.csproj" />
   </ItemGroup>
 
   <ItemGroup>
