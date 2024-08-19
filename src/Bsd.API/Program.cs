@@ -1,4 +1,3 @@
-using Bsd.API.Helpers;
 using Bsd.API.Middlewares;
 
 using Bsd.Application.Interfaces;
@@ -14,11 +13,13 @@ using Bsd.Domain.Services;
 
 using Bsd.Infrastructure.Context;
 using Bsd.Infrastructure.RepositoryImpl;
+using Bsd.Infrastructure.Data;
+
+using Bsd.ExternalService.Service;
 
 using Microsoft.EntityFrameworkCore;
 
 using Serilog;
-using Bsd.Infrastructure.Data;
 
 // Configuração do Serilog
 Log.Logger = new LoggerConfiguration()
@@ -49,14 +50,20 @@ try
     builder.Services.AddScoped<IDayTypeChecker, DayTypeChecker>();
     builder.Services.AddScoped<IHolidayChecker, HolidayChecker>();
     builder.Services.AddScoped<IVariableDateHolidayAdjuster, VariableDateHolidayAdjuster>();
+    builder.Services.AddScoped<IRubricService, RubricService>();
 
     builder.Services.AddScoped<IGeralRepository, GeralRepository>();
     builder.Services.AddScoped<IBsdRepository, BsdRepository>();
     builder.Services.AddScoped<IStaticDataService, DataService>();
 
     builder.Services.AddScoped<IBsdApplicationService, BsdApplicationService>();
-
+    builder.Services.AddScoped<IMarkService, MarkService>();
+    builder.Services.AddScoped<IReportService, ReportService>();
     builder.Services.AddScoped<IDateHelper, DateHelper>();
+    builder.Services.AddScoped<IMarkProcessor, MarkProcessor>();
+    builder.Services.AddScoped<ICalculateRubricHours, CalculateRubricHours>();
+
+    builder.Services.AddScoped<IExternalApiService, ExternalApiService>();
 
     // Configuração dos controllers e Swagger
     builder.Services.AddControllersWithViews();
