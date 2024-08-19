@@ -1,6 +1,4 @@
-using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
-using Bsd.Domain.Enums;
 using Bsd.Domain.Entities;
 
 namespace Bsd.Domain.Services
@@ -8,64 +6,41 @@ namespace Bsd.Domain.Services
     public class BsdService : IBsdService
     {
         private readonly IDayTypeChecker _dayTypeChecker;
-        private readonly IBsdRepository _bsdRepository;
-        private readonly IStaticDataService _staticDataService;
+        private readonly IRubricService _rubricService;
+        private readonly ICalculateRubricHours _calculateRubricHours;
 
         public BsdService(IDayTypeChecker dayTypeChecker,
-                          IBsdRepository bsdRepository,
-                          IStaticDataService staticDataService)
+                          IRubricService rubricService,
+                          ICalculateRubricHours calculateRubricsHours)
         {
             _dayTypeChecker = dayTypeChecker;
-            _bsdRepository = bsdRepository;
-            _staticDataService = staticDataService;
+            _rubricService = rubricService;
+            _calculateRubricHours = calculateRubricsHours;
         }
 
-        public async Task<bool> CreateBsdAsync(BsdEntity bsd)
+        public async Task<BsdEntity> CreateBsdAsync(BsdEntity bsd)
         {
-            var day = _dayTypeChecker.GetDayType(bsd.DateService);
+            var day = await _dayTypeChecker.GetDayType(bsd.DateService); // verificar se esse método é redundante
 
             bsd.DayType = day;
-            bsd.EmployeeRubricAssignments = AddEmployeeRubricAssignmentToBsd(bsd);
+            await _rubricService.AssociateRubricAsync(bsd);
 
-            return await _bsdRepository.CreateBsdAsync(bsd);
+            return bsd;
         }
 
-        private List<EmployeeRubricAssignment> AddEmployeeRubricAssignmentToBsd(BsdEntity bsd)
+        public async Task<ICollection<BsdEntity>> CreateOrUpdateBsdsAsync(ICollection<BsdEntity> bsds)
         {
-            var employeeRubricAssignments = new List<EmployeeRubricAssignment>();
-            var day = _dayTypeChecker.GetDayType(bsd.DateService);
+            var responses = new List<BsdEntity>();
 
-            foreach (var employee in bsd.Employees)
+            _calculateRubricHours.CalculateTotalWorkedHours(bsds);
+
+            foreach (var bsd in bsds)
             {
-                var allowedRubrics = GetAllowedRubrics(employee, day);
-                var assignment = new EmployeeRubricAssignment
-                {
-                    EmployeeId = employee.EmployeeId,
-                    AllowedRubrics = allowedRubrics
-                };
-                employeeRubricAssignments.Add(assignment);
+                await CreateBsdAsync(bsd);
+                responses.Add(bsd);
             }
 
-            return employeeRubricAssignments;
-        }
-
-        private List<Rubric> GetAllowedRubrics(Employee employee, DayType dayType)
-        {
-            var rubrics = _staticDataService.GetRubrics();
-
-            return dayType switch
-            {
-                DayType.Workday => rubrics
-                                        .Where(r => r.ServiceType == employee.ServiceType && r.DayType == DayType.Workday)
-                                        .ToList(),
-                DayType.Holiday => rubrics
-                                        .Where(r => r.ServiceType == employee.ServiceType && r.DayType == DayType.Holiday)
-                                        .ToList(),
-                DayType.Sunday => rubrics
-                                        .Where(r => r.ServiceType == employee.ServiceType && r.DayType == DayType.Sunday)
-                                        .ToList(),
-                _ => new List<Rubric>(),
-            };
+            return responses;
         }
     }
 }
