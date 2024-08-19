@@ -3,10 +3,10 @@ using Bsd.Domain.Entities;
 namespace Bsd.Domain.Services.Interfaces
 {
     public interface IStaticDataService
-    {
-        Employee GetEmployeeById(int employeeId);
-        IEnumerable<Employee> GetEmployees();
+    {        
+        Task<Employee> GetEmployeeById(int employeeId);
+        Task<IEnumerable<Employee>> GetEmployeesAsync();
         Rubric GetRubricById(int rubricId);
-        IEnumerable<Rubric> GetRubrics();
+        Task<IEnumerable<Rubric>> GetRubrics();
     }
 }

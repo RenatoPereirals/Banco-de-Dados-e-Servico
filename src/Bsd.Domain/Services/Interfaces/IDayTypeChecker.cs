@@ -4,6 +4,6 @@ namespace Bsd.Domain.Services.Interfaces
 {
     public interface IDayTypeChecker
     {
-        DayType GetDayType(DateTime dateTime);
+        Task<DayType> GetDayType(DateTime dateTime);
     }
 }
