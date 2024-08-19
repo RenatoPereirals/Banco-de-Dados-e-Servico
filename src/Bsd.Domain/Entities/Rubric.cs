@@ -7,9 +7,9 @@ namespace Bsd.Domain.Entities
     {
         [Key]
         public int RubricId { get; set; }
-        public string Description { get; set; } =string.Empty;
-        public decimal HoursPerDay { get; set; }
         public DayType DayType { get; set; }
         public ServiceType ServiceType { get; set; }
+        public decimal HoursPerDay { get; set; }
+        public decimal TotalWorkedHours { get; set; }
     }
 }
