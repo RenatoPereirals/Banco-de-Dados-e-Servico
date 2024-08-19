@@ -1,10 +1,10 @@
 using Bsd.Domain.Entities;
-using Bsd.Domain.Enums;
 
 namespace Bsd.Domain.Services.Interfaces
 {
     public interface IBsdService
     {
-        Task<bool> CreateBsdAsync(BsdEntity bsd);
+        Task<BsdEntity> CreateBsdAsync(BsdEntity bsd);
+        Task<ICollection<BsdEntity>> CreateOrUpdateBsdsAsync(ICollection<BsdEntity> bsds);
     }
 }
