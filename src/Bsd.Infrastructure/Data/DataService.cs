@@ -5,14 +5,17 @@ namespace Bsd.Infrastructure.Data
 {
     public class DataService : IStaticDataService
     {
-        public Employee GetEmployeeById(int employeeId)
+        public Task<Employee> GetEmployeeById(int employeeId)
         {
-            return StaticData.Employees.FirstOrDefault(e => e.EmployeeId == employeeId)!;
+            var employee = StaticData.Employees.FirstOrDefault(e => e.EmployeeId == employeeId) ??
+                throw new ArgumentException($"Funcionário com mátricula {employeeId} não encontrado.");
+            return Task.FromResult(employee);
         }
 
-        public IEnumerable<Employee> GetEmployees()
+        public Task<IEnumerable<Employee>> GetEmployeesAsync()
         {
-            return StaticData.Employees ?? Enumerable.Empty<Employee>();
+            var employees = StaticData.Employees ?? Enumerable.Empty<Employee>();
+            return Task.FromResult(employees);
         }
 
         public Rubric GetRubricById(int rubricId)
@@ -20,9 +23,10 @@ namespace Bsd.Infrastructure.Data
             return StaticData.Rubrics.FirstOrDefault(e => e.RubricId == rubricId)!;
         }
 
-        public IEnumerable<Rubric> GetRubrics()
+        public Task<IEnumerable<Rubric>> GetRubrics()
         {
-            return StaticData.Rubrics ?? Enumerable.Empty<Rubric>();
+            var rubrics = StaticData.Rubrics ?? Enumerable.Empty<Rubric>();
+            return Task.FromResult(rubrics);
         }
     }
 }
