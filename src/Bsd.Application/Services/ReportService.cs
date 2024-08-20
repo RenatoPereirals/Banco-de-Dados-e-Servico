@@ -2,6 +2,7 @@
 using Bsd.Application.DTOs;
 
 using System.Text;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Bsd.Application.Services
 {
@@ -17,6 +18,22 @@ namespace Bsd.Application.Services
             await File.WriteAllLinesAsync(outputPath, lines, Encoding.UTF8);
 
             return true;
+        }
+
+        public string GenerateOutputPath()
+        {
+            var reportDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Report");
+
+            if (!Directory.Exists(reportDirectory))
+            {
+                Directory.CreateDirectory(reportDirectory);
+            }
+
+            var fileName = $"Report_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+
+            var outputPath = Path.Combine(reportDirectory, fileName);
+
+            return outputPath;
         }
     }
 }
