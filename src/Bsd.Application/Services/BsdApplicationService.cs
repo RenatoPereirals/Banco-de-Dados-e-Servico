@@ -13,16 +13,19 @@ namespace Bsd.Application.Services
         private readonly IMarkService _markService;
         private readonly IReportService _reportService;
         private readonly IStaticDataService _staticDataService;
+        private readonly IBsdService _bsdService;
 
         public BsdApplicationService(IExternalApiService externalApiService,
                                      IMarkService markService,
                                      IReportService reportService,
-                                     IStaticDataService staticDataService)
+                                     IStaticDataService staticDataService,
+                                     IBsdService bsdService)
         {
             _externalApiService = externalApiService;
             _markService = markService;
             _reportService = reportService;
             _staticDataService = staticDataService;
+            _bsdService = bsdService;
         }
 
         public async Task<bool> GenerateReportAsync(ReportRequest request)
@@ -30,9 +33,14 @@ namespace Bsd.Application.Services
             var employees = await GetEmployeesAsync();
             var marks = await GetMarksForEmployeesAsync(employees, request);
 
-            var processedMarks = await _markService.ProcessMarksAsync(marks);
+            // Processa as marcas para gerar os WorkedDays e associá-los aos funcionários
+            // esse método não está associando corretamente as datas de inicio e fim dos dias trabalhados e as horas de entrada e saída
+            var processedEmployees = await _markService.ProcessMarksAsync(marks);
+            // Cria os bsdEntity com os funcionários processados
+            var bsdEntity = await CreatebsdEntity(processedEmployees);
 
-            var reportGenerated = await GenerateReportAsync(processedMarks, request.OutputPath);
+            var outputPath = _reportService.GenerateOutputPath();
+            var reportGenerated = await CreateReportAsync(bsdEntity, outputPath);
 
             return reportGenerated;
         }
@@ -53,21 +61,29 @@ namespace Bsd.Application.Services
             return await _externalApiService.GetMarkAsync(markRequest);
         }
 
-        private async Task<bool> GenerateReportAsync(ICollection<BsdEntity> processedMarks, string outputPath)
+        // Método para criar os bsdEntity com os funcionários processados
+        private async Task<BsdEntity> CreatebsdEntity(BsdEntity bsdEntity)
         {
-            var reportResponses = processedMarks
-                .SelectMany(bsdEntity => bsdEntity.Employees
-                    .SelectMany(employee => employee.Rubrics.Select(rubric => new
-                    {
-                        employee.EmployeeId,
-                        rubric.RubricId,
-                        TotalHours = rubric.TotalWorkedHours
-                    })))
-                .GroupBy(x => new { x.EmployeeId, x.RubricId })
+            await _bsdService.CreateOrUpdateBsdsAsync(bsdEntity);
+
+            return bsdEntity;
+        }
+
+        private async Task<bool> CreateReportAsync(BsdEntity bsdEntity, string outputPath)
+        {
+            var reportResponses = bsdEntity
+                .Employees
+                .SelectMany(employee => employee.Rubrics, (employee, rubric) => new ReportResponse
+                {
+                    MatriculaPessoa = employee.EmployeeId,
+                    Rubric = rubric.RubricId,
+                    TotalHours = rubric.TotalWorkedHours
+                })
+                .GroupBy(x => new { x.MatriculaPessoa, x.Rubric })
                 .Select(g => new ReportResponse
                 {
-                    MatriculaPessoa = g.Key.EmployeeId,
-                    Rubric = g.Key.RubricId,
+                    MatriculaPessoa = g.Key.MatriculaPessoa,
+                    Rubric = g.Key.Rubric,
                     TotalHours = g.Sum(x => x.TotalHours)
                 })
                 .OrderBy(r => r.MatriculaPessoa)
@@ -76,6 +92,5 @@ namespace Bsd.Application.Services
 
             return await _reportService.GenerateReport(reportResponses, outputPath);
         }
-
     }
 }
