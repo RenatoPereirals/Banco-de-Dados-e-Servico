@@ -8,6 +8,7 @@ namespace Bsd.Domain.Entities
         [Key]
         public int EmployeeId { get; set; }
         public ServiceType ServiceType { get; set; }
+        public ICollection<WorkedDay> WorkedDays { get; set; } = new List<WorkedDay>();
         public ICollection<Rubric> Rubrics { get; set; } = new List<Rubric>();
     }
 }
