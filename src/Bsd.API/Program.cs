@@ -53,7 +53,6 @@ try
     builder.Services.AddScoped<IRubricService, RubricService>();
 
     builder.Services.AddScoped<IGeralRepository, GeralRepository>();
-    builder.Services.AddScoped<IBsdRepository, BsdRepository>();
     builder.Services.AddScoped<IStaticDataService, DataService>();
 
     builder.Services.AddScoped<IBsdApplicationService, BsdApplicationService>();
