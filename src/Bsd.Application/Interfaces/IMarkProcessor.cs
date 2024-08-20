@@ -5,6 +5,6 @@ namespace Bsd.Application.Interfaces
 {
     public interface IMarkProcessor
     {
-        ICollection<BsdEntity> ProcessMarks(ICollection<MarkResponse> markResponses);
+        ICollection<Employee> ProcessMarks(ICollection<MarkResponse> markResponses);
     }
 }
