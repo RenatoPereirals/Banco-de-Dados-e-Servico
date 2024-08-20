@@ -1,104 +1,42 @@
-using Bsd.Domain.Entities;
-using Bsd.Domain.Repository.Interfaces;
 using Bsd.Domain.Services.Interfaces;
-namespace Bsd.Domain.Services
+using Bsd.Domain.Entities;
+
+namespace Bsd.Domain.Services;
+
+public class EmployeeService : IEmployeeService
 {
-    public class EmployeeService : IEmployeeService
+    private readonly IStaticDataService _staticDataService;
+
+    public EmployeeService(IStaticDataService staticDataService)
     {
-        private readonly IBsdRepository _bsdRepository;
-        private readonly IStaticDataService _staticDataService;
+        _staticDataService = staticDataService;
+    }
 
-        public EmployeeService(IBsdRepository bsdRepository, IStaticDataService staticDataService)
-        {
-            _bsdRepository = bsdRepository;
-            _staticDataService = staticDataService;
-        }
+    public async Task<BsdEntity> AssociateEmployeesToBsdAsync(ICollection<Employee> employees)
+    {
+        BsdEntity bsd = new();
 
-        public async Task AssociateEmployeesToBsdAsync(ICollection<BsdEntity> bsdEntities, List<int> employeeIds)
-        {
-            var employeeTasks = employeeIds
-                .Distinct()
-                .Select(async id => new { Id = id, Employee = await _staticDataService.GetEmployeeById(id) })
-                .ToList();
+        var employeeIds = employees.Select(e => e.EmployeeId).Distinct().ToList();
 
-            var employees = await Task.WhenAll(employeeTasks);
+        var employeeTasks = employeeIds.Select(id => _staticDataService.GetEmployeeById(id));
+        var employeeResults = await Task.WhenAll(employeeTasks);
+        var employeeDictionary = employeeIds.Zip(employeeResults, (id, employee) => new { Id = id, Employee = employee })
+            .ToDictionary(x => x.Id, x => x.Employee);
 
-            var employeeDictionary = employees.ToDictionary(x => x.Id, x => x.Employee);
+        bsd.Employees = employees
+            .Where(e => employeeDictionary.ContainsKey(e.EmployeeId))
+            .Select(e => employeeDictionary[e.EmployeeId])
+            .ToList();
 
-            foreach (var bsd in bsdEntities)
-            {
-                bsd.Employees = employeeIds
-                    .Where(employeeDictionary.ContainsKey)
-                    .Select(id => employeeDictionary[id])
-                    .ToList();
-            }
-        }
+        return bsd;
+    }
 
-        public async Task<ICollection<Employee>> GetEmployeesByIds(ICollection<int> registrations)
-        {
-            var employees = new List<Employee>();
-
-            foreach (var employeeId in registrations)
-            {
-                var employee = await _staticDataService.GetEmployeeById(employeeId);
-                employees.Add(employee);
-            }
-
-            return employees;
-        }
-
-        public async Task<int> CalculateEmployeeWorkedDays(int employeeRegistration, DateTime startDate, DateTime endDate)
-        {
-            var bsdEntities = await _bsdRepository.GetAllBsdAsync();
-            return bsdEntities
-                .Where(bsdDate => bsdDate.DateService >= startDate && bsdDate.DateService <= endDate)
-                .SelectMany(bsdEntity => bsdEntity.Employees)
-                .Count(employee => employeeRegistration == employee.EmployeeId);
-        }
-
-        public int CalculateModulo11CheckDigit(int registrationValue)
-        {
-            string registration = registrationValue.ToString();
-            ValidateRegistrationLength(registration);
-            ValidateRegistrationCharacters(registration);
-
-            int sum = CalculateWeightedSum(registration);
-            int mod = sum % 11;
-
-            return 11 - mod;
-        }
-
-        private static void ValidateRegistrationLength(string registration)
-        {
-            if (registration.Length != 4)
-            {
-                throw new ArgumentException($"A matrícula {registration} deve conter exatamente 4 dígitos.");
-            }
-        }
-
-        private static void ValidateRegistrationCharacters(string registration)
-        {
-            if (!registration.All(char.IsDigit))
-            {
-                throw new ArgumentException($"A matrícula {registration}, deve conter apenas números.");
-            }
-        }
-
-        private static int CalculateWeightedSum(string registration)
-        {
-            int sum = 0;
-            int weight = registration.Length + 1;
-
-            foreach (char digitChar in registration)
-            {
-                if (!int.TryParse(digitChar.ToString(), out int digit))
-                    throw new FormatException($"O caractere {digitChar} é inválido na matrícula");
-
-                sum += digit * weight;
-                weight--;
-            }
-
-            return sum;
-        }
+    public async Task<ICollection<Employee>> GetEmployeesByRegistrationIdsAsync(ICollection<int> registrationIds)
+    {
+        var employeeTasks = registrationIds.Select(id => _staticDataService.GetEmployeeById(id));
+        var employeeResults = await Task.WhenAll(employeeTasks);
+        var employees = employeeResults.ToList();
+    
+        return employees;
     }
 }
