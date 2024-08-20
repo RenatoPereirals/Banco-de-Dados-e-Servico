@@ -1,54 +1,51 @@
+using Bsd.Domain.Enums;
 using Bsd.Domain.Service.Interfaces;
 using Bsd.Domain.Services.Interfaces;
-using Bsd.Domain.Enums;
 
-namespace Bsd.Domain.Services
+namespace Bsd.Domain.Services;
+
+public class DayTypeChecker : IDayTypeChecker
 {
-    public class DayTypeChecker : IDayTypeChecker
+    private readonly IHolidayChecker _holidayChecker;
+    public DayTypeChecker(IHolidayChecker holidayChecker)
     {
-        private readonly IHolidayChecker _holidayChecker;
-        public DayTypeChecker(IHolidayChecker holidayChecker)
-        {
-            _holidayChecker = holidayChecker;
-        }
+        _holidayChecker = holidayChecker;
+    }
 
-        public Task<DayType> GetDayType(DateTime date)
+    public DayType GetDayType(DateTime date)
+    {
+        if (IsSundayAndHoliday(date))
         {
-            if (IsSundayAndHoliday(date))
-            {
-                return Task.FromResult(DayType.SundayAndHoliday);
-            }
-            else if (IsSunday(date))
-            {
-                return Task.FromResult(DayType.Sunday);
-            }
-            else if (_holidayChecker.IsHoliday(date))
-            {
-                return Task.FromResult(DayType.Holiday);
-            }
-            else
-            {
-                return Task.FromResult(DayType.Workday);
-            }
+            return DayType.SundayAndHoliday;
         }
-
-
-        private bool IsSundayAndHoliday(DateTime date)
+        else if (IsSunday(date))
         {
-            if (date.DayOfWeek == DayOfWeek.Sunday && _holidayChecker.IsHoliday(date))
-            {
-                return true;
-            }
-            return false;
+            return DayType.Sunday;
         }
-
-        private static bool IsSunday(DateTime date)
+        else if (_holidayChecker.IsHoliday(date))
         {
-            if (date.DayOfWeek == DayOfWeek.Sunday)
-            {
-                return true;
-            }
-            return false;
+            return DayType.Holiday;
         }
+        else
+        {
+            return DayType.Workday;
+        }
+    }
+
+    private bool IsSundayAndHoliday(DateTime date)
+    {
+        bool isSunday = date.DayOfWeek == DayOfWeek.Sunday;
+        bool isHoliday = _holidayChecker.IsHoliday(date);
+    
+        return isSunday && isHoliday;
+    }
+
+    private static bool IsSunday(DateTime date)
+    {
+        if (date.DayOfWeek == DayOfWeek.Sunday)
+        {
+            return true;
+        }
+        return false;
     }
 }
