@@ -9,6 +9,5 @@ namespace Bsd.Application.DTOs
 
         [Required(ErrorMessage = "O campo {0} é obrigatória.")]
         public string DataFim { get; set; } = string.Empty;
-        public string OutputPath { get; set; } = string.Empty;
     }
 }
