@@ -1,26 +1,41 @@
 using Bsd.Domain.Entities;
 using Bsd.Domain.Services.Interfaces;
 
-namespace Bsd.Domain.Services
+namespace Bsd.Domain.Services;
+public class CalculateRubricHours : ICalculateRubricHours
 {
-    public class CalculateRubricHours : ICalculateRubricHours
+    public void CalculateTotalWorkedHours(BsdEntity bsdEntity)
     {
-        public void CalculateTotalWorkedHours(IEnumerable<BsdEntity> bsdEntities)
+        var worker = bsdEntity.Employees.FirstOrDefault();
+
+        if (worker != null)
         {
-            var rubricAssignments = bsdEntities.SelectMany(bsd => bsd.Employees);
-            var allowedRubrics = rubricAssignments.SelectMany(r => r.Rubrics);
+            var rubrics = worker.Rubrics;
 
-            var groupedRubrics = allowedRubrics.GroupBy(r => r.RubricId);
+            var totalHoursByRubric = new Dictionary<int, decimal>();
 
-            foreach (var group in groupedRubrics)
+            foreach (var rubric in rubrics)
             {
-                var totalHours = group.Sum(r => r.HoursPerDay);
-
-                foreach (var rubric in group)
+                if (totalHoursByRubric.ContainsKey(rubric.RubricId))
                 {
-                    rubric.TotalWorkedHours = totalHours;
+                    totalHoursByRubric[rubric.RubricId] += rubric.HoursPerDay;
+                }
+                else
+                {
+                    totalHoursByRubric[rubric.RubricId] = rubric.HoursPerDay;
                 }
             }
+
+            foreach (var rubric in rubrics)
+            {
+                rubric.TotalWorkedHours = totalHoursByRubric[rubric.RubricId];
+            }
+        }
+        else
+        {
+            throw new InvalidOperationException($"No employees found in BSD entity.");
         }
     }
 }
+
+
