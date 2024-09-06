@@ -12,10 +12,10 @@ namespace Bsd.Infrastructure.Data
             return Task.FromResult(employee);
         }
 
-        public Task<IEnumerable<Employee>> GetEmployeesAsync()
+        public ICollection<Employee> GetEmployees()
         {
-            var employees = StaticData.Employees ?? Enumerable.Empty<Employee>();
-            return Task.FromResult(employees);
+            var employees = StaticData.Employees;
+            return employees;
         }
 
         public Rubric GetRubricById(int rubricId)
