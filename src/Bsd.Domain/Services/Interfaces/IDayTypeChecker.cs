@@ -1,9 +1,8 @@
 using Bsd.Domain.Enums;
 
-namespace Bsd.Domain.Services.Interfaces
+namespace Bsd.Domain.Services.Interfaces;
+
+public interface IDayTypeChecker
 {
-    public interface IDayTypeChecker
-    {
-        Task<DayType> GetDayType(DateTime dateTime);
-    }
+    DayType GetDayType(DateTime dateTime);
 }

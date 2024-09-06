@@ -1,11 +1,9 @@
 using Bsd.Domain.Entities;
 
-namespace Bsd.Domain.Services.Interfaces
+namespace Bsd.Domain.Services.Interfaces;
+
+public interface IEmployeeService
 {
-    public interface IEmployeeService
-    {
-        Task<int> CalculateEmployeeWorkedDays(int employeeRegistration, DateTime startDate, DateTime endDate);
-        Task AssociateEmployeesToBsdAsync(ICollection<BsdEntity> bsdEntities, List<int> employeesIds);
-        int CalculateModulo11CheckDigit(int registration);
-    }
+    Task<ICollection<Employee>> GetEmployeesByRegistrationIdsAsync(ICollection<int> registrationIds);
+    Task<BsdEntity> AssociateEmployeesToBsdAsync(ICollection<Employee> employees);
 }

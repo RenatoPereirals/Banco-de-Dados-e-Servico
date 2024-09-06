@@ -1,8 +1,7 @@
-namespace Bsd.Domain.Service.Interfaces
+namespace Bsd.Domain.Services.Interfaces;
+
+public interface IHolidayChecker
 {
-    public interface IHolidayChecker
-    {
-        bool IsHoliday(DateTime dateTime);
-        bool IsHolidayEve(DateTime date);
-    }
+    bool IsHoliday(DateTime dateTime);
+    bool IsHolidayEve(DateTime date);
 }

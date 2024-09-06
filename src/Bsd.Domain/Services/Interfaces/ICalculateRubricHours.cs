@@ -1,9 +1,8 @@
 using Bsd.Domain.Entities;
 
-namespace Bsd.Domain.Services.Interfaces
+namespace Bsd.Domain.Services.Interfaces;
+
+public interface ICalculateRubricHours
 {
-    public interface ICalculateRubricHours
-    {
-        void CalculateTotalWorkedHours(IEnumerable<BsdEntity> bsdEntities);
-    }
+    void CalculateTotalWorkedHours(BsdEntity bsdEntity);
 }

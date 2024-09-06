@@ -1,7 +1,6 @@
-namespace Bsd.Domain.Service.Interfaces
+namespace Bsd.Domain.Services.Interfaces;
+
+public interface IVariableDateHolidayAdjuster
 {
-    public interface IVariableDateHolidayAdjuster
-    {
-        bool IsVariableHoliday(DateTime date);
-    }
+    bool IsVariableHoliday(DateTime date);
 }
