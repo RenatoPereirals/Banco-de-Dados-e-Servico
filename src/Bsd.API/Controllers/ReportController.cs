@@ -11,31 +11,25 @@ namespace Bsd.API.Controllers
     [Route("api/[controller]")]
     public class ReportController : Controller
     {
-        private readonly IBsdApplicationService _bsdApplication;
+        private readonly IReportService _reportService;
 
-        public ReportController(IBsdApplicationService bsdApplication)
+        public ReportController(IReportService reportService)
         {
-            _bsdApplication = bsdApplication;
+            _reportService = reportService;
         }
 
-        [HttpPost("generate")]
+        [HttpPost()]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> GenerateReport([FromBody] ReportRequest request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(nameof(ModelState));
-
-            var result = await _bsdApplication.GenerateReportAsync(request);
+            var result = await _reportService.ProcessReportAsync(request);
 
             if (result)
                 return Ok("Report generation initiated successfully.");
             else
                 return StatusCode((int)HttpStatusCode.InternalServerError, "Failed to generate the report.");
-
         }
     }
 }
