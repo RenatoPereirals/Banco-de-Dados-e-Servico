@@ -1,41 +1,38 @@
-using Bsd.Domain.Entities;
 using Bsd.Domain.Services.Interfaces;
+using Bsd.Domain.Entities;
 
-namespace Bsd.Domain.Services;
-public class CalculateRubricHours : ICalculateRubricHours
+namespace Bsd.Domain.Services
 {
-    public void CalculateTotalWorkedHours(BsdEntity bsdEntity)
+    public class CalculateRubricHours : ICalculateRubricHours
     {
-        var worker = bsdEntity.Employees.FirstOrDefault();
-
-        if (worker != null)
+        public void CalculateTotalWorkedHours(BsdEntity bsdEntity)
         {
-            var rubrics = worker.Rubrics;
+            if (bsdEntity.Employees == null || !bsdEntity.Employees.Any())
+                throw new InvalidOperationException("No employees found in BSD entity.");
 
-            var totalHoursByRubric = new Dictionary<int, decimal>();
-
-            foreach (var rubric in rubrics)
+            foreach (var employee in bsdEntity.Employees)
             {
-                if (totalHoursByRubric.ContainsKey(rubric.RubricId))
-                {
-                    totalHoursByRubric[rubric.RubricId] += rubric.HoursPerDay;
-                }
-                else
-                {
-                    totalHoursByRubric[rubric.RubricId] = rubric.HoursPerDay;
-                }
-            }
+                var hoursPerRubric = new Dictionary<int, decimal>();
 
-            foreach (var rubric in rubrics)
-            {
-                rubric.TotalWorkedHours = totalHoursByRubric[rubric.RubricId];
+                foreach (var rubric in employee.Rubrics)
+                {
+                    if (hoursPerRubric.ContainsKey(rubric.RubricId))
+                        hoursPerRubric[rubric.RubricId] += rubric.HoursPerDay;
+                    else
+                        hoursPerRubric[rubric.RubricId] = rubric.HoursPerDay;
+                }
+
+                var newRubrics = hoursPerRubric.Select(entry => new Rubric
+                {
+                    RubricId = entry.Key,
+                    TotalWorkedHours = entry.Value,
+                    HoursPerDay = employee.Rubrics.First(r => r.RubricId == entry.Key).HoursPerDay, 
+                    DayType = employee.Rubrics.First(r => r.RubricId == entry.Key).DayType,
+                    ServiceType = employee.Rubrics.First(r => r.RubricId == entry.Key).ServiceType
+                }).ToList();
+
+                employee.Rubrics = newRubrics;
             }
-        }
-        else
-        {
-            throw new InvalidOperationException($"No employees found in BSD entity.");
         }
     }
 }
-
-
