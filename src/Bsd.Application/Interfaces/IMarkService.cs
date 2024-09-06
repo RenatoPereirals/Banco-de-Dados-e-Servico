@@ -2,10 +2,10 @@ using Bsd.Application.DTOs;
 
 using Bsd.Domain.Entities;
 
-namespace Bsd.Application.Interfaces
+namespace Bsd.Application.Interfaces;
+
+public interface IMarkService
 {
-    public interface IMarkService
-    {
-        Task<BsdEntity> ProcessMarksAsync(ICollection<MarkResponse> marks);
-    }
+    Task<ICollection<MarkResponse>> GetMarksForEmployeesAsync(IEnumerable<Employee> employees, ReportRequest request);
+    ICollection<Employee> ProcessMarksAsync(ICollection<MarkResponse> markResponses);
 }
