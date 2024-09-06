@@ -15,41 +15,53 @@ public class RubricService : IRubricService
         _dayTypeChecker = dayTypeChecker;
     }
 
-    public async Task AssociateRubricAsync(BsdEntity bsd)
+    public async Task AssociateRubricsToEmployeeAsync(BsdEntity bsdEntity)
     {
-        var existingRubricIds = new HashSet<int>();
-        
-        foreach (var employee in bsd.Employees)
+        if (bsdEntity.Employees == null || !bsdEntity.Employees.Any())
+            throw new InvalidOperationException("No employees found in BSD entity.");
+
+        foreach (var employee in bsdEntity.Employees)
         {
             var rubrics = new List<Rubric>();
-        
-            foreach (var workedDay in employee.WorkedDays)
+
+            if (employee.WorkedDays == null || employee.WorkedDays.Count == 0)
+                throw new Exception("Employee does not have worked days");
+
+            else
             {
-                var dayType = _dayTypeChecker.GetDayType(workedDay.DateEntry);
-        
-                var allowedRubrics = await GetAllowedRubric(employee, dayType);
-        
-                existingRubricIds.Clear();
-                existingRubricIds.UnionWith(rubrics.Select(r => r.RubricId));
-                rubrics.AddRange(allowedRubrics.Where(r => !existingRubricIds.Contains(r.RubricId)));
-            }
-        
-            employee.Rubrics = rubrics;
+                foreach (var workedDay in employee.WorkedDays)
+                {
+                    var dayType = _dayTypeChecker.GetDayType(workedDay.DateEntry);
+
+                    var allowedRubrics = await GetAllowedRubric(employee.ServiceType, dayType);
+
+                    rubrics.AddRange(allowedRubrics);
+                }
+            }            
+
+            employee.Rubrics = rubrics;           
         }
     }
 
-    public async Task<ICollection<Rubric>> GetAllowedRubric(Employee employee, DayType dayType)
+    public async Task<ICollection<Rubric>> GetAllowedRubric(ServiceType serviceType, DayType dayType)
     {
         var rubrics = await _staticDataService.GetRubrics();
 
         var rubricMappings = new Dictionary<DayType, Func<IEnumerable<Rubric>>>
         {
-            { DayType.Workday, () => rubrics.Where(r => r.ServiceType == employee.ServiceType && r.DayType == DayType.Workday) },
-            { DayType.Holiday, () => rubrics.Where(r => r.ServiceType == employee.ServiceType && r.DayType == DayType.Holiday) },
-            { DayType.Sunday, () => rubrics.Where(r => r.ServiceType == employee.ServiceType && r.DayType == DayType.Sunday) },
-            { DayType.SundayAndHoliday, () => rubrics.Where(r => r.ServiceType == employee.ServiceType && r.DayType == DayType.SundayAndHoliday) },
+            { DayType.Workday, () => rubrics.Where(r => r.ServiceType == serviceType && r.DayType == DayType.Workday) },
+            { DayType.Holiday, () => rubrics.Where(r => r.ServiceType == serviceType && r.DayType == DayType.Holiday) },
+            { DayType.Sunday, () => rubrics.Where(r => r.ServiceType == serviceType && r.DayType == DayType.Sunday) },
+            { DayType.SundayAndHoliday, () => rubrics.Where(r => r.ServiceType == serviceType && r.DayType == DayType.SundayAndHoliday) },
         };
 
-        return rubricMappings.TryGetValue(dayType, out var value) ? value.Invoke().ToList() : new List<Rubric>();
+        if (rubricMappings.TryGetValue(dayType, out var getRubrics))
+        {
+            var result = getRubrics().ToList();
+            return result;
+        }
+        else
+            return new List<Rubric>();
     }
+
 }
