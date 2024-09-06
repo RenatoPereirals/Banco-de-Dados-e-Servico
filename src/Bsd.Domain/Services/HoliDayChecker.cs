@@ -1,4 +1,4 @@
-using Bsd.Domain.Service.Interfaces;
+using Bsd.Domain.Services.Interfaces;
 
 namespace Bsd.Domain.Entities;
 
@@ -12,7 +12,7 @@ public class HolidayChecker : IHolidayChecker
         _variableDateHolidayAdjuster = variableDateHolidayAdjuster;
     }
 
-    // Lista de feriados fixos (mês, dia)
+    // List of fixed holidays (month, day)
     private static readonly List<(int, int)> FixedHolidays = new()
     {
         (1, 1),  (3, 6), (4, 7), (4, 21), (5, 1), (6, 24),
