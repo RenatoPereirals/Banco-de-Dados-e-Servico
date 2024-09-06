@@ -25,13 +25,14 @@ namespace Bsd.Application.Helpers
             string dateDecoded = System.Net.WebUtility.UrlDecode(date);
             string[] formats = { "dd/MM/yyyy", "MM/dd/yyyy", "d/M/yyyy", "yyyy-MM-dd" };
             if (DateTime.TryParseExact(dateDecoded, formats, _culture, DateTimeStyles.None, out DateTime parsedDate))
-            {
                 return parsedDate;
-            }
             else
-            {
                 throw new FormatException("Invalid date format");
-            }
+        }
+
+        public string ParseString(DateTime date)
+        {
+            return date.ToString("dd/MM/yyyy", _culture);
         }
 
         public DateTime CreateDateTime(int year, int month, int day, int hour = 0, int minute = 0)
