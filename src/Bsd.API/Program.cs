@@ -6,9 +6,7 @@ using Bsd.Application.Helpers;
 
 using Bsd.Domain.Services.Interfaces;
 using Bsd.Domain.Repository.Interfaces;
-using Bsd.Domain.Service.Interfaces;
 using Bsd.Domain.Entities;
-using Bsd.Domain.Service;
 using Bsd.Domain.Services;
 
 using Bsd.Infrastructure.Context;
