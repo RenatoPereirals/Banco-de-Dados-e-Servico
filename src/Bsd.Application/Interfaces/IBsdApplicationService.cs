@@ -1,9 +1,8 @@
-using Bsd.Application.DTOs;
+using Bsd.Domain.Entities;
 
-namespace Bsd.Application.Interfaces
+namespace Bsd.Application.Interfaces;
+
+public interface IBsdApplicationService
 {
-    public interface IBsdApplicationService
-    {
-        Task<bool> GenerateReportAsync(ReportRequest request);
-    }
+    Task<BsdEntity> CreatebsdEntityAsync(ICollection<Employee> employees);
 }
