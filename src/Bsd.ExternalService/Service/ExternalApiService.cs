@@ -38,13 +38,9 @@ namespace Bsd.ExternalService.Service
             var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<MarkResponse>>>(responseJson);
 
             if (apiResponse!.Sucesso)
-            {
                 return apiResponse.Obj;
-            }
             else
-            {
                 throw new InvalidOperationException($"Erro na requisição: {apiResponse.Mensagem}");
-            }
         }
 
     }
