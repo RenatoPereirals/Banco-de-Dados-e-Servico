@@ -49,7 +49,7 @@ namespace Bsd.API.Helpers
                     break;
             }
 
-            context.Response.Clear(); // Limpa a resposta antes de definir novos cabeçalhos
+            context.Response.Clear();
             context.Response.StatusCode = (int)statusCode;
             context.Response.ContentType = "application/json";
 
