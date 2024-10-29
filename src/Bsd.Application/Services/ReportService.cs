@@ -26,20 +26,51 @@ public class ReportService : IReportService
         _dateHelper = dateHalper;
     }
 
+    public async Task<bool> ProcessReportByIdAsync(ReportRequest request, IEnumerable<Employee> employees)
+    {
+        var parseDate = _dateHelper.ParseDate(request.DataFim).AddDays(1);
+        request.DataFim = _dateHelper.ParseString(parseDate);
+
+        ICollection<MarkResponse> marks = await _markService.GetMarksForEmployeesAsync(employees, request)
+            ?? throw new Exception("Não foi possível recuperar as marcações");
+
+        ICollection<Employee> processedEmployees = _markService.ProcessMarksAsync(marks)
+            ?? throw new Exception("Não foi possível processar as marcações");
+
+        var bsdEntity = await _bsdApplicationService.CreatebsdEntityAsync(processedEmployees)
+            ?? throw new Exception("Não foi possível criar as marcações");
+
+        var outputPath = GenerateOutputPath()
+            ?? throw new Exception("Local inválido para o relatatório.");
+
+        bool reportGenerated = await CreateReportAsync(bsdEntity, outputPath);
+
+        if (!reportGenerated)
+            throw new Exception("Error generating report");
+
+        return reportGenerated;
+    }
+
     public async Task<bool> ProcessReportAsync(ReportRequest request)
     {
-        var employees = _staticDataService.GetEmployees();
+        var employees = _staticDataService.GetEmployees() 
+            ?? throw new Exception("Employees not found");
 
         var parseDate = _dateHelper.ParseDate(request.DataFim).AddDays(1);
         request.DataFim = _dateHelper.ParseString(parseDate);
 
-        var marks = await _markService.GetMarksForEmployeesAsync(employees, request);
+        ICollection<MarkResponse> marks = await _markService.GetMarksForEmployeesAsync(employees, request) 
+            ?? throw new Exception("Não foi possível recuperar as marcações");
 
-        ICollection<Employee> processedEmployees = _markService.ProcessMarksAsync(marks);
+        ICollection<Employee> processedEmployees = _markService.ProcessMarksAsync(marks)
+            ?? throw new Exception("Não foi possível processar as marcações");
 
-        var bsdEntity = await _bsdApplicationService.CreatebsdEntityAsync(processedEmployees);
+        var bsdEntity = await _bsdApplicationService.CreatebsdEntityAsync(processedEmployees)
+            ?? throw new Exception("Não foi possível criar as marcações");
 
-        var outputPath = GenerateOutputPath();
+        var outputPath = GenerateOutputPath() 
+            ?? throw new Exception("Local inválido para o relatatório.");
+
         bool reportGenerated = await CreateReportAsync(bsdEntity, outputPath);
 
         if (!reportGenerated)
@@ -63,7 +94,6 @@ public class ReportService : IReportService
     private async Task<bool> CreateReportAsync(BsdEntity bsdEntity, string outputPath)
     {
         var reportResponses = new List<ReportResponse>();
-
 
         foreach (var employee in bsdEntity.Employees)
         {
