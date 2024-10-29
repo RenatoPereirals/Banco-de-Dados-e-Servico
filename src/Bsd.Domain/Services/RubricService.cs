@@ -26,7 +26,6 @@ public class RubricService : IRubricService
 
             if (employee.WorkedDays == null || employee.WorkedDays.Count == 0)
                 throw new Exception("Employee does not have worked days");
-
             else
             {
                 foreach (var workedDay in employee.WorkedDays)
@@ -37,9 +36,8 @@ public class RubricService : IRubricService
 
                     rubrics.AddRange(allowedRubrics);
                 }
-            }            
-
-            employee.Rubrics = rubrics;           
+            }
+            employee.Rubrics = rubrics;
         }
     }
 
@@ -47,21 +45,10 @@ public class RubricService : IRubricService
     {
         var rubrics = await _staticDataService.GetRubrics();
 
-        var rubricMappings = new Dictionary<DayType, Func<IEnumerable<Rubric>>>
-        {
-            { DayType.Workday, () => rubrics.Where(r => r.ServiceType == serviceType && r.DayType == DayType.Workday) },
-            { DayType.Holiday, () => rubrics.Where(r => r.ServiceType == serviceType && r.DayType == DayType.Holiday) },
-            { DayType.Sunday, () => rubrics.Where(r => r.ServiceType == serviceType && r.DayType == DayType.Sunday) },
-            { DayType.SundayAndHoliday, () => rubrics.Where(r => r.ServiceType == serviceType && r.DayType == DayType.SundayAndHoliday) },
-        };
+        var result = rubrics
+            .Where(r => r.ServiceType.HasFlag(serviceType) && r.DayType.HasFlag(dayType))
+            .ToList();
 
-        if (rubricMappings.TryGetValue(dayType, out var getRubrics))
-        {
-            var result = getRubrics().ToList();
-            return result;
-        }
-        else
-            return new List<Rubric>();
+        return result;
     }
-
 }

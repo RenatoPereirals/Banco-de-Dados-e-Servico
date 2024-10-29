@@ -6,6 +6,7 @@ namespace Bsd.Domain.Services;
 public class DayTypeChecker : IDayTypeChecker
 {
     private readonly IHolidayChecker _holidayChecker;
+
     public DayTypeChecker(IHolidayChecker holidayChecker)
     {
         _holidayChecker = holidayChecker;
