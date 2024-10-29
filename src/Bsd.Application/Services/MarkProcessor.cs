@@ -15,23 +15,22 @@ namespace Bsd.Application.Services
             _staticDataService = staticDataService;
         }
 
-        public ICollection<Employee> ProcessMarks(ICollection<MarkResponse> marks)
+        public ICollection<Employee> ProcessMarks(ICollection<MarkResponse> markResponses)
         {
-            var groupedMarks = GroupMarksByEmployee(marks);
+
+            List<List<MarkResponse>> groupedMarks = GroupMarksByEmployee(markResponses);
+
             var employees = new List<Employee>();
 
             foreach (var employeeMarks in groupedMarks)
             {
-                var employee = AssignWorkedDaysToEmployee(employeeMarks);
+                Employee employee = AssignWorkedDaysToEmployee(employeeMarks);
                 if (employee != null)
-                {
                     employees.Add(employee);
-                }
             }
 
             return employees;
         }
-
 
         private List<List<MarkResponse>> GroupMarksByEmployee(ICollection<MarkResponse> marks)
         {
@@ -43,16 +42,24 @@ namespace Bsd.Application.Services
             return grouped;
         }
 
-
         private Employee AssignWorkedDaysToEmployee(List<MarkResponse> employeeMarks)
         {
             var employees = _staticDataService.GetEmployees();
-            var employee = employees.FirstOrDefault(e => e.EmployeeId == employeeMarks.First().Matricula) ?? throw new Exception("Employee not found");
+            var employee = employees.FirstOrDefault(e => e.EmployeeId == employeeMarks.First().Matricula) 
+                ?? throw new Exception("Employee not found");
+
             var workedDays = GetWorkedDays(employeeMarks);
 
             foreach (var workedDay in workedDays)
             {
-                employee.WorkedDays.Add(workedDay);
+                // Verifica se já existe um dia com a mesma Data de Entrada e Hora de Início
+                bool isDuplicate = employee.WorkedDays.Any(wd =>
+                    wd.DateEntry == workedDay.DateEntry && wd.StartTime == workedDay.StartTime);
+
+                if (!isDuplicate)
+                {
+                    employee.WorkedDays.Add(workedDay);
+                }
             }
 
             return employee;
@@ -62,50 +69,61 @@ namespace Bsd.Application.Services
         {
             var workedDays = new List<WorkedDay>();
 
-            List<MarkResponse> sortedMarks = employeeMarks.OrderBy(m => new DateTime(m.Ano, m.Mes, m.Dia, m.Hora, m.Minuto, 0)).ToList();
-            MarkResponse startMark = sortedMarks.First();
-            MarkResponse endMark = startMark;
+            MarkResponse? startMark = null;
 
-            bool hasContinuousMarks = false;
-
-            Console.WriteLine($"Processando {sortedMarks.Count} marcaï¿½ï¿½es para o funcionï¿½rio {startMark.Matricula}...");
-
-            for (int i = 1; i < sortedMarks.Count; i++)
+            for (int i = 0; i < employeeMarks.Count; i++)
             {
-                var currentMark = sortedMarks[i];
+                var currentMark = employeeMarks[i];
                 var currentDate = new DateTime(currentMark.Ano, currentMark.Mes, currentMark.Dia);
-                var endDate = new DateTime(endMark.Ano, endMark.Mes, endMark.Dia);
 
-                if (currentDate.Date == endDate.Date.AddDays(1))
+                // Se startMark for null, significa que estamos buscando uma marcação de entrada
+                if (startMark == null)
                 {
-                    endMark = currentMark;
-                    workedDays.Add(CreateWorkedDay(startMark, endMark));
-                    hasContinuousMarks = true;
+                    startMark = currentMark;
                 }
                 else
                 {
-                    startMark = currentMark;
-                    endMark = currentMark;
+                    // Se startMark já está preenchido, o currentMark é tratado como marcação de saída
+                    var endMark = currentMark;
+
+                    // Garante que a marcação de saída é do mesmo dia
+                    if (startMark.Ano == endMark.Ano && startMark.Mes == endMark.Mes && startMark.Dia == endMark.Dia)
+                    {
+                        // Adiciona o dia trabalhado
+                        workedDays.Add(CreateWorkedDay(startMark, endMark));
+
+                        // Reseta startMark para buscar a próxima entrada
+                        startMark = null;
+                    }
+                    else
+                    {
+                        // Se as marcações não forem do mesmo dia, reinicia a marcação de entrada para o próximo dia
+                        startMark = currentMark;
+                    }
                 }
             }
-
-            if (!hasContinuousMarks)
-                workedDays.Clear();
 
             return workedDays;
         }
 
         private WorkedDay CreateWorkedDay(MarkResponse startMark, MarkResponse endMark)
         {
+            var dateEntry = new DateTime(startMark.Ano, startMark.Mes, startMark.Dia);
+
+            var dateExit = (startMark.Dia == endMark.Dia)
+                ? new DateTime(endMark.Ano, endMark.Mes, endMark.Dia).AddDays(1)
+                : new DateTime(endMark.Ano, endMark.Mes, endMark.Dia);
+
             var workedDay = new WorkedDay
             {
-                DateEntry = new DateTime(startMark.Ano, startMark.Mes, startMark.Dia),
-                DateExit = new DateTime(endMark.Ano, endMark.Mes, endMark.Dia),
+                DateEntry = dateEntry,
+                DateExit = dateExit,
                 StartTime = new TimeOnly(startMark.Hora, startMark.Minuto),
                 EndTime = new TimeOnly(endMark.Hora, endMark.Minuto)
             };
 
             return workedDay;
         }
+
     }
 }

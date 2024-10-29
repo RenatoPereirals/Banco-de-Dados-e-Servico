@@ -13,11 +13,10 @@ using Bsd.Infrastructure.Context;
 using Bsd.Infrastructure.RepositoryImpl;
 using Bsd.Infrastructure.Data;
 
-using Bsd.ExternalService.Service;
-
 using Microsoft.EntityFrameworkCore;
 
 using Serilog;
+using Bsd.ExternalService_.Service;
 
 // Configuração do Serilog
 Log.Logger = new LoggerConfiguration()
@@ -91,8 +90,6 @@ try
     app.UseMiddleware<ExceptionMiddleware>();
     app.UseMiddleware<LoggingMiddleware>();
 
-
-    // Configurações gerais
     app.UseHttpsRedirection();
     app.UseAuthorization();
     app.MapControllers();

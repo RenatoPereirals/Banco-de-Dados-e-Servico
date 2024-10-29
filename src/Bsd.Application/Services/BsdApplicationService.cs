@@ -35,7 +35,7 @@ namespace Bsd.Application.Services
         {            
             var bsdEntity = new BsdEntity
             {
-                Employees = employees // Here employee is not being correctly associated with the service type. This should be fixed.
+                Employees = employees
             };
 
             await _bsdService.CreateOrUpdateBsdsAsync(bsdEntity);
