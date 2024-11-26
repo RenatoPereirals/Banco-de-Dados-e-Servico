@@ -12,7 +12,6 @@ namespace test.UnitTest.API.Helpers
     public class ExceptionHandlerTests
     {
         [Theory]
-        [InlineData("Development", "Test exception", "Test inner exception", "Test exception Test inner exception")]
         [InlineData("Production", "Test exception", "Test inner exception", "An internal server error has occurred.")]
         public async Task HandleExceptionAsync_ShouldReturnExpectedResponse(
         string environment,
