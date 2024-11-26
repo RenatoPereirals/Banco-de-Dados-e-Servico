@@ -128,10 +128,7 @@ public class ReportService : IReportService
 
         foreach (var response in reportResponses)
         {
-            if (previousMatricula != null && previousMatricula != response.MatriculaPessoa)
-                lines.Add(string.Empty);
-
-            lines.Add($"{response.MatriculaPessoa:D8};{response.Rubric:D5};{response.TotalHours}");
+            lines.Add($"{response.MatriculaPessoa:D8};{response.Rubric:D5};{response.TotalHours:F2}");
 
             previousMatricula = response.MatriculaPessoa;
         }
@@ -140,7 +137,4 @@ public class ReportService : IReportService
 
         return true;
     }
-
-
-
 }
