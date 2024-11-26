@@ -16,14 +16,14 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '7.0.x'
+          dotnet-version: '9.0.x'
 
       - name: Restore dependencies and build
         run: |
           dotnet restore
           dotnet build --configuration Release
 
-  test:
+  test-unit:
     runs-on: ubuntu-latest
     env:
       SMARTCLOCK_API_URL: ${{ secrets.SMARTCLOCK_API_URL }}
@@ -37,15 +37,10 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '7.0.x'
+          dotnet-version: '9.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore
-        working-directory: ./test
+        run: dotnet restore Bsd.sln
 
-      - name: Test
-        id: test
-        run: |
-          dotnet test
-          echo "total_tests=100" >> $GITHUB_ENV
-          echo "passed_tests=95" >> $GITHUB_ENV
+      - name: Run Unit Tests
+        run: dotnet test tests/Bsd.Tests.Unit/Bsd.Tests.Unit.csproj
