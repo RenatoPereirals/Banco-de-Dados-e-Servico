@@ -495,4 +495,4 @@ serviceDependencies.local.json
 Report/
 
 # Ignorar arquivos com dados sensíveis
-StaticData.cs
+
