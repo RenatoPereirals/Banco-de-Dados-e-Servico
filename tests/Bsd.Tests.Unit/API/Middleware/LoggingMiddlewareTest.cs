@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 
 using System.Net;
 
-namespace test.UnitTest.API.Middleware
+namespace Bsd.Tests.Unit.API.Middleware
 {
     public class LoggingMiddlewareTest
     {

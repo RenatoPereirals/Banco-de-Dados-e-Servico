@@ -2,9 +2,7 @@ using Bsd.Domain.Services.Interfaces;
 using Bsd.Domain.Entities;
 using Bsd.Domain.Services;
 
-using Moq;
-
-namespace test.UnitTest.Domain.Services;
+namespace Bsd.Tests.Unit.Domain.Services;
 
 public class CalculateRubricsHoursTest
 {

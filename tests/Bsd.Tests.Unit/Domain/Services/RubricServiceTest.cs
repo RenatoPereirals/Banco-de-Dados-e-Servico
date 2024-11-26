@@ -2,11 +2,9 @@ using Bsd.Domain.Services.Interfaces;
 using Bsd.Domain.Enums;
 using Bsd.Domain.Entities;
 
-using Moq;
 using Bsd.Domain.Services;
-using FluentAssertions;
 
-namespace test.UnitTest.Domain.Services;
+namespace Bsd.Tests.Unit.Domain.Services;
 
 public class RubricServiceTests
 {

@@ -1,10 +1,9 @@
 using Bsd.Domain.Services.Interfaces;
 using Bsd.Domain.Entities;
 
-using Moq;
 using Bsd.Domain.Services;
 
-namespace test.UnitTest.Domain.Services;
+namespace Bsd.Tests.Unit.Domain.Services;
 
 public class BsdServiceTests
 {
