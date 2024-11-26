@@ -1,26 +1,22 @@
 ﻿using Bsd.Domain.Entities;
-namespace test.Domain.Entities
+
+namespace Bsd.Domain.Tests.Entities
 {
-    public class BsdTest
+    public class BsdEntityTests
     {
         [Fact]
-        public void BsdEntity_ShouldInitializePropertiesWithValues()
+        public void BsdEntity_InitializeEmployees_CreatesEmptyList()
         {
             // Arrange
-            var bsd = new BsdEntity();
-            var expectedBsdNumber = 25123;
-            var expectedDateService = DateTime.UtcNow;
-            var expectedEmployeeList = new List<Employee>();
+            var bsdEntity = new BsdEntity();
 
             // Act
-            bsd.BsdId = expectedBsdNumber;
-            bsd.DateService = expectedDateService;
-            bsd.Employees = expectedEmployeeList;
+            var employees = bsdEntity.Employees;
 
             // Assert
-            Assert.Equal(expectedBsdNumber, bsd.BsdId);
-            Assert.Equal(expectedDateService, bsd.DateService);
-            Assert.Same(expectedEmployeeList, bsd.Employees);
+            Assert.NotNull(employees);
+            Assert.IsType<List<Employee>>(employees);
+            Assert.Empty(employees);
         }
     }
 }
