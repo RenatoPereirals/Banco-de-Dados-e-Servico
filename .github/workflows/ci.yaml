@@ -25,6 +25,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    env:
+      SMARTCLOCK_API_URL: "${{ secrets.SMARTCLOCK_API_URL }}"
 
     steps:
       - name: Checkout code
